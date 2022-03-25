@@ -313,7 +313,8 @@ class epce_calculator:
             Calculates renormalized eigenvalues by doing a thermal average using the 
             Bose Einstein factor. Return renormalized eigenvalues in Ha.
           """
-          be_factor = np.array([1.0+bose_einstein(omega=self.omega[i],omega_unit='Ha',T=T) for i in range(self.nmstart,len(self.nm_disp))])
+          #be_factor = np.array([1.0+bose_einstein(omega=self.omega[i],omega_unit='Ha',T=T) for i in range(self.nmstart,len(self.nm_disp))])
+          be_factor = np.array([1.0+2*bose_einstein(omega=self.omega[i],omega_unit='Ha',T=T) for i in range(self.nmstart,len(self.nm_disp))])
           renorm = np.zeros(self.no_of_orbitals,np.float64)
           #print(be_factor)
           for orbital in range(self.no_of_orbitals):
