@@ -57,4 +57,24 @@ class ipi_info:
              self.mass_shape = eval(self.mass_tree.attrib["shape"])   
              self.mass = np.array([[float(element.strip(",")), float(element.strip(",")),float(element.strip(","))] \
              for element in self.mass_tree.text.split()[1:-1]]).reshape(3*self.mass_shape)
-   
+  
+          ### Reading self.coord ==> coordinates
+          self.coord_tree = file_tree.find("./system/beads/q")
+          if self.coord_tree is None:
+              sys.exit("Optimized geometry coordinates not found in file" + file_path)
+          else:
+              self.coord_shape = eval(self.coord_tree.attrib["shape"])[1]
+              #print(self.coord_shape)
+              self.coord = np.array([float(element.strip(",")) for element in self.coord_tree.text.split()[1:-1]])
+              #print(self.coord[0])
+
+          ### Reading symbols of atoms
+          self.symbol_tree = file_tree.find("./system/beads/names")
+          self.symbols = []
+          if self.symbol_tree is None:
+              sys.exit("Atom symbols not found in file" + file_path)
+          else:
+              for element in self.symbol_tree.text.split()[1:-1]:
+                  self.symbols.append(element.strip(","))
+          #print(self.symbols)
+

@@ -107,7 +107,9 @@ class central_diff:
 
 class dm:
       """
-      A class that stores the essentials of a dynamical matrix
+      A class that stores the essentials of a dynamical matrix.
+      w2[i] = Eigenvalues in ascending order
+      V[:,i] = i-th eigenvector
       """
       def __init__(self,dynmat,mass):
           if len(dynmat) != len(mass):
