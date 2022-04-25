@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 import scipy.stats
 from ipi_file_read import ipi_info
-from froz_phon_classes import dm
+from elph_classes import dm
 from constants import *
 
 

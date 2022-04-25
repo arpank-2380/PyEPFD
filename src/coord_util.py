@@ -2,7 +2,7 @@ import sys, os, re
 import xml.etree.ElementTree as ET
 import numpy as np
 from constants import *
-from froz_phon_classes import nm_sym_displacements,stoch_displacements
+from elph_classes import nm_sym_displacements,stoch_displacements
 
 
 def abc2h(abc):

@@ -4,7 +4,7 @@ import numpy as np
 from ipi_file_read import ipi_info
 from constants import *
 from degeneracy_class import degeneracy
-from froz_phon_classes import *
+from elph_classes import *
 
 inp_dir = "./"
 out_dir = "./"
