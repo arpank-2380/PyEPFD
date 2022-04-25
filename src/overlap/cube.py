@@ -29,7 +29,7 @@ class cube_data:
           """
           square_integral,square = self.power_cube(power=2)
           power4_integral,power4 = self.power_cube(power=4)
-          ipr = power4_integral/square_integral           
+          ipr = power4_integral/(square_integral**2)           
           return ipr
       
       def read_cube_file(self,fname):

@@ -5,8 +5,8 @@ import numpy as np
 import scipy
 import scipy.stats
 from ipi_file_read import ipi_info
-from epce_classes import dm
-from energy_conv import *
+from froz_phon_classes import dm
+from constants import *
 
 
 class nm_info:

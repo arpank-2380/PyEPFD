@@ -1,8 +1,10 @@
-__all__=["epce_calculator"]
+__all__=["dm","epce_calculator","phonon_calculator"]
+
+""" This file contains all the classes relavant to frozen phonon calculation """
 
 import numpy as np
 from ipi_file_read import ipi_info
-from energy_conv import *
+from constants import *
 
 
 def bose_einstein(omega,omega_unit='Ha',T=0.0):
@@ -34,14 +36,13 @@ class central_diff:
            order = order of central difference
            ngrid = symmetric displacement grid for central difference,allowed values 1,2,3 or 4.
                    actual number of points would be double as we do symmetric displacements.
+           decreasing = if True the displacements are in decreasing  order , i.e +2h,+h,-h,-2h        
       """
-      def __init__(self,x,y,order=2,ngrid=4):    
-          self.x = x
-          self.y = y
-          self._sizex = len(x)
-          self._sizey = len(y)
-          self.order = order
-          self.ngrid = ngrid
+      def __init__(self,x,y,order=2,ngrid=4,decreasing=True):    
+          #print("Central_diff class speaking")
+          self.x = x; self.y = y
+          self._sizex = len(x); self._sizey = len(y)
+          self.order = order; self.ngrid = ngrid
           if self._sizey//self._sizex != 2*ngrid:
              raise ValueError("Size of x,y and ngrid are not consistent.")
 
@@ -56,6 +57,8 @@ class central_diff:
               y_data +=  2*self.ngrid
               _x = self.x[row]
               _y = self.y[y_data_start:y_data]
+              if decreasing: _y = np.flip(_y)
+              #print(_x,_y)
               self.cd[row] = self.__cd__(x=_x, y=_y, order=self.order, ngrid=self.ngrid)
           #print(self.cd)
 
@@ -110,23 +113,135 @@ class dm:
       A class that stores the essentials of a dynamical matrix.
       w2[i] = Eigenvalues in ascending order
       V[:,i] = i-th eigenvector
+      It has a method that takes a normal mode displacement as a column vector 
+      and converts them into a column vector of cartesian displacements
       """
       def __init__(self,dynmat,mass):
           if len(dynmat) != len(mass):
              sys.exit("Dynamical matrix and mass matrix are not consistent.")
-          self.dynmatrix = dynmat
+          self.dynmatrix = dynmat; 
           self.w2, self.U = np.linalg.eigh(self.dynmatrix)
           self.V = self.U.copy()
-
+          self.omega = np.sqrt(abs(self.w2)); self.nmodes = len(dynmat)
+          self.natoms = self.nmodes//3
+          self.mass = np.array([mass[3*i] for i in range(len(mass)//3)])
           self.massinv = np.array([1/np.sqrt(mass[i]) for i in range(len(mass))])
-
+          #print(self.massinv)
           for i in range(len(self.V)):
             self.V[:, i] *= self.massinv
+          #print(self.V)  
+
+      def nm2cart_disp(self, nm_disp):
+          """ nm_disp = A 3N-dim column vector of normal mode displacements,
+              returns cart_disp, a 3N-dim column vec containing cartesian displacements.
+          """
+          if len(nm_disp) != self.nmodes:
+             sys.exit("Dimension of NM displacement is not consistent with dynamical matrix.")
+          cart_disp = np.zeros(self.nmodes,np.float64)
+          for icart in range(3*self.natoms):
+              for imode in range(self.nmodes):
+                  cart_disp[icart] += self.V[icart,imode] * nm_disp[imode]
+          return cart_disp        
+
+      def nm2cart_matrix(self,Mnm):
+          """Converts any matrix (Mnm) represented in normal modes to that represented in cartesian(Mcart)"""
+          Mcart = np.dot(self.U, np.dot(Mnm, np.transpose(self.U)))
+          return Mcart
+
+      def cart2nm_vec(self,cart_v,normed=False):
+          """Projects a 3N-dim cartesian vector (coordinate or force) into a normal mode and return coeff"""
+          nm_v = np.zeros(len(self.V), np.float64)
+          for mode_no in range(len(self.V)):
+              if normed:
+                 nm_v[mode_no] = np.dot(cart_v,self.V[:,mode_no])/np.dot(self.V[:,mode_no],self.V[:,mode_no])
+              else:
+                 nm_v[mode_no]  = np.dot(cart_v,self.V[:,mode_no]) 
+          return nm_v
+
+      def apply_asr(self,opt_coord,asr='none'):
+          #print(self.mass)
+          if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'cry'): 
+             pass
+          else:
+             raise ValueError("The allowed values for asr are 'none', 'poly', 'lin', 'cry'") 
+
+          if len(opt_coord) != self.nmodes:
+             raise ValueError("Dimension of opt_coord is not consistent with dynmatrix") 
+          if asr == 'none':
+             return self.dynmatrix
+          coord = np.array(opt_coord).reshape(self.natoms,3)
+          com = np.dot(np.transpose(coord), self.mass) / self.mass.sum()   #center of mass coordinates (com)
+          coord_com = coord - com    # coordinate with respect to com
+          moi = np.zeros((3, 3), np.float64)     #moment of inertia
+          for i in range(self.natoms):
+              moi -= np.dot(np.cross(coord_com[i], np.identity(3)), np.cross(coord_com[i], np.identity(3))) * self.mass[i]
+
+          U = (np.linalg.eig(moi))[1]       ## eigenvectors of moi
+          R = np.dot(coord_com, U)
+          D = np.zeros((3, 3 * self.natoms), np.float64)
+          #print("U:"); print(U); print("R:"); print(R)
+
+          ### Vectors along translations
+          D[0] = np.tile([1, 0, 0], self.natoms) / self.massinv
+          D[1] = np.tile([0, 1, 0], self.natoms) / self.massinv
+          D[2] = np.tile([0, 0, 1], self.natoms) / self.massinv
+
+          ### Vectors along rotations
+          if asr != 'cry':
+             DR = np.zeros((3, 3 * self.natoms), np.float64)
+             for iatom in range(self.natoms):
+                 for icart in range(3):
+                     i = 3*iatom + icart
+                     DR[0, i] = (R[iatom, 1] * U[icart, 2] - R[iatom, 2] * U[icart, 1]) / self.massinv[i]
+                     DR[1, i] = (R[iatom, 2] * U[icart, 0] - R[iatom, 0] * U[icart, 2]) / self.massinv[i]
+                     DR[2, i] = (R[iatom, 0] * U[icart, 1] - R[iatom, 1] * U[icart, 0]) / self.massinv[i]
+             if asr == 'lin':
+                DRnorm = np.zeros(3, np.float64) 
+                for i in range(3):  DRnorm = np.linalg.norm(DR[i])
+                DR = np.delete(DR,np.argmin(DRnorm),axis=0)
+
+             D = np.vstack ((D,DR))
+    
+          for i in range(len(D)): D[i] = D[i] / np.linalg.norm(D[i])  ### normalizing the vectors
+
+          #transformation matrix to project out translation and rotation
+          TM = np.eye(3 * self.natoms) - np.dot(D.T, D)
+          #print("TM:"); print(TM)
+          refdynmatrix = np.dot(TM.T, np.dot(self.dynmatrix, TM))   #refined dynamical matrix
+          return refdynmatrix
+
+class stoch_displacements(dm):
+      def __init__(self,dynmat,mass,asr=None,temperature=0):
+          super(stoch_displacements,self).__init__(dynmat,mass)
+          sigma = np.zeros(self.nmodes,np.float64)
+          for mode in range(self.nmodes):
+              be = bose_einstein(self.omega[mode],omega_unit='Ha',T=temperature)
+              sigma[mode] = np.sqrt((be+0.5)/self.omega[mode])
+
+          if asr == 'crystal': nmstart = 3
+          elif asr == 'lin':   nmstart = 5
+          elif asr == 'poly':  nmstart = 6
+          else:                nmstart = 0
+
+          self.nmdisp = np.zeros((2,self.nmodes),np.float64)
+          for mode in range(self.nmodes):
+              if self.V[0,mode] < 0:
+                  self.V[:,mode] *= -1
+          for mode in range(nmstart,self.nmodes):       
+              if (mode-nmstart)%2 == 0:
+                 self.nmdisp[0,mode] += sigma[mode]
+                 self.nmdisp[1,mode] -= sigma[mode]
+              else:   
+                 self.nmdisp[0,mode] -= sigma[mode]
+                 self.nmdisp[1,mode] += sigma[mode]
+          print(self.nmdisp[0])
+          print(self.nmdisp[1])
 
 
-class nm_sym_displacements:
+class nm_sym_displacements(dm):
       """
-        A class that determines the values of normal mode displacements
+        This is a daughter class of dm.
+        It determines the values of normal mode displacements
         used in i-PI. Only nmfd/enmfd vibrationl modes in i-PI are 
         consistent with this.
       """
@@ -136,26 +251,104 @@ class nm_sym_displacements:
              pass
           else:
              raise NotImplementedError("Allowed modes: nmfd/enmfd")
-          self.deltax = deltax
-          self.deltae = deltae
-          self.dm = dm(dynmat=dynmat,mass=mass)
-          self.displacements = np.zeros(len(self.dm.V),np.float64)
-          self.omega = np.sqrt(abs(self.dm.w2)) 
+          self.deltax = deltax; self.deltae = deltae
+
+          super(nm_sym_displacements,self).__init__(dynmat,mass)
+
+          self.displacements = np.zeros(len(self.V),np.float64)
 
           #print("nm_sym_displacements class speaking")
-        
-          for step in range(len(self.dm.V)):
+          #print(dynmat); print(mass); print(mode); print(deltax); print(deltae)
+
+          self.vknorm = np.zeros(len(self.V),np.float64)
+          for step in range(len(self.V)):
               #print("#Mode= %5d Freq (cm-1) = %10.2f" %(step+1,self.omega[step]*ha2unit['cm-1']))
-              vknorm = np.sqrt(np.dot(self.dm.V[:, step], self.dm.V[:, step]))
+              vknorm = np.sqrt(np.dot(self.V[:, step], self.V[:, step]))
+              self.vknorm[step] = vknorm
               if self.mode == 'nmfd':
                  self.displacements[step] = self.deltax / vknorm
               elif self.mode == 'enmfd':
-                 edelta = vknorm * np.sqrt(self.deltae * 2.0 / abs(self.dm.w2[step]))
+                 edelta = vknorm * np.sqrt(self.deltae * 2.0 / abs(self.w2[step]))
                  if edelta > 100 * self.deltax:
                     edelta = 100 * self.deltax
                  self.displacements[step] = edelta / vknorm
-          self.displacement2 = self.displacements*np.sqrt(abs(self.dm.w2[step]))
-          #print(self.displacement2)                       
+          self.displacement2 = self.displacements*np.sqrt(abs(self.w2[step]))
+          #print(self.displacements)                       
+
+class phonon_calculator:
+      """
+         This class accepts forces and displacements and computes dynamical matrix as Jacobian of force.
+         Arg:
+             forces = (2*ngrid, 3*N) 2D-array. Each row represents 3N-force components
+                      for a specific displaced struc. There are 2*ngrid such displaced struc.
+             mass = mass matrix
+             ngrid = symmetric displacement grid for central difference,allowed values 1,2,3 or 4.
+                     actual number of points would be double as we do symmetric displacements.
+             mode = fd/nmfd/enmfd        
+             
+      """
+      def __init__(self,forces,mass,ngrid=1, mode = 'fd', deltax = 0.005, dynmat = None, deltae =0.001):
+          self.nconfg = forces.shape[0]; self.nmode = forces.shape[1]   ## no of config and no of modes (degrees of freedom)
+          self.forces = forces ; self.ngrid = ngrid 
+          mode = mode.lower()
+          if self.nconfg != 2*self.ngrid*self.nmode + 1: 
+             #print(self.nconfg) 
+             raise ValueError("fdphonon: No of configurations in forces matrix does not match with ngrid/nmode")
+
+          self.dynmat = np.zeros((self.nmode, self.nmode),np.float64)
+          self.hessian = np.zeros((self.nmode, self.nmode),np.float64)
+        
+          #print(self.forces)
+      
+          if mode == 'fd':
+             self.cartdisp = True     ### True if the displacements made are along cartesian  
+             self.massinv = np.array([1/np.sqrt(mass[i]) for i in range(len(mass))])
+             self.displacements = np.ones(self.nmode)*deltax
+          elif (mode == 'nmfd') | (mode == 'enmfd'):
+             if dynmat is None: 
+                raise ValueError("fdphonon: dynmat must be supplied for nmfd/enmfd")
+             if (dynmat.shape[0] != self.nmode) | (dynmat.shape[1] != self.nmode):
+                raise ValueError("fdphonon: dimension of dynmat is not consistent with forces") 
+             self.cartdisp = False 
+             self.nmdisp = nm_sym_displacements(dynmat = dynmat, mass = mass, mode = mode, deltax = deltax, deltae = deltae )
+             self.massinv = self.nmdisp.massinv
+             self.displacements = self.nmdisp.displacements
+             #print(self.forces)
+             #print("fdphonon class speaking:")
+          else: 
+             raise NotImplementedError("Allowed modes: nmfd/enmfd")   
+
+          #print("fdphonon class speaking:")
+          #print(self.displacements)
+          
+          self.calc_phonon()
+
+      def calc_phonon(self):
+          #print("fdphonon.calc_phonon speaking:")
+          #self.dynmat = np.zeros((self.nmode, self.nmode),np.float64)
+          for imode in range(self.nmode):
+              istart = 2*self.ngrid * imode + 1; iend =  2*self.ngrid*(imode+1)+1
+              tmp_forces = -self.forces[istart:iend].transpose().flatten()
+              if self.cartdisp:
+                 displacements = self.displacements 
+                 self.hessian[imode] = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd
+                 self.dynmat[imode] = self.hessian[imode] * self.massinv[imode] * self.massinv
+              else:
+                 displacements =  self.displacements[imode] * np.ones(self.nmode) 
+                 dm_row = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd 
+                 #print("refdm_row:"); print(refdm_row)
+                 self.dynmat[imode] = np.dot(self.nmdisp.V.T,dm_row) 
+
+          if not self.cartdisp: self.dynmat = self.nmdisp.nm2cart_matrix(self.dynmat)
+          self.symmetrize()
+          if not self.cartdisp:
+             for imode in range(self.nmode): 
+                 self.hessian[imode] = self.dynmat[imode] / (self.massinv[imode] * self.massinv)
+
+      def symmetrize(self):
+          #print("fdphonon.symmetrize speaking:")
+          dm = self.dynmat.copy()
+          self.dynmat = 0.50 * ( dm + dm.T)
 
 class epce_calculator:
       """
@@ -193,9 +386,7 @@ class epce_calculator:
           else:
              raise ValueError("vib_freq_unit is not understood") 
 
-          self.logfile = logfile
-
-          self.epce_unit = epce_unit
+          self.logfile = logfile; self.epce_unit = epce_unit
        
           nm_disp_object = nm_sym_displacements(dynmat=dynmat,mass=mass,mode=mode,deltax=deltax,deltae=deltae)
           self.nm_disp = nm_disp_object.displacements
@@ -207,14 +398,10 @@ class epce_calculator:
           self.no_of_orbitals = self.eigval.size // len(self.eigval)
 
 
-          if asr == 'crystal':
-             self.nmstart = 3
-          elif asr == 'lin':
-             self.nmstart = 5
-          elif asr == 'poly':
-             self.nmstart = 6
-          else:
-             self.nmstart = 0
+          if asr == 'crystal': self.nmstart = 3
+          elif asr == 'lin':   self.nmstart = 5
+          elif asr == 'poly':  self.nmstart = 6
+          else:                self.nmstart = 0
 
           self.vib_freq, self.force_const = self.__vib_freq__()
           self.__write__omega__vib_freq()             
@@ -224,20 +411,6 @@ class epce_calculator:
           self.epce_sum = np.sum(self.epce,axis=0)
           self.zpr = 0.5000*self.epce_sum
       
-          #### printing by changing units
-          #print("Displacement Vectors")
-
-          #print(self.nm_disp)
-          ##print("Vibrational freq ( "+ self.vib_freq_unit + " )" ) 
-          ##print(self.vib_freq*ha2unit[self.vib_freq_unit])
-          #print("Force constant ( "+ self.epce_unit + " )" )
-          #print(self.force_const*ha2unit[self.epce_unit])
-          ##print("EPCE ( "+ self.epce_unit + " )" )
-          ##print(self.epce*ha2unit[self.epce_unit])
-          ##print("EPCE SUM ( "+ self.epce_unit + " )" )
-          ##print(self.epce_sum*ha2unit[self.epce_unit])
-          #print("ZPR ("+ self.epce_unit + ")" )
-          #print(self.zpr*ha2unit[self.epce_unit])
 
       def __nm_hessian__(self,displacements,energies):
           """
@@ -294,8 +467,6 @@ class epce_calculator:
              Returns epce in Ha
           """          
           epce = np.zeros((len(self.nm_disp),self.no_of_orbitals),np.float64)
-          #epce_gap = np.zeros(len(self.nm_disp),np.float64)
-          #gap = self.eigval[:,1]-self.eigval[:,0]
 
           for orbital in range(self.no_of_orbitals):
               try:
@@ -306,16 +477,13 @@ class epce_calculator:
                   self.logfile.write("#------------------------------------------------------------------------------------------------\n")
                   self.logfile.write("#Derivative of orbital energy, column 1  unit: au\n")
                   epce = self.__nm_hessian__(self.nm_disp,self.eigval)/(2.0*self.vib_freq)
-              #epce_gap = self.__nm_hessian__(self.nm_disp,gap)/(2.0*self.vib_freq)
           return epce
-          #return epce_gap
 
       def renorm_eigval_at_temp(self,T):
           """
             Calculates renormalized eigenvalues by doing a thermal average using the 
             Bose Einstein factor. Return renormalized eigenvalues in Ha.
           """
-          #be_factor = np.array([1.0+bose_einstein(omega=self.omega[i],omega_unit='Ha',T=T) for i in range(self.nmstart,len(self.nm_disp))])
           be_factor = np.array([1.0+2*bose_einstein(omega=self.omega[i],omega_unit='Ha',T=T) for i in range(self.nmstart,len(self.nm_disp))])
           renorm = np.zeros(self.no_of_orbitals,np.float64)
           #print(be_factor)

@@ -2,9 +2,9 @@
 import sys
 import numpy as np
 from ipi_file_read import ipi_info
-from energy_conv import *
+from constants import *
 from degeneracy_class import degeneracy
-from epce_classes import *
+from froz_phon_classes import *
 
 inp_dir = "./"
 out_dir = "./"
