@@ -119,7 +119,7 @@ class dm:
       def __init__(self,dynmat,mass):
           if len(dynmat) != len(mass):
              sys.exit("Dynamical matrix and mass matrix are not consistent.")
-          self.dynmatrix = dynmat; 
+          self.dynmatrix = dynmat
           self.w2, self.U = np.linalg.eigh(self.dynmatrix)
           self.V = self.U.copy()
           self.omega = np.sqrt(abs(self.w2)); self.nmodes = len(dynmat)
@@ -130,6 +130,12 @@ class dm:
           for i in range(len(self.V)):
             self.V[:, i] *= self.massinv
           #print(self.V)  
+    
+      def calc_hessian(self):
+          """Hessian matrix without mass weighting"""
+          self.hessian = np.copy(self.dynmatrix)
+          for imode in range(self.nmodes):
+              self.hessian[imode] = self.dynmatrix[imode] / (self.massinv[imode] * self.massinv)
 
       def nm2cart_disp(self, nm_disp):
           """ nm_disp = A 3N-dim column vector of normal mode displacements,
@@ -160,10 +166,10 @@ class dm:
 
       def apply_asr(self,opt_coord,asr='none'):
           #print(self.mass)
-          if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'cry'): 
+          if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): 
              pass
           else:
-             raise ValueError("The allowed values for asr are 'none', 'poly', 'lin', 'cry'") 
+             raise ValueError("The allowed values for asr are 'none', 'poly', 'lin', 'crystal'") 
 
           if len(opt_coord) != self.nmodes:
              raise ValueError("Dimension of opt_coord is not consistent with dynmatrix") 
@@ -187,7 +193,7 @@ class dm:
           D[2] = np.tile([0, 0, 1], self.natoms) / self.massinv
 
           ### Vectors along rotations
-          if asr != 'cry':
+          if asr != 'crystal':
              DR = np.zeros((3, 3 * self.natoms), np.float64)
              for iatom in range(self.natoms):
                  for icart in range(3):
