@@ -115,6 +115,7 @@ class dm:
       V[:,i] = i-th eigenvector
       It has a method that takes a normal mode displacement as a column vector 
       and converts them into a column vector of cartesian displacements
+      dynmatrix is the mass weighted hessian, while hessian is not mass weighted
       """
       def __init__(self,dynmat,mass):
           if len(dynmat) != len(mass):
@@ -319,6 +320,7 @@ class phonon_calculator:
              self.nmdisp = nm_sym_displacements(dynmat = dynmat, mass = mass, mode = mode, deltax = deltax, deltae = deltae )
              self.massinv = self.nmdisp.massinv
              self.displacements = self.nmdisp.displacements
+             self._nmforces()
              #print(self.forces)
              #print("fdphonon class speaking:")
           else: 
@@ -331,30 +333,42 @@ class phonon_calculator:
 
       def calc_phonon(self):
           #print("fdphonon.calc_phonon speaking:")
-          #self.dynmat = np.zeros((self.nmode, self.nmode),np.float64)
           for imode in range(self.nmode):
               istart = 2*self.ngrid * imode + 1; iend =  2*self.ngrid*(imode+1)+1
               tmp_forces = -self.forces[istart:iend].transpose().flatten()
-              if self.cartdisp:
+
+              if self.cartdisp: 
                  displacements = self.displacements 
                  self.hessian[imode] = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd
                  self.dynmat[imode] = self.hessian[imode] * self.massinv[imode] * self.massinv
               else:
                  displacements =  self.displacements[imode] * np.ones(self.nmode) 
-                 dm_row = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd 
+                 self.dynmat[imode] = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd
+                 #dm_row = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd 
                  #print("refdm_row:"); print(refdm_row)
-                 self.dynmat[imode] = np.dot(self.nmdisp.V.T,dm_row) 
-
-          if not self.cartdisp: self.dynmat = self.nmdisp.nm2cart_matrix(self.dynmat)
-          self.symmetrize()
-          if not self.cartdisp:
+                 #self.dynmat[imode] = np.dot(self.nmdisp.V.T,dm_row) 
+          
+          #tmp_omega = np.sqrt(abs(self.dynmat))
+          #for i in range(len(self.dynmat)):
+          #    print(tmp_omega[i,i]*ha2unit['cm-1'])
+         
+          if not self.cartdisp: 
+             self.dynmat = self.nmdisp.nm2cart_matrix(self.dynmat)
              for imode in range(self.nmode): 
                  self.hessian[imode] = self.dynmat[imode] / (self.massinv[imode] * self.massinv)
+
+          self.symmetrize()       
 
       def symmetrize(self):
           #print("fdphonon.symmetrize speaking:")
           dm = self.dynmat.copy()
           self.dynmat = 0.50 * ( dm + dm.T)
+          h = self.hessian.copy()
+          self.hessian = 0.50 * ( h + h.T)
+
+      def _nmforces(self):
+          for iconfg in range(len(self.forces)):
+              self.forces[iconfg,:] = self.nmdisp.cart2nm_vec(self.forces[iconfg,:],normed=False)
 
 class epce_calculator:
       """

@@ -25,7 +25,8 @@ class anharm(dm):
 
           for i in range(len(self.disp)):
               self.disp[i] -= opt_coord
-          self.dynmatrix = self.apply_asr(opt_coord = opt_coord ,asr = asr)    
+          refdynmatrix = self.apply_asr(opt_coord = opt_coord ,asr = asr)    
+          self.dynmatrix = refdynmatrix
           self.calc_hessian()
 
       def measure(self,resol='both'): 
@@ -57,7 +58,6 @@ class anharm(dm):
           variance = variance/len(vector)    
           return variance    
 
-
       def _anh_measure(self,coordinate='cartesian'):
           if (coordinate == 'cartesian') | (coordinate == 'normal'): pass
           else: raise ValueError(" anharm: value of coordinate must be either 'cartesian' or 'normal'. ")
@@ -69,8 +69,18 @@ class anharm(dm):
                  disp[i] = self.cart2nm_vec(self.disp[i], normed=True)
              hessian = self.w2 * np.eye(self.nmodes)
              
-
           anh_forces, harm_forces = self._force_decomp(hessian, forces, disp)
+
+          print("#--------------------------------Forces are in %s coordinate-------------------------------------"%coordinate)
+          print("#Coord   Anh_F   Harm_F    Tot_F")   
+          print("#-------------------------------------------------------------------------------------------------")
+          for iconfg in range(len(anh_forces)):
+              print("#Config = %d"%(iconfg+1))
+              for i in range(self.nmodes):
+                  if harm_forces[iconfg,i] * forces[iconfg,i] < 0:
+                     print("%d  %14.6g %14.6g %14.6g"%(i+1,anh_forces[iconfg,i], harm_forces[iconfg,i], forces[iconfg,i]))
+          print("==================================================================================================")
+        
           anh_var = self._variance(anh_forces); tot_var = self._variance(forces)
           anh_measure = np.sqrt(anh_var/tot_var)
           if coordinate == 'cartesian':
