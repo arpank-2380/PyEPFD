@@ -24,9 +24,9 @@ class anharm(dm):
           else: ValueError("anharm: The allowed values for asr are 'none', 'poly', 'lin', 'cry'")
 
           for i in range(len(self.disp)):
-              self.disp[i] -= opt_coord
-          refdynmatrix = self.apply_asr(opt_coord = opt_coord ,asr = asr)    
-          self.dynmatrix = refdynmatrix
+              self.disp[i] -= opt_coord    
+          self.apply_asr(opt_coord = opt_coord ,asr = asr)   
+          self.dynmatrix = self.refdynmatrix; self.U = self.refU; self.V = self.refV; self.w2 = self.refw2; self.omega = self.refomega
           self.calc_hessian()
 
       def measure(self,resol='both'): 
@@ -64,11 +64,13 @@ class anharm(dm):
               
           forces = self.forces.copy(); disp = self.disp.copy(); hessian = self.hessian
           if coordinate == 'normal':
-             for i in range(len(forces)): 
-                 forces[i] = self.cart2nm_vec(self.forces[i], normed=False)
-                 disp[i] = self.cart2nm_vec(self.disp[i], normed=True)
+             for i in range(len(forces)):
+                 forces[i] = self.cart2nm_vec(self.forces[i], normed=False)  
+                 disp[i] = self.cart2nm_vec(self.disp[i], normed=True)   
              hessian = self.w2 * np.eye(self.nmodes)
-             
+             for i in range(len(hessian)):
+                 hessian[i] = hessian[i] * (self.massinv/self.massinv[i])  
+                  
           anh_forces, harm_forces = self._force_decomp(hessian, forces, disp)
 
           print("#--------------------------------Forces are in %s coordinate-------------------------------------"%coordinate)
@@ -77,8 +79,8 @@ class anharm(dm):
           for iconfg in range(len(anh_forces)):
               print("#Config = %d"%(iconfg+1))
               for i in range(self.nmodes):
-                  if harm_forces[iconfg,i] * forces[iconfg,i] < 0:
-                     print("%d  %14.6g %14.6g %14.6g"%(i+1,anh_forces[iconfg,i], harm_forces[iconfg,i], forces[iconfg,i]))
+                  #if harm_forces[iconfg,i] * forces[iconfg,i] < 0:
+                  print("%d  %14.6g %14.6g %14.6g"%(i+1,anh_forces[iconfg,i], harm_forces[iconfg,i], forces[iconfg,i]))
           print("==================================================================================================")
         
           anh_var = self._variance(anh_forces); tot_var = self._variance(forces)

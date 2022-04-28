@@ -127,7 +127,7 @@ class dm:
           self.natoms = self.nmodes//3
           self.mass = np.array([mass[3*i] for i in range(len(mass)//3)])
           self.massinv = np.array([1/np.sqrt(mass[i]) for i in range(len(mass))])
-          #print(self.massinv)
+          print(self.massinv)
           for i in range(len(self.V)):
             self.V[:, i] *= self.massinv
           #print(self.V)  
@@ -175,7 +175,8 @@ class dm:
           if len(opt_coord) != self.nmodes:
              raise ValueError("Dimension of opt_coord is not consistent with dynmatrix") 
           if asr == 'none':
-             return self.dynmatrix
+             self.refdynmatrix = self.dynmatrix.copy()
+             return
           coord = np.array(opt_coord).reshape(self.natoms,3)
           com = np.dot(np.transpose(coord), self.mass) / self.mass.sum()   #center of mass coordinates (com)
           coord_com = coord - com    # coordinate with respect to com
@@ -204,7 +205,7 @@ class dm:
                      DR[2, i] = (R[iatom, 0] * U[icart, 1] - R[iatom, 1] * U[icart, 0]) / self.massinv[i]
              if asr == 'lin':
                 DRnorm = np.zeros(3, np.float64) 
-                for i in range(3):  DRnorm = np.linalg.norm(DR[i])
+                for i in range(3):  DRnorm[i] = np.linalg.norm(DR[i])
                 DR = np.delete(DR,np.argmin(DRnorm),axis=0)
 
              D = np.vstack ((D,DR))
@@ -214,8 +215,14 @@ class dm:
           #transformation matrix to project out translation and rotation
           TM = np.eye(3 * self.natoms) - np.dot(D.T, D)
           #print("TM:"); print(TM)
-          refdynmatrix = np.dot(TM.T, np.dot(self.dynmatrix, TM))   #refined dynamical matrix
-          return refdynmatrix
+          print("I'm here")
+          self.refdynmatrix = np.dot(TM.T, np.dot(self.dynmatrix, TM))   #refined dynamical matrix
+          self.refw2, self.refU = np.linalg.eigh(self.refdynmatrix)
+          self.refV = self.refU.copy()
+          self.refomega = np.sqrt(abs(self.refw2))
+          for i in range(len(self.V)):
+            self.refV[:, i] *= self.massinv
+          return
 
 class stoch_displacements(dm):
       def __init__(self,dynmat,mass,asr=None,temperature=0):
