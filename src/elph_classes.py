@@ -123,11 +123,11 @@ class dm:
           self.dynmatrix = dynmat
           self.w2, self.U = np.linalg.eigh(self.dynmatrix)
           self.V = self.U.copy()
-          self.omega = np.sqrt(abs(self.w2)); self.nmodes = len(dynmat)
+          self.omega = np.sqrt(abs(self.w2))*np.sign(self.w2); self.nmodes = len(dynmat)
           self.natoms = self.nmodes//3
           self.mass = np.array([mass[3*i] for i in range(len(mass)//3)])
           self.massinv = np.array([1/np.sqrt(mass[i]) for i in range(len(mass))])
-          print(self.massinv)
+          #print(self.massinv)
           for i in range(len(self.V)):
             self.V[:, i] *= self.massinv
           #print(self.V)  
@@ -155,14 +155,21 @@ class dm:
           Mcart = np.dot(self.U, np.dot(Mnm, np.transpose(self.U)))
           return Mcart
 
-      def cart2nm_vec(self,cart_v,normed=False):
+      def cart2nm_vec(self,cart_v,normed=False,mass_weight=True):
           """Projects a 3N-dim cartesian vector (coordinate or force) into a normal mode and return coeff"""
           nm_v = np.zeros(len(self.V), np.float64)
-          for mode_no in range(len(self.V)):
-              if normed:
-                 nm_v[mode_no] = np.dot(cart_v,self.V[:,mode_no])/np.dot(self.V[:,mode_no],self.V[:,mode_no])
-              else:
-                 nm_v[mode_no]  = np.dot(cart_v,self.V[:,mode_no]) 
+          if mass_weight:
+             for mode_no in range(len(self.V)):
+                 if normed:
+                    nm_v[mode_no] = np.dot(cart_v,self.V[:,mode_no])/np.dot(self.V[:,mode_no],self.V[:,mode_no])
+                 else:
+                    nm_v[mode_no]  = np.dot(cart_v,self.V[:,mode_no]) 
+          else:
+             for mode_no in range(len(self.V)):
+                 if normed:
+                    nm_v[mode_no] = np.dot(cart_v,self.U[:,mode_no])/np.dot(self.U[:,mode_no],self.U[:,mode_no])
+                 else:
+                    nm_v[mode_no]  = np.dot(cart_v,self.U[:,mode_no])
           return nm_v
 
       def apply_asr(self,opt_coord,asr='none'):
@@ -175,8 +182,10 @@ class dm:
           if len(opt_coord) != self.nmodes:
              raise ValueError("Dimension of opt_coord is not consistent with dynmatrix") 
           if asr == 'none':
-             self.refdynmatrix = self.dynmatrix.copy()
+             self.refdynmatrix = self.dynmatrix.copy(); self.refU = self.U.copy(); self.refw2 = self.w2.copy();
+             self.refV = self.V.copy(); self.refomega = self.omega.copy()
              return
+
           coord = np.array(opt_coord).reshape(self.natoms,3)
           com = np.dot(np.transpose(coord), self.mass) / self.mass.sum()   #center of mass coordinates (com)
           coord_com = coord - com    # coordinate with respect to com
@@ -215,11 +224,10 @@ class dm:
           #transformation matrix to project out translation and rotation
           TM = np.eye(3 * self.natoms) - np.dot(D.T, D)
           #print("TM:"); print(TM)
-          print("I'm here")
           self.refdynmatrix = np.dot(TM.T, np.dot(self.dynmatrix, TM))   #refined dynamical matrix
           self.refw2, self.refU = np.linalg.eigh(self.refdynmatrix)
           self.refV = self.refU.copy()
-          self.refomega = np.sqrt(abs(self.refw2))
+          self.refomega = np.sqrt(abs(self.refw2))*np.sign(self.refw2)
           for i in range(len(self.V)):
             self.refV[:, i] *= self.massinv
           return
@@ -302,6 +310,7 @@ class phonon_calculator:
              
       """
       def __init__(self,forces,mass,ngrid=1, mode = 'fd', deltax = 0.005, dynmat = None, deltae =0.001):
+          #print("phonon_calculator class speaking:")
           self.nconfg = forces.shape[0]; self.nmode = forces.shape[1]   ## no of config and no of modes (degrees of freedom)
           self.forces = forces ; self.ngrid = ngrid 
           mode = mode.lower()
@@ -327,9 +336,6 @@ class phonon_calculator:
              self.nmdisp = nm_sym_displacements(dynmat = dynmat, mass = mass, mode = mode, deltax = deltax, deltae = deltae )
              self.massinv = self.nmdisp.massinv
              self.displacements = self.nmdisp.displacements
-             self._nmforces()
-             #print(self.forces)
-             #print("fdphonon class speaking:")
           else: 
              raise NotImplementedError("Allowed modes: nmfd/enmfd")   
 
@@ -349,15 +355,14 @@ class phonon_calculator:
                  self.hessian[imode] = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd
                  self.dynmat[imode] = self.hessian[imode] * self.massinv[imode] * self.massinv
               else:
-                 displacements =  self.displacements[imode] * np.ones(self.nmode) 
-                 self.dynmat[imode] = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd
-                 #dm_row = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd 
+                 displacements =  self.displacements[imode] * np.ones(self.nmode)
+                 dm_row = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd 
                  #print("refdm_row:"); print(refdm_row)
-                 #self.dynmat[imode] = np.dot(self.nmdisp.V.T,dm_row) 
-          
-          #tmp_omega = np.sqrt(abs(self.dynmat))
+                 self.dynmat[imode] = np.dot(self.nmdisp.V.T,dm_row) 
+
+          #print("nmhessian:")
           #for i in range(len(self.dynmat)):
-          #    print(tmp_omega[i,i]*ha2unit['cm-1'])
+          #    print(self.dynmat[i])
          
           if not self.cartdisp: 
              self.dynmat = self.nmdisp.nm2cart_matrix(self.dynmat)
@@ -372,10 +377,6 @@ class phonon_calculator:
           self.dynmat = 0.50 * ( dm + dm.T)
           h = self.hessian.copy()
           self.hessian = 0.50 * ( h + h.T)
-
-      def _nmforces(self):
-          for iconfg in range(len(self.forces)):
-              self.forces[iconfg,:] = self.nmdisp.cart2nm_vec(self.forces[iconfg,:],normed=False)
 
 class epce_calculator:
       """

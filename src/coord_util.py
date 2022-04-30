@@ -249,7 +249,7 @@ class qbox:
       This class has methods related to qbox inputs and outputs 
 
       """
-      def __init__(self,file_path,io='w', atoms='None', run_cmd = None):
+      def __init__(self,file_path,io='w', atoms=None, run_cmd = None):
           """
           Args: file_path = path of the qbox input or output file
           io = input/output status: Options r= reading from a qbox output and storing data; 

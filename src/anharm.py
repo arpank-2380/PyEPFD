@@ -1,9 +1,10 @@
 import sys, os
 import numpy as np
 from coord_util import *
+from constants import *
 from elph_classes import dm
 
-class anharm(dm):
+class anharm_measure(dm):
       """
       This class have all methods to compute anharmonicity measure
       Args: dynmat = dynamical matrix ; mass = mass matrix
@@ -12,36 +13,39 @@ class anharm(dm):
             opt_coord = 3N-dimensional vector of cartesian coordinates of a optimized geometry/structure
             asr = acoustic sum rule; allowed values 'crystal', 'poly', 'lin'
       """
-      def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none'):
-          super(anharm,self).__init__(dynmat,mass)
+      def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none', mode_resolved=True):
+          super(anharm_measure,self).__init__(dynmat,mass)
+          #print("anharm class speaking:")
           self.forces = np.array(forces); self.disp = np.array(disp_coords)
 
           if self.forces.shape[0] != self.disp.shape[0]:
              raise ValueError("anharm: Number of MD/MC snapshots in forces and disp_coords are not same!")
           if (self.forces.shape[1] != self.nmodes) | (self.disp.shape[1] != self.nmodes) | (len(opt_coord) != self.nmodes):
              raise ValueError("anharm: Vector dimension of forces/displacement/opt_coord is not consistent with dynmatrix.") 
-          if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'cry'): pass
-          else: ValueError("anharm: The allowed values for asr are 'none', 'poly', 'lin', 'cry'")
+          if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): pass
+          else: ValueError("anharm: The allowed values for asr are 'none', 'poly', 'lin', 'crystal")
 
           for i in range(len(self.disp)):
               self.disp[i] -= opt_coord    
           self.apply_asr(opt_coord = opt_coord ,asr = asr)   
           self.dynmatrix = self.refdynmatrix; self.U = self.refU; self.V = self.refV; self.w2 = self.refw2; self.omega = self.refomega
-          self.calc_hessian()
+          self.calc_hessian(); self._measure(mode_resolved = mode_resolved)
 
-      def measure(self,resol='both'): 
-          """resol = Allowed values 'atom', 'mode', 'both' for atom-resolved, mode-resolved or both"""
-          if (resol == 'atom') | (resol == 'mode') | (resol == 'both'): pass
-          else: ValueError(\
-           "anharm.measure(): The allowed values for resol are:\n\'atom' (atom-resolved),\n or 'mode'(mode-resolved),\n or 'both' (for both atom and mode resolved ")
-          if (resol == 'atom') | (resol == 'both'):
-             self.atom_res_anh_var, self.atom_res_tot_var, self.atom_res = self._anh_measure('cartesian')
-          if (resol == 'mode') | (resol == 'both'):  
-             self.mode_res_anh_var, self.mode_res_tot_var, self.mode_res = self._anh_measure('normal')
+      def _measure(self,mode_resolved=True): 
+          """if mode_resolved=True it also calculates mode resolved anharmonic measure"""
+          self.cart_anh_var, self.cart_tot_var, self.cart_anh_mes, \
+          self.mode_anh_var, self.mode_tot_var, self.mode_anh_mes = self._KPSC_anh_measure(mode_resolved)
+          self.atom_anh_var, self.atom_tot_var, self.atom_anh_mes = self._atom_resolved(self.cart_anh_var,self.cart_tot_var)
+          self.atom_anh_var_sum, self.atom_tot_var_sum, self.atom_anh_mes_sum = \
+                  self._sum_measure(anh_var = self.atom_anh_var, tot_var = self.atom_tot_var)
+          if self.mode_anh_mes is not None:        
+             self.mode_anh_var_sum, self.mode_tot_var_sum, self.mode_anh_mes_sum = \
+                     self._sum_measure(anh_var = self.mode_anh_var, tot_var = self.mode_tot_var)
 
       def _force_decomp(self,hessian, forces, disp):
           """force_decomposition: returns harmonic and anharmonic forces for a particular frame. 
-             Args: disp, forces = n rows of 3N-dim vectors, hess = 3N*3N """
+             Args: disp, forces = n rows of 3N-dim cartesian vectors, hess = 3N*3N cartesian hessian"""
+
           harm_forces = np.array(forces)
           for i in range(len(forces)):
               harm_forces[i] = -np.dot(hessian,disp[i])
@@ -58,47 +62,80 @@ class anharm(dm):
           variance = variance/len(vector)    
           return variance    
 
-      def _anh_measure(self,coordinate='cartesian'):
-          if (coordinate == 'cartesian') | (coordinate == 'normal'): pass
-          else: raise ValueError(" anharm: value of coordinate must be either 'cartesian' or 'normal'. ")
-              
-          forces = self.forces.copy(); disp = self.disp.copy(); hessian = self.hessian
-          if coordinate == 'normal':
-             for i in range(len(forces)):
-                 forces[i] = self.cart2nm_vec(self.forces[i], normed=False)  
-                 disp[i] = self.cart2nm_vec(self.disp[i], normed=True)   
-             hessian = self.w2 * np.eye(self.nmodes)
-             for i in range(len(hessian)):
-                 hessian[i] = hessian[i] * (self.massinv/self.massinv[i])  
-                  
-          anh_forces, harm_forces = self._force_decomp(hessian, forces, disp)
+      def _KPSC_anh_measure(self,mode_resolved=True):
+          """Knoop, Purcell, Scheffler, Carbogno Anharmonic Measure
+             Cite Paper: Phys. Rev. Mater 4, 083809 (2020)
+             Arg: mode_resolved = if True also calculates mode resolved measure,
+                                  else calculates only atom resolved measure
+             Returns:                      
 
-          print("#--------------------------------Forces are in %s coordinate-------------------------------------"%coordinate)
-          print("#Coord   Anh_F   Harm_F    Tot_F")   
-          print("#-------------------------------------------------------------------------------------------------")
-          for iconfg in range(len(anh_forces)):
-              print("#Config = %d"%(iconfg+1))
-              for i in range(self.nmodes):
-                  #if harm_forces[iconfg,i] * forces[iconfg,i] < 0:
-                  print("%d  %14.6g %14.6g %14.6g"%(i+1,anh_forces[iconfg,i], harm_forces[iconfg,i], forces[iconfg,i]))
-          print("==================================================================================================")
-        
+          """              
+          forces = self.forces.copy(); disp = self.disp.copy(); hessian = self.hessian
+          anh_forces, harm_forces = self._force_decomp(hessian, forces, disp)
           anh_var = self._variance(anh_forces); tot_var = self._variance(forces)
           anh_measure = np.sqrt(anh_var/tot_var)
-          if coordinate == 'cartesian':
-             anh_var,tot_var, anh_measure = self._atom_resolved(anh_var, tot_var) 
-          return anh_var,tot_var, anh_measure
+          anh_var_mode = None; tot_var_mode = None; anh_measure_mode = None 
 
-      def _atom_resolved(self,anh_var,tot_var):
+          if mode_resolved: 
+             anh_forces_mode = np.copy(anh_forces)
+             harm_forces_mode = np.copy(harm_forces) 
+             forces_mode = np.copy(forces)
+             for i in range(len(forces)): 
+                 harm_forces_mode[i] = self.cart2nm_vec(harm_forces[i], normed=False, mass_weight=False) 
+                 forces_mode[i] = self.cart2nm_vec(forces[i],normed=False, mass_weight=False) 
+                 anh_forces[i] = forces[i] - harm_forces[i]
+             anh_var_mode = self._variance(anh_forces_mode); tot_var_mode = self._variance(forces_mode)
+             anh_measure_mode = np.sqrt(anh_var_mode/tot_var_mode)
+          return anh_var,tot_var, anh_measure, anh_var_mode, tot_var_mode, anh_measure_mode
+
+      def _atom_resolved(self,cart_anh_var,cart_tot_var):
           """Sum up the variances for 3 cartesian coordinates of an atom"""
           atom_res_anh_var = np.zeros(self.natoms)
           atom_res_tot_var = np.zeros(self.natoms)
           for iatom in range(self.natoms):
               for icart in range(3):
                   i = 3*iatom + icart
-                  atom_res_anh_var[iatom] += anh_var[i]
-                  atom_res_tot_var[iatom] += tot_var[i]
+                  atom_res_anh_var[iatom] += cart_anh_var[i]
+                  atom_res_tot_var[iatom] += cart_tot_var[i]
           atom_res_anh_var = atom_res_anh_var/3; atom_res_tot_var = atom_res_tot_var/3        
           atom_res_anh_measure = np.sqrt(atom_res_anh_var/atom_res_tot_var)
           return atom_res_anh_var, atom_res_tot_var, atom_res_anh_measure
       
+      def _sum_measure(self,anh_var,tot_var):
+          if len(anh_var) != len(tot_var):
+             raise ValueError("anharm._sum_measure(): len(anh_var) != len(tot_var)") 
+          sum_anh_var = np.sum(anh_var) / len(anh_var)
+          sum_tot_var = np.sum(tot_var) / len(tot_var)
+          sum_anh_mes = np.sqrt(sum_anh_var/sum_tot_var)
+          return sum_anh_var, sum_tot_var, sum_anh_mes
+      
+      def write_measure(self,file_path,atoms,vib_freq_unit='cm-1'):
+          if len(atoms) != self.natoms:
+              raise ValueError("anharm.write_measure(): len(atoms) != anharm.natoms.")
+          if (vib_freq_unit=='cm-1') | (vib_freq_unit=='K') | (vib_freq_unit=='THz') | (vib_freq_unit=='meV'): 
+              pass
+          else: 
+              raise ValueError("anharm.write_measure(): Allowed options for vib_freq_unit are: 'cm-1', 'K', 'THz', 'meV'")
+          atom_res_out = open(file_path+'_atom-res_anh-mes.out', 'w+')
+          atom_res_out.write("#  Atom         Var(Anh)        Var(Tot)     Anh_Measure \n")
+          atom_res_out.write("#--------------------------------------------------------\n")
+          for i in range(self.natoms):
+              atom_res_out.write("%5d %3s  %14.6g %14.6g %14.6g\n"%(i+1, atoms[i],\
+            self.atom_anh_var[i], self.atom_tot_var[i], self.atom_anh_mes[i]))
+          atom_res_out.write("#-------------------------------------------------------\n")
+          atom_res_out.write("# SUM      %14.6g %14.6g %14.6g\n"\
+                  %(self.atom_anh_var_sum, self.atom_tot_var_sum, self.atom_anh_mes_sum))
+
+          if self.mode_anh_mes is not None:
+             mode_res_out = open(file_path+'_mode_res_anh_mes.out', 'w+')
+             mode_res_out.write("# Mode  Freq(%4s)       Var(Anh)        Var(Tot)     Anh_Measure \n"%(vib_freq_unit))
+             mode_res_out.write("#--------------------------------------------------------------\n")
+             for i in range(self.nmodes):
+                 mode_res_out.write("%5d  %10.4f %14.6g  %14.6g %14.6g \n"\
+                    %(i+1, self.omega[i]*ha2unit[vib_freq_unit],\
+                    self.mode_anh_var[i], self.mode_tot_var[i], self.mode_anh_mes[i]))
+             mode_res_out.write("#--------------------------------------------------------------\n")
+             mode_res_out.write("# SUM             %14.6g %14.6g %14.6g\n"\
+                  %(self.mode_anh_var_sum, self.mode_tot_var_sum, self.mode_anh_mes_sum))
+
+
