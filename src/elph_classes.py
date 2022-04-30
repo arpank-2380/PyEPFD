@@ -359,10 +359,6 @@ class phonon_calculator:
                  dm_row = central_diff(displacements, tmp_forces, order = 1, ngrid = self.ngrid).cd 
                  #print("refdm_row:"); print(refdm_row)
                  self.dynmat[imode] = np.dot(self.nmdisp.V.T,dm_row) 
-
-          #print("nmhessian:")
-          #for i in range(len(self.dynmat)):
-          #    print(self.dynmat[i])
          
           if not self.cartdisp: 
              self.dynmat = self.nmdisp.nm2cart_matrix(self.dynmat)
