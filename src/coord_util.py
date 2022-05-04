@@ -342,9 +342,11 @@ class qbox:
           if self.input_indices == [i+1 for i in range(self.natoms)]:
              return
           else:
-              print("Reording forces and coordinates according to input sequence")
+              print("Reording atoms, forces, and coordinates according to input sequence.")
               input_cart_ind = []
+              atoms = self.atoms.copy()
               for i in range(self.natoms):
+                  self.atoms[self.input_indices[i]-1] = atoms[i]
                   input_cart_ind.append((self.input_indices[i]-1)*3)
                   input_cart_ind.append((self.input_indices[i]-1)*3+1)
                   input_cart_ind.append((self.input_indices[i]-1)*3+2)
