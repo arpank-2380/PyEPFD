@@ -1,4 +1,4 @@
-import sys, os, re
+import sys, os, re, time
 import xml.etree.ElementTree as ET
 import numpy as np
 from constants import *
@@ -62,6 +62,7 @@ class xyz:
                pos_unit, cell_unit --> optional for 'io = w' mode; define unit of given coordinate and cell
       """
       def __init__(self, file_path, io='r', atoms=None, pos_unit='atomic_unit', cell_unit='atomic_unit'):
+          init_time = time.time()
           self.io = io
           if self.io == 'r':
              self.__get_xyz_info(file_path)
@@ -73,6 +74,10 @@ class xyz:
              self.iconfg = 0
           else:
              raise NotImplementedError("xyz class: io status must be r or w.")
+
+          final_time = time.time()
+          exec_time = final_time - init_time
+          print("Time spent on xyz class: " + str(exec_time) + " s.")
 
           #### Printing to test global variables:
           #print(self.atoms); print(self.natoms); print(self.pos_unit); print(self.cell_unit)
@@ -173,6 +178,7 @@ class ionic_mover:
              deltae  = energy scaled displacement in au
       """
       def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,dynmat=None,mass=None,ngrid=1,temperature=0):
+          init_time = time.time()
           self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)
           if len(self.opt_coord) != 3*self.natoms:
              sys.exit("dimensions of atoms and coordinates supplied to ionic_mover class are not consistent.") 
@@ -209,6 +215,10 @@ class ionic_mover:
 
           else:
              raise NotImplementedError("Allowed modes: fd/nmfd/enmfd/snmfd")
+          
+          final_time = time.time()
+          exec_time = final_time - init_time
+          print("Time spent on ipnic_mover class: " + str(exec_time) + " s.")
       
       def _cart_disp(self):
           """deltax is a scaler"""
@@ -257,11 +267,13 @@ class qbox:
           atoms = A list containing atom symbols; mandatory in in 'io = w' mode
           internal length units are Bohr and angle units are degrees. 
           """
+          init_time = time.time()
           self.io = io; self.file_path = file_path
           if self.io == 'r':
-             self.cellabc, self.atoms = self.__getsystem__(self.file_path);   self.natoms = len(self.atoms) 
-             self.etotals = self.getenergy();   self.nframes = len(self.etotals)
+             self.cellabc, self.atoms, self.input_indices = self.__getsystem__(self.file_path);   
+             self.natoms = len(self.atoms) ; self.etotals = self.getenergy();   self.nframes = len(self.etotals)
              self.forces = self.getv('<force>');   self.coords = self.getv('<position>')
+             self._reorder()
           elif self.io == 'w':
              self.qbfil = open(file_path,"w+")
              if atoms is None:
@@ -277,6 +289,9 @@ class qbox:
           
           self.mass = np.array([[masses[element]*amu,masses[element]*amu,masses[element]*amu]\
                          for element in self.atoms]).reshape(3*self.natoms)
+          final_time = time.time()
+          exec_time = final_time - init_time
+          print("Time spent on qbox class: " + str(exec_time) + " s.")
 
       def write(self, cell, coord):
           """
@@ -322,6 +337,31 @@ class qbox:
           etotals = grep(file_path = self.file_path, pattern = "<etotal>", cols=(1))
           return etotals
 
+      def _reorder(self):
+          """Reorders the forces and coordinates according to input indices"""
+          if self.input_indices == [i+1 for i in range(self.natoms)]:
+             return
+          else:
+              print("Reording forces and coordinates according to input sequence")
+              input_cart_ind = []
+              for i in range(self.natoms):
+                  input_cart_ind.append((self.input_indices[i]-1)*3)
+                  input_cart_ind.append((self.input_indices[i]-1)*3+1)
+                  input_cart_ind.append((self.input_indices[i]-1)*3+2)
+              #print(input_cart_ind)    
+              for i in range(self.nframes):
+                  self.coords[i,:] = self._reorder_vec(input_cart_ind, self.coords[i,:])
+                  self.forces[i,:] = self._reorder_vec(input_cart_ind, self.forces[i,:])
+
+      def _reorder_vec(self,input_cart_ind,vec):
+          """reorders a vector according to input indices"""
+          reord_vec = np.copy(vec)
+          for i in range(len(vec)):
+              #print(i, input_cart_ind[i])
+              reord_vec[input_cart_ind[i]] = vec[i]
+          return reord_vec    
+          
+
       @staticmethod
       def __getsystem__(file_path):
           qbout = open(file_path, 'r')
@@ -336,14 +376,15 @@ class qbox:
              if 'iteration>' in line: read = False
           qbout.close()
           root = ET.fromstring(xml_str)
-          atoms = []
+          atoms = []; input_atom_index = []
           for atom in root.findall('./atomset/atom'):
               atoms.append(re.sub( r"\d+", "", atom.attrib['name']))
+              input_atom_index.append(int(re.sub( r"[a-zA-Z]", "", atom.attrib['name'])))
           cell = np.zeros(6,np.float64)
           cell_addresses = ['./unit_cell_a_norm','./unit_cell_b_norm', 'unit_cell_c_norm',\
                             'unit_cell_alpha', 'unit_cell_beta', 'unit_cell_gamma']
           for i in range(6): cell[i] = float(root.find(cell_addresses[i]).text)
-          return cell, atoms
+          return cell, atoms, input_atom_index
 
 
 def write_nmode(atoms, cell_v, opt_coord, mode_v, mode_freq, file_path='dynmat',fmt = 'axsf'):

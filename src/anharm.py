@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, time
 import numpy as np
 from coord_util import *
 from constants import *
@@ -16,20 +16,25 @@ class anharm_measure(dm):
       def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none', mode_resolved=True):
           super(anharm_measure,self).__init__(dynmat,mass)
           #print("anharm class speaking:")
+          init_time = time.time()
           self.forces = np.array(forces); self.disp = np.array(disp_coords)
 
           if self.forces.shape[0] != self.disp.shape[0]:
-             raise ValueError("anharm: Number of MD/MC snapshots in forces and disp_coords are not same!")
+             raise ValueError("anharm_measure: Number of MD/MC snapshots in forces and disp_coords are not same!")
           if (self.forces.shape[1] != self.nmodes) | (self.disp.shape[1] != self.nmodes) | (len(opt_coord) != self.nmodes):
-             raise ValueError("anharm: Vector dimension of forces/displacement/opt_coord is not consistent with dynmatrix.") 
+             raise ValueError("anharm_measure: Vector dimension of forces/displacement/opt_coord is not consistent with dynmatrix.") 
           if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): pass
-          else: ValueError("anharm: The allowed values for asr are 'none', 'poly', 'lin', 'crystal")
+          else: ValueError("anharm_measure: The allowed values for asr are 'none', 'poly', 'lin', 'crystal")
 
           for i in range(len(self.disp)):
               self.disp[i] -= opt_coord    
           self.apply_asr(opt_coord = opt_coord ,asr = asr)   
           self.dynmatrix = self.refdynmatrix; self.U = self.refU; self.V = self.refV; self.w2 = self.refw2; self.omega = self.refomega
           self.calc_hessian(); self._measure(mode_resolved = mode_resolved)
+
+          final_time = time.time()
+          exec_time = final_time - init_time
+          print("anharm_measure: Execution time (s): " + str(exec_time))
 
       def _measure(self,mode_resolved=True): 
           """if mode_resolved=True it also calculates mode resolved anharmonic measure"""
@@ -103,20 +108,20 @@ class anharm_measure(dm):
       
       def _sum_measure(self,anh_var,tot_var):
           if len(anh_var) != len(tot_var):
-             raise ValueError("anharm._sum_measure(): len(anh_var) != len(tot_var)") 
+             raise ValueError("anharm_measure._sum_measure(): len(anh_var) != len(tot_var)") 
           sum_anh_var = np.sum(anh_var) / len(anh_var)
           sum_tot_var = np.sum(tot_var) / len(tot_var)
           sum_anh_mes = np.sqrt(sum_anh_var/sum_tot_var)
           return sum_anh_var, sum_tot_var, sum_anh_mes
       
-      def write_measure(self,file_path,atoms,vib_freq_unit='cm-1'):
+      def write(self,file_path,atoms,vib_freq_unit='cm-1'):
           if len(atoms) != self.natoms:
-              raise ValueError("anharm.write_measure(): len(atoms) != anharm.natoms.")
+              raise ValueError("anharm_measure.write(): len(atoms) != anharm.natoms.")
           if (vib_freq_unit=='cm-1') | (vib_freq_unit=='K') | (vib_freq_unit=='THz') | (vib_freq_unit=='meV'): 
               pass
           else: 
-              raise ValueError("anharm.write_measure(): Allowed options for vib_freq_unit are: 'cm-1', 'K', 'THz', 'meV'")
-          atom_res_out = open(file_path+'_atom-res_anh-mes.out', 'w+')
+              raise ValueError("anharm.write(): Allowed options for vib_freq_unit are: 'cm-1', 'K', 'THz', 'meV'")
+          atom_res_out = open(file_path+'_atom_res_anh_mes.out', 'w+')
           atom_res_out.write("#  Atom         Var(Anh)        Var(Tot)     Anh_Measure \n")
           atom_res_out.write("#--------------------------------------------------------\n")
           for i in range(self.natoms):

@@ -316,7 +316,7 @@ class phonon_calculator:
           mode = mode.lower()
           if self.nconfg != 2*self.ngrid*self.nmode + 1: 
              #print(self.nconfg) 
-             raise ValueError("fdphonon: No of configurations in forces matrix does not match with ngrid/nmode")
+             raise ValueError("phonon_calculator: No of configurations in forces matrix does not match with ngrid/nmode")
 
           self.dynmat = np.zeros((self.nmode, self.nmode),np.float64)
           self.hessian = np.zeros((self.nmode, self.nmode),np.float64)
@@ -329,9 +329,9 @@ class phonon_calculator:
              self.displacements = np.ones(self.nmode)*deltax
           elif (mode == 'nmfd') | (mode == 'enmfd'):
              if dynmat is None: 
-                raise ValueError("fdphonon: dynmat must be supplied for nmfd/enmfd")
+                raise ValueError("phonon_calculator: dynmat must be supplied for nmfd/enmfd")
              if (dynmat.shape[0] != self.nmode) | (dynmat.shape[1] != self.nmode):
-                raise ValueError("fdphonon: dimension of dynmat is not consistent with forces") 
+                raise ValueError("phonon_calculator: dimension of dynmat is not consistent with forces") 
              self.cartdisp = False 
              self.nmdisp = nm_sym_displacements(dynmat = dynmat, mass = mass, mode = mode, deltax = deltax, deltae = deltae )
              self.massinv = self.nmdisp.massinv
@@ -339,13 +339,13 @@ class phonon_calculator:
           else: 
              raise NotImplementedError("Allowed modes: nmfd/enmfd")   
 
-          #print("fdphonon class speaking:")
+          #print("phonon_calculator class speaking:")
           #print(self.displacements)
           
           self.calc_phonon()
 
       def calc_phonon(self):
-          #print("fdphonon.calc_phonon speaking:")
+          #print("phonon_calculator.calc_phonon speaking:")
           for imode in range(self.nmode):
               istart = 2*self.ngrid * imode + 1; iend =  2*self.ngrid*(imode+1)+1
               tmp_forces = -self.forces[istart:iend].transpose().flatten()
@@ -368,7 +368,7 @@ class phonon_calculator:
           self.symmetrize()       
 
       def symmetrize(self):
-          #print("fdphonon.symmetrize speaking:")
+          #print("phonon_calculator.symmetrize() speaking:")
           dm = self.dynmat.copy()
           self.dynmat = 0.50 * ( dm + dm.T)
           h = self.hessian.copy()
