@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import numpy as np
-import sys
+import sys, os, time
 
 
 class ipi_info:
@@ -11,6 +11,7 @@ class ipi_info:
         Arg: Only the path of the iPI file
       """
       def __init__(self,file_path="RESTART"):
+          init_time = time.time()
           file_tree = ET.parse(file_path)
           file_root = file_tree.getroot()
           
@@ -77,4 +78,8 @@ class ipi_info:
               for element in self.symbol_tree.text.split()[1:-1]:
                   self.symbols.append(element.strip(","))
           #print(self.symbols)
+
+          final_time = time.time()
+          exec_time = final_time - init_time
+          print("Time spent on ipi_info class: " + str(exec_time) + " s.")
 
