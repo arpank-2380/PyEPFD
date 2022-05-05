@@ -271,7 +271,9 @@ class qbox:
           self.io = io; self.file_path = file_path
           if self.io == 'r':
              self.cellabc, self.atoms, self.input_indices = self.__getsystem__(self.file_path);   
-             self.natoms = len(self.atoms) ; self.etotals = self.getenergy();   self.nframes = len(self.etotals)
+             self.natoms = len(self.atoms) ; self.etotals = self.getenergy();  
+             try: self.nframes = self.etotals.shape[0]
+             except IndexError: self.nframes = self.etotals.size
              self.forces = self.getv('<force>');   self.coords = self.getv('<position>')
              self._reorder()
           elif self.io == 'w':
@@ -334,7 +336,7 @@ class qbox:
           return v
 
       def getenergy(self):
-          etotals = grep(file_path = self.file_path, pattern = "<etotal>", cols=(1))
+          etotals = np.array( grep(file_path = self.file_path, pattern = "<etotal>", cols=(1)) )
           return etotals
 
       def _reorder(self):
