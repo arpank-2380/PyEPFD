@@ -259,7 +259,7 @@ class qbox:
       This class has methods related to qbox inputs and outputs 
 
       """
-      def __init__(self,file_path,io='w', atoms=None, run_cmd = None):
+      def __init__(self,file_path,io='w', atoms=None, run_cmd = None, reorder=True):
           """
           Args: file_path = path of the qbox input or output file
           io = input/output status: Options r= reading from a qbox output and storing data; 
@@ -275,7 +275,7 @@ class qbox:
              try: self.nframes = self.etotals.shape[0]
              except IndexError: self.nframes = self.etotals.size
              self.forces = self.getv('<force>');   self.coords = self.getv('<position>')
-             self._reorder()
+             if reorder: self._reorder()
           elif self.io == 'w':
              self.qbfil = open(file_path,"w+")
              if atoms is None:
