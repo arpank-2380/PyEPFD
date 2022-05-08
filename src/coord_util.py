@@ -52,6 +52,109 @@ def grep(file_path, pattern, cols):
     os.system("rm -rf tmp")
     return data_array
 
+def quaternion_fit(ref_coord, coord, mass):
+    """
+    This function fits a quaternion that rotates a set of 3N-coordinates into a a set of ref coordinates.
+    Citation: SIMON K. KEARSLEY, Acta Cryst. (1989). A45, 208-210
+    Args: ref_coord = 3N cartesian coordinates for the reference structure
+          coord = 3N cartesian coordinates for the rotated rigid body
+          mass = mass-matrix
+    Returns rotated_coordinate and rotation matrix
+    """
+    if len(ref_coord) != len(coord):
+       raise ValueError("len(ref_coord) != len(coord)")
+    if len(ref_coord) != len(mass):
+       raise ValueError("len(ref_coord) != len(mass)")
+    natoms = len(coord)//3
+    massinv = np.array([1/np.sqrt(mass[i]) for i in range(len(mass))])
+    p = (ref_coord + coord) * massinv  #plus combination
+    m = (ref_coord - coord) * massinv  #minus combination
+    p = p.reshape(natoms,3); m = m.reshape(natoms,3)
+    Q = np.zeros((4,4),np.float64)
+
+    Q[0,0] = np.dot(m[:,0],m[:,0]) + np.dot(m[:,1],m[:,1]) + np.dot(m[:,2],m[:,2])
+    Q[0,1] = np.dot(p[:,1],m[:,2]) - np.dot(m[:,1],p[:,2])
+    Q[0,2] = np.dot(m[:,0],p[:,2]) - np.dot(p[:,0],m[:,2])
+    Q[0,3] = np.dot(p[:,0],m[:,1]) - np.dot(m[:,0],p[:,1])
+    Q[1,1] = np.dot(m[:,0],m[:,0]) + np.dot(p[:,1],p[:,1]) + np.dot(p[:,2],p[:,2])
+    Q[1,2] = np.dot(m[:,0],m[:,1]) - np.dot(p[:,0],p[:,1])
+    Q[1,3] = np.dot(m[:,0],m[:,2]) - np.dot(p[:,0],p[:,2])
+    Q[2,2] = np.dot(p[:,0],p[:,0]) + np.dot(m[:,1],m[:,1]) + np.dot(p[:,2],p[:,2])
+    Q[2,3] = np.dot(m[:,1],m[:,2]) - np.dot(p[:,1],p[:,2])
+    Q[3,3] = np.dot(p[:,0],p[:,0]) + np.dot(p[:,1],p[:,1]) + np.dot(m[:,2],m[:,2])
+
+    for i in range(4):
+        for j in range(i+1,4):
+            Q[j,i] = Q[i,j]
+
+
+    eigval,eigvec = np.linalg.eigh(Q)
+    q = np.insert( eigvec[:,0], 0, 0)
+
+    rot_matrix = np.zeros((3,3),np.float64)
+    rot_matrix[0,0] = q[1]*q[1] + q[2]*q[2] - q[3]*q[3] - q[4]*q[4]
+    rot_matrix[0,1] = 2 * ( q[2]*q[3] + q[1]*q[4] )
+    rot_matrix[0,2] = 2 * ( q[2]*q[4] - q[1]*q[3] )
+    rot_matrix[1,0] = 2 * ( q[2]*q[3] - q[1]*q[4] )
+    rot_matrix[1,1] = q[1]*q[1] - q[2]*q[2] + q[3]*q[3] - q[4]*q[4]
+    rot_matrix[1,2] = 2 * ( q[3]*q[4] + q[1]*q[2] )
+    rot_matrix[2,0] = 2 * ( q[2]*q[4] + q[1]*q[3] )
+    rot_matrix[2,1] = 2 * ( q[3]*q[4] - q[1]*q[2] )
+    rot_matrix[2,2] = q[1]*q[1] - q[2]*q[2] - q[3]*q[3] + q[4]*q[4]
+    return rot_matrix
+
+def rotate_vector(rot_matrix,vector):
+    """Rigid body rotation of a 3N dimensional vector given a rotation matrix"""
+    natoms = len(vector)//3; vector = np.reshape(vector,(natoms,3))
+    rot_vector = np.array([])
+    for i in range(natoms):
+        rot_vector = np.append(rot_vector, np.dot(rot_matrix,vector[i]))
+    return rot_vector
+
+def remove_rotation(ref_coord, coord, mass, forces=None):
+    """
+    Rotates coordinates and forces(optional) so that the coordinates
+    superimposed to a reference coordinates by rigid body rotation.
+    This is to be used to remove rotation from a trajectory
+    Args: ref_coord = 3N cartesian coordinates for the reference structure
+          coord = 3N cartesian coordinates for the rotated rigid body
+          mass = mass-matrix
+    """
+    natoms = len(coord)//3
+    if len(ref_coord) != len(coord):
+       raise ValueError("len(ref_coord) != len(coord)") 
+    if len(mass) == len(coord): 
+       pass
+    elif len(mass) == len(coord)//3: 
+       tmp_mass = np.copy(mass)
+       mass = np.array([[tmp_mass[i], tmp_mass[i], tmp_mass[i]] for i in range(len(tmp_mass))])
+       mass = mass.reshape(3*natoms)
+    else: 
+       raise ValueError("Dimensions of mass and coord are not consistent.")
+    rot_matrix = quaternion_fit(ref_coord, coord, mass)
+    rot_coord = rotate_vector(rot_matrix,coord)
+    if forces is None:
+       return rot_coord
+    else:
+       rot_forces = rotate_vector(rot_matrix,forces)
+       return rot_coord, rot_forces   
+
+
+def remove_translation(ref_com, coord, mass):
+    """
+    Removes translation from a trajectory 
+    Args: ref_com = Reference center of mass 3-d vector w.r.t which rigid translation is computed
+          coord = 3N dimensional cartesian coordinates for N atoms
+          mass = N dimensional mass matrix
+    """
+    natoms = len(coord)//3
+    coord = np.reshape(coord,(natoms,3))
+    mass = np.array(mass)
+    com = np.dot(coord.T, mass) / mass.sum() 
+    com_shift = com - ref_com
+    coord_com = np.reshape(coord - com_shift,3*natoms)
+    return coord_com
+
 
 class xyz:
       """
@@ -66,6 +169,9 @@ class xyz:
           self.io = io
           if self.io == 'r':
              self.__get_xyz_info(file_path)
+             self.coords = np.zeros((self.nframes,3*self.natoms),np.float64)
+             for i in range(self.nframes): 
+                 self.coords[i] = (self.get_frame(frame=i+1))[1]
           elif self.io == 'w':
              self.out_xyz = open(file_path,"w+")
              if atoms is None:
@@ -74,6 +180,9 @@ class xyz:
              self.iconfg = 0
           else:
              raise NotImplementedError("xyz class: io status must be r or w.")
+
+          self.mass = np.array([[masses[element]*amu,masses[element]*amu,masses[element]*amu]\
+                         for element in self.atoms]).reshape(3*self.natoms)
 
           final_time = time.time()
           exec_time = final_time - init_time
@@ -154,7 +263,7 @@ class xyz:
              raise NotImplementedError("xyz class: write not implemented for io = r")          
           if len(coord) != 3*self.natoms:
              sys.exit("xyz class: dimensions of atoms and coord supplied to write are not consistent.")
-
+          cell[0:3] *= unit2ang[self.cell_unit]
           coord_angstrom = coord * unit2ang[self.pos_unit]   
           coord_angstrom = coord_angstrom.reshape((self.natoms,3))
           self.out_xyz.write("%d\n"%(self.natoms))
