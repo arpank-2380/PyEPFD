@@ -456,7 +456,7 @@ class qbox:
 
       def getenergy(self):
           etotals = np.array( grep(file_path = self.file_path, pattern = "<etotal>", cols=(1)) )
-          try: len(a)
+          try: len(etotals)
           except TypeError: etotals = np.array([etotals])
           return etotals
 
