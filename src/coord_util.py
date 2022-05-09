@@ -329,7 +329,7 @@ class ionic_mover:
              if (dynmat is None) | (temperature is None):
                 sys.exit("For mc modes dynamical matrix and a temperature must be supplied to ionic_mover class") 
              self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
-             print(self.disp_coord.shape)
+             #print(self.disp_coord.shape)
              self._mc()
 
           else:
@@ -337,7 +337,7 @@ class ionic_mover:
           
           final_time = time.time()
           exec_time = final_time - init_time
-          print("Time spent on ipnic_mover class: " + str(exec_time) + " s.")
+          print("Time spent on ionic_mover class: " + str(exec_time) + " s.")
       
       def _cart_disp(self):
           """deltax is a scaler"""
@@ -456,6 +456,8 @@ class qbox:
 
       def getenergy(self):
           etotals = np.array( grep(file_path = self.file_path, pattern = "<etotal>", cols=(1)) )
+          try: len(a)
+          except TypeError: etotals = np.array([etotals])
           return etotals
 
       def _reorder(self):
