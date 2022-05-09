@@ -14,7 +14,7 @@ class anharm_measure(dm):
             asr = acoustic sum rule; allowed values 'crystal', 'poly', 'lin'
       """
       def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none', \
-                   mode_resolved=True, remove_translation=True, remove_rotation=True):
+                   mode_resolved=True):
           super(anharm_measure,self).__init__(dynmat,mass)
           #print("anharm class speaking:")
           init_time = time.time()
@@ -27,29 +27,26 @@ class anharm_measure(dm):
           if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): pass
           else: ValueError("anharm_measure: The allowed values for asr are 'none', 'poly', 'lin', 'crystal")
 
-          if remove_translation: self._remove_translation(opt_coord)
-          if (asr == 'lin') | (asr == 'poly'):
-             if remove_rotation: self._remove_rotation(opt_coord)
-
-          for i in range(len(self.disp)):
-              self.disp[i] -= opt_coord 
 
           self.apply_asr(opt_coord = opt_coord ,asr = asr)   
-          self.dynmatrix = self.refdynmatrix; self.U = self.refU; self.V = self.refV; self.w2 = self.refw2; self.omega = self.refomega
-          self.calc_hessian(); self._measure(mode_resolved = mode_resolved)
+          self.dynmatrix = self.refdynmatrix
+          self.U = self.refU; self.V = self.refV; self.w2 = self.refw2; self.omega = self.refomega
+
+          self.calc_hessian()
+          self.opt_coord_com = self.opt_coord_com.flatten()
+          self._remove_trans_rot(self.opt_coord_com)
+          for i in range(len(self.disp)): self.disp[i] -= self.opt_coord_com
+
+          self._measure(mode_resolved = mode_resolved)
 
           final_time = time.time()
           exec_time = final_time - init_time
           print("anharm_measure: Execution time (s): " + str(exec_time))
 
-      def _remove_translation(self, ref_coord):
-          ref_com = np.dot(np.transpose(ref_coord.reshape(self.natoms,3)), self.mass) / self.mass.sum()
-          for i in range(len(self.disp)):
-              self.disp[i] = remove_translation(ref_com = ref_com, coord = self.disp[i], mass = self.mass)
       
-      def _remove_rotation(self,ref_coord):
+      def _remove_trans_rot(self,ref_coord):
           for i in range(len(self.disp)):
-              self.disp[i], self.forces[i] = remove_rotation( ref_coord = ref_coord, \
+              self.disp[i], self.forces[i] = remove_trans_rot( ref_coord = ref_coord, \
                                           coord = self.disp[i], forces = self.forces[i], mass = self.mass)
 
       def _measure(self,mode_resolved=True): 

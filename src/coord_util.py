@@ -2,7 +2,7 @@ import sys, os, re, time
 import xml.etree.ElementTree as ET
 import numpy as np
 from constants import *
-from elph_classes import nm_sym_displacements,stoch_displacements
+from elph_classes import nm_sym_displacements,stoch_displacements, coord_com
 
 
 def abc2h(abc):
@@ -89,7 +89,12 @@ def quaternion_fit(ref_coord, coord, mass):
 
 
     eigval,eigvec = np.linalg.eigh(Q)
-    q = np.insert( eigvec[:,0], 0, 0)
+    q = eigvec[:,0]; qnorm = np.linalg.norm(q)
+    
+    if np.abs(qnorm-1.000000) > 0.000001: 
+       q = q/qnorm 
+
+    q = np.insert( q, 0, 0)
 
     rot_matrix = np.zeros((3,3),np.float64)
     rot_matrix[0,0] = q[1]*q[1] + q[2]*q[2] - q[3]*q[3] - q[4]*q[4]
@@ -111,7 +116,7 @@ def rotate_vector(rot_matrix,vector):
         rot_vector = np.append(rot_vector, np.dot(rot_matrix,vector[i]))
     return rot_vector
 
-def remove_rotation(ref_coord, coord, mass, forces=None):
+def remove_trans_rot(ref_coord, coord, mass, rotation=True, forces=None, wrt_com=False):
     """
     Rotates coordinates and forces(optional) so that the coordinates
     superimposed to a reference coordinates by rigid body rotation.
@@ -119,7 +124,11 @@ def remove_rotation(ref_coord, coord, mass, forces=None):
     Args: ref_coord = 3N cartesian coordinates for the reference structure
           coord = 3N cartesian coordinates for the rotated rigid body
           mass = mass-matrix
+          rotation = if True, angular momentum would be removed from coord w.r.t ref_coord
+          forces = if supplied then forces would be rotated back to ref_coord frame
+          wrt_com = if True, coordinates w.r.t c.o.m would be returned
     """
+    #print("removing translational and rotational motion")
     natoms = len(coord)//3
     if len(ref_coord) != len(coord):
        raise ValueError("len(ref_coord) != len(coord)") 
@@ -131,29 +140,19 @@ def remove_rotation(ref_coord, coord, mass, forces=None):
        mass = mass.reshape(3*natoms)
     else: 
        raise ValueError("Dimensions of mass and coord are not consistent.")
-    rot_matrix = quaternion_fit(ref_coord, coord, mass)
-    rot_coord = rotate_vector(rot_matrix,coord)
+
+    ref_coord, ref_com = coord_com(ref_coord,mass)
+    new_coord, com = coord_com(coord,mass)
+    if rotation:
+       rot_matrix = quaternion_fit(ref_coord, new_coord, mass)
+       new_coord = rotate_vector(rot_matrix,new_coord)
+    if not wrt_com:
+       new_coord = np.reshape( np.reshape(new_coord,(natoms,3)) + ref_com, 3*natoms )
     if forces is None:
-       return rot_coord
+       return new_coord
     else:
        rot_forces = rotate_vector(rot_matrix,forces)
-       return rot_coord, rot_forces   
-
-
-def remove_translation(ref_com, coord, mass):
-    """
-    Removes translation from a trajectory 
-    Args: ref_com = Reference center of mass 3-d vector w.r.t which rigid translation is computed
-          coord = 3N dimensional cartesian coordinates for N atoms
-          mass = N dimensional mass matrix
-    """
-    natoms = len(coord)//3
-    coord = np.reshape(coord,(natoms,3))
-    mass = np.array(mass)
-    com = np.dot(coord.T, mass) / mass.sum() 
-    com_shift = com - ref_com
-    coord_com = np.reshape(coord - com_shift,3*natoms)
-    return coord_com
+       return new_coord, rot_forces   
 
 
 class xyz:
@@ -252,24 +251,35 @@ class xyz:
 
 
       def write(self, cell, coord):
-          """This method writes the atoms & coordinates in an XYZ file with output unit angstrom """
-          #if len[cell] == 6: cell[0:3] *= unit2ang[self.cell_unit]
-          #elif len[cell] == 9: 
-          #   h = cell*unit2ang[self.cell_unit]; del cell; cell = h2abc(h)
-          #else: 
-          #   raise ValueError("xyz.write: Incorrect cell dimension. Allowed dimensions: 6 or 9")
+          """
+          This method writes the atoms & coordinates in an XYZ file with output unit angstrom
+          cell parameters would be written in abcABC format
+          """
+          cell_write=True
+          if cell is not None:
+             if len(cell) == 6: cell[0:3] *= unit2ang[self.cell_unit]
+             elif len(cell) == 9: 
+                h = cell*unit2ang[self.cell_unit]; del cell; cell = h2abc(h)
+             else: 
+                print("xyz.write: Incorrect cell dimension. Allowed dimensions: 6 or 9.")
+                cell_write = False
+          else:
+             cell_write = False
 
           if self.io == 'r':
              raise NotImplementedError("xyz class: write not implemented for io = r")          
           if len(coord) != 3*self.natoms:
              sys.exit("xyz class: dimensions of atoms and coord supplied to write are not consistent.")
-          cell[0:3] *= unit2ang[self.cell_unit]
           coord_angstrom = coord * unit2ang[self.pos_unit]   
           coord_angstrom = coord_angstrom.reshape((self.natoms,3))
           self.out_xyz.write("%d\n"%(self.natoms))
-          self.out_xyz.write("# CELL(abcABC): %10.5f  %10.5f  %10.5f  %10.5f  %10.5f  %10.5f"\
+          if cell_write:
+             self.out_xyz.write("# CELL(abcABC): %10.5f  %10.5f  %10.5f  %10.5f  %10.5f  %10.5f"\
                              %(cell[0],cell[1],cell[2],cell[3],cell[4],cell[5])+\
-                          "  PYEPFD-Step: %d positions{angstrom} cell{angstrom}\n"%(self.iconfg))
+                          "  PyEPFD-Step: %d positions{angstrom} cell{angstrom}\n"%(self.iconfg))
+          else: 
+             self.out_xyz.write("#Cell-parameters not understood/supplied PyEPFD-Step: %d\n"%(self.iconfg)) 
+
           for iatom in range(self.natoms):
               self.out_xyz.write("%s    %15.8g  %15.8g  %15.8g\n"\
                       %(self.atoms[iatom], coord_angstrom[iatom,0], coord_angstrom[iatom,1], coord_angstrom[iatom,2]))

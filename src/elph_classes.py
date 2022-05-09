@@ -23,6 +23,28 @@ def bose_einstein(omega,omega_unit='Ha',T=0.0):
        bose_einstein = 1.00000e+00/(np.exp(x)-1.0000000e+0)
     return bose_einstein
 
+def coord_com(coord, mass, flatten=True):
+    """
+    Retruns coordinates with respect to center of mass (com) and com coordinates
+          coord = 3N dimensional cartesian coordinates for N atoms
+          mass = N dimensional mass matrix
+    Returns: coord_com = coordinates with respect to c.o.m and
+             com = center of mass coordinate
+    """
+    natoms = len(coord)//3
+    if len(mass) == len(coord):
+       mass = np.array([mass[3*i] for i in range(natoms)])
+    elif len(mass) == natoms:
+       pass
+    else:
+       raise ValueError("Dimensions of mass and coord are not consistent.")
+    coord = np.reshape(coord,(natoms,3))
+    mass = np.array(mass)
+    com = np.dot(coord.T, mass) / mass.sum()
+    if flatten: coord_com = np.reshape(coord - com,3*natoms)
+    else: coord_com = coord - com
+    return coord_com, com
+
 
 class central_diff:
       """
@@ -181,20 +203,26 @@ class dm:
 
           if len(opt_coord) != self.nmodes:
              raise ValueError("Dimension of opt_coord is not consistent with dynmatrix") 
+          #center of mass coordinates (com) and coordinates wrt com
+          self.opt_coord_com, self.opt_com = coord_com(opt_coord,self.mass,flatten=False)  
+
           if asr == 'none':
              self.refdynmatrix = self.dynmatrix.copy(); self.refU = self.U.copy(); self.refw2 = self.w2.copy();
              self.refV = self.V.copy(); self.refomega = self.omega.copy()
              return
 
-          coord = np.array(opt_coord).reshape(self.natoms,3)
-          com = np.dot(np.transpose(coord), self.mass) / self.mass.sum()   #center of mass coordinates (com)
-          coord_com = coord - com    # coordinate with respect to com
+          #coord = np.array(opt_coord).reshape(self.natoms,3)
+          #self.opt_com = np.dot(np.transpose(coord), self.mass) / self.mass.sum()   #center of mass coordinates (com)
+          #coord_com = coord - self.opt_com    # coordinate with respect to com of optimized geometry
+          #self.opt_coord_com, self.opt_com = coord_com(opt_coord,self.mass)
+
           moi = np.zeros((3, 3), np.float64)     #moment of inertia
           for i in range(self.natoms):
-              moi -= np.dot(np.cross(coord_com[i], np.identity(3)), np.cross(coord_com[i], np.identity(3))) * self.mass[i]
+              moi -= np.dot(np.cross(self.opt_coord_com[i], np.identity(3)), \
+                      np.cross(self.opt_coord_com[i], np.identity(3))) * self.mass[i]
 
           U = (np.linalg.eig(moi))[1]       ## eigenvectors of moi
-          R = np.dot(coord_com, U)
+          R = np.dot(self.opt_coord_com, U)
           D = np.zeros((3, 3 * self.natoms), np.float64)
           #print("U:"); print(U); print("R:"); print(R)
 
