@@ -23,7 +23,8 @@ class ipi_info:
              sys.exit("Motion mode is not vibrations")
           
           vibrations_tree = motion_tree.find("vibrations")
-          self.vibration_mode = vibrations_tree.attrib["mode"]
+          try: self.vibration_mode = vibrations_tree.attrib["mode"]
+          except KeyError: self.vibration_mode = 'fd'   
           self.asr = vibrations_tree.find("asr")
           if self.asr is not None:
              self.asr = self.asr.text.strip()
