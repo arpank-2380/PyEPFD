@@ -300,11 +300,11 @@ class ionic_mover:
       def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,\
                   dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal'):
           init_time = time.time()
-          self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)
+          self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)          
           if len(self.opt_coord) != 3*self.natoms:
              sys.exit("dimensions of atoms and coordinates supplied to ionic_mover class are not consistent.") 
           self.mode = mode.lower(); self.deltax = deltax; self.deltae = deltae
-          self.dynmat = dynmat; self.mass = mass
+          self.dynmat = dynmat; self.mass = mass; self.asr = asr
 
           self.__define_mass()
 
