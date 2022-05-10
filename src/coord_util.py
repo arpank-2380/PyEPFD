@@ -297,7 +297,8 @@ class ionic_mover:
              deltax = displacement in au
              deltae  = energy scaled displacement in au
       """
-      def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,dynmat=None,mass=None,ngrid=1,temperature=0):
+      def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,\
+                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal'):
           init_time = time.time()
           self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)
           if len(self.opt_coord) != 3*self.natoms:
@@ -364,7 +365,7 @@ class ionic_mover:
                      #print(nm_disp)    
       def _mc(self):
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
-                                      asr = 'crystal', temperature = 0)
+                                      asr = self.asr, temperature = 0)
           for idisp in range(2):
               self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
 
