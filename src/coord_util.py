@@ -257,6 +257,7 @@ class xyz:
           """
           cell_write=True
           if cell is not None:
+             cell = np.array(cell)
              if len(cell) == 6: cell[0:3] *= unit2ang[self.cell_unit]
              elif len(cell) == 9: 
                 h = cell*unit2ang[self.cell_unit]; del cell; cell = h2abc(h)
