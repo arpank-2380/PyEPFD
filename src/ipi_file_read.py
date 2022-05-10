@@ -69,15 +69,15 @@ class ipi_info:
               self.coord = np.array([float(element.strip(",")) for element in self.coord_tree.text.split()[1:-1]])
               #print(self.coord[0])
 
-          ### Reading symbols of atoms
-          self.symbol_tree = file_tree.find("./system/beads/names")
-          self.symbols = []
-          if self.symbol_tree is None:
-              sys.exit("Atom symbols not found in file" + file_path)
+          ### Reading  atoms
+          self.atom_tree = file_tree.find("./system/beads/names")
+          self.atoms = []
+          if self.atom_tree is None:
+              sys.exit("Atoms not found in file" + file_path)
           else:
-              for element in self.symbol_tree.text.split()[1:-1]:
-                  self.symbols.append(element.strip(","))
-          #print(self.symbols)
+              for element in self.atom_tree.text.split()[1:-1]:
+                  self.atoms.append(element.strip(","))
+          #print(self.atoms)
 
           final_time = time.time()
           exec_time = final_time - init_time
