@@ -330,6 +330,7 @@ class ionic_mover:
           elif self.mode == 'mc':
              if (dynmat is None) | (temperature is None):
                 sys.exit("For mc modes dynamical matrix and a temperature must be supplied to ionic_mover class") 
+             self.temperature = temperature
              self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
              #print(self.disp_coord.shape)
              self._mc()
@@ -365,7 +366,7 @@ class ionic_mover:
                      #print(nm_disp)    
       def _mc(self):
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
-                                      asr = self.asr, temperature = 0)
+                                      asr = self.asr, temperature = self.temperature)
           for idisp in range(2):
               self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
 

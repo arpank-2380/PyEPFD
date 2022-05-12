@@ -264,9 +264,10 @@ class stoch_displacements(dm):
       def __init__(self,dynmat,mass,asr=None,temperature=0):
           super(stoch_displacements,self).__init__(dynmat,mass)
           sigma = np.zeros(self.nmodes,np.float64)
+          #print(temperature)
           for mode in range(self.nmodes):
               be = bose_einstein(self.omega[mode],omega_unit='Ha',T=temperature)
-              sigma[mode] = np.sqrt((be+0.5)/self.omega[mode])
+              sigma[mode] = np.sqrt(np.abs((be+0.5)/self.omega[mode]))  ## negative frequencies converted to +ve
 
           if asr == 'crystal': nmstart = 3
           elif asr == 'lin':   nmstart = 5
@@ -284,8 +285,8 @@ class stoch_displacements(dm):
               else:   
                  self.nmdisp[0,mode] -= sigma[mode]
                  self.nmdisp[1,mode] += sigma[mode]
-          print(self.nmdisp[0])
-          print(self.nmdisp[1])
+          #print(self.nmdisp[0])
+          #print(self.nmdisp[1])
 
 
 class nm_sym_displacements(dm):
