@@ -298,7 +298,7 @@ class ionic_mover:
              deltae  = energy scaled displacement in au
       """
       def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,\
-                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal'):
+                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal',algo='osap'):
           init_time = time.time()
           self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)          
           if len(self.opt_coord) != 3*self.natoms:
@@ -333,7 +333,7 @@ class ionic_mover:
              self.temperature = temperature
              self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
              #print(self.disp_coord.shape)
-             self._mc()
+             self._mc(algo = algo, ngrid = ngrid)
 
           else:
              raise NotImplementedError("Allowed modes: fd/nmfd/enmfd/snmfd")
@@ -364,9 +364,11 @@ class ionic_mover:
                      idisp += 1
                      print("idisp = %d"%idisp)
                      #print(nm_disp)    
-      def _mc(self):
+
+      def _mc(self,algo,ngrid):
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
-                                      asr = self.asr, temperature = self.temperature)
+                                      asr = self.asr, temperature = self.temperature,\
+                                      ngrid = ngrid, algo = algo)
           for idisp in range(2):
               self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
 

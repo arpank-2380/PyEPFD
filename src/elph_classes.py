@@ -261,33 +261,66 @@ class dm:
           return
 
 class stoch_displacements(dm):
-      def __init__(self,dynmat,mass,asr=None,temperature=0):
+      """
+      This class calculates the stochastic displacements along normal modes given algorithm
+      Args: dynmat = Dynamical matrix
+            mass = mass matrix
+            asr = Acoustic sum rule; allowed values: 'crystal', 'lin', 'poly'
+            temperature = Temperature for which displacements are chosen
+            algo = algorithm 
+                   Options:'os': one-shot, 
+                           'osap': one-shot with anthetic pair
+                           'osrnd': oneshot where displacement signs chosen at random
+                           'mc': Monte Carlo where displacements are chosen at random from a Gaussian
+            ngrid = number of integration grid (sample points)
+      """
+      def __init__(self,dynmat,mass,asr='none',temperature=0,algo='osap',ngrid=1):
           super(stoch_displacements,self).__init__(dynmat,mass)
+          self.algo = algo.lower(); self.ngrid = ngrid 
+          if (self.algo == 'os') | (self.algo == 'osap') | (self.algo == 'osrnd') | (self.algo == 'mc'):
+             pass
+          else:
+             raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osrnd' or 'mc'")
           sigma = np.zeros(self.nmodes,np.float64)
           #print(temperature)
           for mode in range(self.nmodes):
               be = bose_einstein(self.omega[mode],omega_unit='Ha',T=temperature)
               sigma[mode] = np.sqrt(np.abs((be+0.5)/self.omega[mode]))  ## negative frequencies converted to +ve
 
-          if asr == 'crystal': nmstart = 3
-          elif asr == 'lin':   nmstart = 5
-          elif asr == 'poly':  nmstart = 6
-          else:                nmstart = 0
-
-          self.nmdisp = np.zeros((2,self.nmodes),np.float64)
+          if asr == 'crystal': self.nmstart = 3
+          elif asr == 'lin':   self.nmstart = 5
+          elif asr == 'poly':  self.nmstart = 6
+          else:                self.nmstart = 0
           for mode in range(self.nmodes):
               if self.V[0,mode] < 0:
                   self.V[:,mode] *= -1
-          for mode in range(nmstart,self.nmodes):       
-              if (mode-nmstart)%2 == 0:
-                 self.nmdisp[0,mode] += sigma[mode]
-                 self.nmdisp[1,mode] -= sigma[mode]
-              else:   
-                 self.nmdisp[0,mode] -= sigma[mode]
-                 self.nmdisp[1,mode] += sigma[mode]
-          #print(self.nmdisp[0])
-          #print(self.nmdisp[1])
 
+          if 'os' in self.algo:
+             signs = self._gen_signs()
+             self.nmdisp = np.zeros((len(signs),self.nmodes),np.float64)
+             for mode in range(self.nmstart,self.nmodes):
+                 for idisp in range(len(signs)):
+                    self.nmdisp[idisp,mode] += sigma[mode]*signs[idisp,mode]
+          else:
+             self.nmdisp = np.zeros((self.ngrid,self.nmodes),np.float64)
+             for mode in range(self.nmstart,self.nmodes):
+                 rng = np.random.default_rng()
+                 self.nmdisp[:,mode] += rng.normal(0.0,sigma[mode],self.ngrid)
+
+      def _gen_signs(self):
+          if 'rnd' in self.algo:
+             options = np.array([-1,1],np.int64)
+             rng = np.random.default_rng()
+             signs = rng.choice(options, size=(ngrid,self.nmodes))
+          else:
+             signs = np.ones((2,self.nmodes),np.int64)
+             for mode in range(self.nmstart,self.nmodes):
+                 if (mode-self.nmstart)%2 == 0: signs[0,mode] *= +1
+                 else: signs[0,mode] *= -1
+             signs[1,self.nmstart:self.nmodes] = -1 * signs[0,self.nmstart:self.nmodes]
+          print(signs)   
+          return signs
+         
 
 class nm_sym_displacements(dm):
       """
