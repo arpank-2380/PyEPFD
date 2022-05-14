@@ -327,27 +327,27 @@ class ionic_mover:
                 sys.exit("For nmfd/enmfd/snmfd modes dynamical matrix must be supplied to ionic_mover") 
              self._nm_disp()  
 
-          elif self.mode == 'mc':
+          elif self.mode == 'sd':
              if (dynmat is None) | (temperature is None):
-                sys.exit("For mc modes dynamical matrix and a temperature must be supplied to ionic_mover class") 
+                sys.exit("For sd modes dynamical matrix and a temperature must be supplied to ionic_mover class") 
              self.temperature = temperature
-             if (algo == 'rnd') | (algo == 'mc'):
+             if (algo == 'osrnd') | (algo == 'mc'):
                 for i in range(ngrid-1): 
                     self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
              else:
                 self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
              #print(self.disp_coord.shape)
-             self._mc(algo = algo, ngrid = ngrid)
+             self._stoch_disp(algo = algo, ngrid = ngrid)
 
           else:
-             raise NotImplementedError("Allowed modes: fd/nmfd/enmfd/snmfd")
+             raise NotImplementedError("Allowed modes: fd/nmfd/enmfd/sd")
           
           final_time = time.time()
           exec_time = final_time - init_time
           print("Time spent on ionic_mover class: " + str(exec_time) + " s.")
       
       def _cart_disp(self):
-          """deltax is a scaler"""
+          """ Method to perform cartesian displacement for frequency calculation"""
           idisp = 1
           for icart in range(3*self.natoms):
               for step in self.step_list:
@@ -355,21 +355,28 @@ class ionic_mover:
                   idisp += 1
 
       def _nm_disp(self):
-             nmfd = nm_sym_displacements( dynmat = self.dynmat, mass = self.mass,\
-                                             mode = self.mode, deltax = self.deltax, deltae = self.deltae)
-             idisp = 1
-             #print(nmfd.displacements)
-             for imode in range(len(nmfd.displacements)):
-                 for step in self.step_list:
-                     nm_disp = np.zeros(3*self.natoms,np.float64)
-                     nm_disp[imode] = nmfd.displacements[imode]*step
-                     #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
-                     self.disp_coord[:,idisp] +=  nmfd.nm2cart_disp(nm_disp)
-                     idisp += 1
-                     print("idisp = %d"%idisp)
-                     #print(nm_disp)    
+          """Method to perform normal-mode displacements for frequency calculation"""        
+          nmfd = nm_sym_displacements( dynmat = self.dynmat, mass = self.mass,\
+                                          mode = self.mode, deltax = self.deltax, deltae = self.deltae)
+          idisp = 1
+          #print(nmfd.displacements)
+          for imode in range(len(nmfd.displacements)):
+              for step in self.step_list:
+                  nm_disp = np.zeros(3*self.natoms,np.float64)
+                  nm_disp[imode] = nmfd.displacements[imode]*step
+                  #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
+                  self.disp_coord[:,idisp] +=  nmfd.nm2cart_disp(nm_disp)
+                  idisp += 1
+                  print("idisp = %d"%idisp)
+                  #print(nm_disp)    
 
-      def _mc(self,algo,ngrid):
+      def _stoch_disp(self,algo,ngrid):
+          """
+          Method to perform stochastic displacements for ZPR/anharmonicity measure etc
+          Args: algo = algorithm. Options: (i) 'os'(one-shot) (ii)'osap' (one-shot with antethetic pair)
+                                          (iii)'osrnd' (one-shot with random signs) (iv) 'mc' (monte-carlo)
+                ngrid = no of samples to be drawn fo 'osrnd' and 'mc' method explained before.  
+          """
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
                                       asr = self.asr, temperature = self.temperature,\
                                       ngrid = ngrid, algo = algo)
