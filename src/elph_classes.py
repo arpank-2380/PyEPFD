@@ -298,6 +298,7 @@ class stoch_displacements(dm):
           if 'os' in self.algo:
              signs = self._gen_signs()
              self.nmdisp = np.zeros((len(signs),self.nmodes),np.float64)
+             print(self.nmdisp.shape)
              for mode in range(self.nmstart,self.nmodes):
                  for idisp in range(len(signs)):
                     self.nmdisp[idisp,mode] += sigma[mode]*signs[idisp,mode]
@@ -309,16 +310,18 @@ class stoch_displacements(dm):
 
       def _gen_signs(self):
           if 'rnd' in self.algo:
+             print("rnd ")
              options = np.array([-1,1],np.int64)
              rng = np.random.default_rng()
-             signs = rng.choice(options, size=(ngrid,self.nmodes))
+             signs = rng.choice(options, size=(self.ngrid,self.nmodes))
           else:
+             print('no rnd')
              signs = np.ones((2,self.nmodes),np.int64)
              for mode in range(self.nmstart,self.nmodes):
                  if (mode-self.nmstart)%2 == 0: signs[0,mode] *= +1
                  else: signs[0,mode] *= -1
              signs[1,self.nmstart:self.nmodes] = -1 * signs[0,self.nmstart:self.nmodes]
-          print(signs)   
+          #print(signs)   
           return signs
          
 
