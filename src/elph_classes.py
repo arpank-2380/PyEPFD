@@ -271,16 +271,20 @@ class stoch_displacements(dm):
                    Options:'os': one-shot, 
                            'osap': one-shot with anthetic pair
                            'osr': oneshot where displacement signs chosen at random
+                           'osrap': The same as 'osr' but for each sampled point it's antethetic pair would be included
                            'mc': Monte Carlo where displacements are chosen at random from a Gaussian
-            ngrid = number of integration grid (sample points)
+                           'mcap': The same as 'mc' but for each sampled point it's antethetic pair would be included
+            ngrid = number of integration grid (sample points); with antethetic pairs ('ap') actual number of
+                    single point calculation (sample points) will be 2 * ngrid
       """
       def __init__(self,dynmat,mass,asr='none',temperature=0,algo='osap',ngrid=1):
           super(stoch_displacements,self).__init__(dynmat,mass)
           self.algo = algo.lower(); self.ngrid = ngrid 
-          if (self.algo == 'os')|(self.algo == 'osap')|(self.algo == 'osr')|(self.algo == 'osrap')|(self.algo == 'mc'):
+          if (self.algo == 'os')|(self.algo == 'osap')|(self.algo == 'osr')|\
+             (self.algo == 'osrap')|(self.algo == 'mc')|(self.algo == 'mcap'):
              pass
           else:
-             raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osr', 'osrap', or 'mc'")
+             raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osr', 'osrap', 'mc' or 'mcap'")
           sigma = np.zeros(self.nmodes,np.float64)
           #print(temperature)
           for mode in range(self.nmodes):
@@ -307,6 +311,9 @@ class stoch_displacements(dm):
              for mode in range(self.nmstart,self.nmodes):
                  rng = np.random.default_rng()
                  self.nmdisp[:,mode] += rng.normal(0.0,sigma[mode],self.ngrid)
+             if 'ap' in self.algo:
+                 ap_nmdisp = -1.0 * self.nmdisp   #Antethetic pairs of sample points
+                 self.nmdisp = np.vstack((self.nmdisp,ap_nmdisp))
 
       def _gen_signs(self):
           if 'r' in self.algo:
@@ -315,7 +322,7 @@ class stoch_displacements(dm):
              rng = np.random.default_rng()
              signs = rng.choice(options, size=(self.ngrid,self.nmodes))
              if 'ap' in self.algo:
-                apsigns = -1 * signs 
+                apsigns = -1 * signs              #Antethetic pairs of sample points
                 signs = np.vstack((signs, apsigns))
           else:
              #print('no r')

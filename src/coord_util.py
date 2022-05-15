@@ -334,11 +334,13 @@ class ionic_mover:
              if (algo == 'osr') | (algo == 'mc'):
                 for i in range(ngrid-1): 
                     self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
-             elif (algo == 'osrap'):
+             elif (algo == 'osrap') | (algo == 'mcap'):
                 for i in range(2*ngrid-1):
                     self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
-             else:
+             elif (algo == 'os') | (algo == 'osap'):
                 self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
+             else:
+                raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osr', 'osrap', 'mc' or 'mcap'")
              #print(self.disp_coord.shape)
              self._stoch_disp(algo = algo, ngrid = ngrid)
 
