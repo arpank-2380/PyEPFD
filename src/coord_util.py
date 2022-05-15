@@ -334,7 +334,7 @@ class ionic_mover:
              if (algo == 'osr') | (algo == 'mc'):
                 for i in range(ngrid-1): 
                     self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
-             elif if (algo == 'osrap'):
+             elif (algo == 'osrap'):
                 for i in range(2*ngrid-1):
                     self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
              else:
