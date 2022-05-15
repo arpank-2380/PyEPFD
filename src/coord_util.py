@@ -331,8 +331,11 @@ class ionic_mover:
              if (dynmat is None) | (temperature is None):
                 sys.exit("For sd modes dynamical matrix and a temperature must be supplied to ionic_mover class") 
              self.temperature = temperature
-             if (algo == 'osrnd') | (algo == 'mc'):
+             if (algo == 'osr') | (algo == 'mc'):
                 for i in range(ngrid-1): 
+                    self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
+             elif if (algo == 'osrap'):
+                for i in range(2*ngrid-1):
                     self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
              else:
                 self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
@@ -374,8 +377,10 @@ class ionic_mover:
           """
           Method to perform stochastic displacements for ZPR/anharmonicity measure etc
           Args: algo = algorithm. Options: (i) 'os'(one-shot) (ii)'osap' (one-shot with antethetic pair)
-                                          (iii)'osrnd' (one-shot with random signs) (iv) 'mc' (monte-carlo)
-                ngrid = no of samples to be drawn fo 'osrnd' and 'mc' method explained before.  
+                                          (iii)'osr' (one-shot with random signs);
+                                          (iv) 'osrap' (one-shot with random signs and antethetic pairs for each point);
+                                           (v) 'mc' (monte-carlo)
+                ngrid = no of samples to be drawn fo 'osr', 'osrap' (2 * ngrid) and 'mc' method explained before.  
           """
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
                                       asr = self.asr, temperature = self.temperature,\

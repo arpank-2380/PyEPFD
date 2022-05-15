@@ -270,17 +270,17 @@ class stoch_displacements(dm):
             algo = algorithm 
                    Options:'os': one-shot, 
                            'osap': one-shot with anthetic pair
-                           'osrnd': oneshot where displacement signs chosen at random
+                           'osr': oneshot where displacement signs chosen at random
                            'mc': Monte Carlo where displacements are chosen at random from a Gaussian
             ngrid = number of integration grid (sample points)
       """
       def __init__(self,dynmat,mass,asr='none',temperature=0,algo='osap',ngrid=1):
           super(stoch_displacements,self).__init__(dynmat,mass)
           self.algo = algo.lower(); self.ngrid = ngrid 
-          if (self.algo == 'os') | (self.algo == 'osap') | (self.algo == 'osrnd') | (self.algo == 'mc'):
+          if (self.algo == 'os')|(self.algo == 'osap')|(self.algo == 'osr')|(self.algo == 'osrap')|(self.algo == 'mc'):
              pass
           else:
-             raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osrnd' or 'mc'")
+             raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osr', 'osrap', or 'mc'")
           sigma = np.zeros(self.nmodes,np.float64)
           #print(temperature)
           for mode in range(self.nmodes):
@@ -309,13 +309,16 @@ class stoch_displacements(dm):
                  self.nmdisp[:,mode] += rng.normal(0.0,sigma[mode],self.ngrid)
 
       def _gen_signs(self):
-          if 'rnd' in self.algo:
-             #print("rnd ")
+          if 'r' in self.algo:
+             #print("r ")
              options = np.array([-1,1],np.int64)
              rng = np.random.default_rng()
              signs = rng.choice(options, size=(self.ngrid,self.nmodes))
+             if 'ap' in self.algo:
+                apsigns = -1 * signs 
+                signs = np.vstack((signs, apsigns))
           else:
-             #print('no rnd')
+             #print('no r')
              signs = np.ones((2,self.nmodes),np.int64)
              for mode in range(self.nmstart,self.nmodes):
                  if (mode-self.nmstart)%2 == 0: signs[0,mode] *= +1
