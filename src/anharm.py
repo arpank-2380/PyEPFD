@@ -14,7 +14,7 @@ class anharm_measure(dm):
             asr = acoustic sum rule; allowed values 'crystal', 'poly', 'lin'
       """
       def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none', \
-                   mode_resolved=True):
+                   mode_resolved=True, remove_rot_trans=True):
           super(anharm_measure,self).__init__(dynmat,mass)
           #print("anharm class speaking:")
           init_time = time.time()
@@ -34,7 +34,7 @@ class anharm_measure(dm):
 
           self.calc_hessian()
           self.opt_coord_com = self.opt_coord_com.flatten()
-          self._remove_trans_rot(self.opt_coord_com)
+          if remove_rot_trans: self._remove_trans_rot(self.opt_coord_com)
           for i in range(len(self.disp)): self.disp[i] -= self.opt_coord_com
 
           self._measure(mode_resolved = mode_resolved)
