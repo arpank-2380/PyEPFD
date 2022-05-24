@@ -157,14 +157,20 @@ class anharm_measure(dm):
                   %(self.mode_anh_var_sum, self.mode_tot_var_sum, self.mode_anh_mes_sum))
 
 
-class anharm_reweighting(dm):
+class boltzmann_reweighting(dm):
+      """
+      This class uses a Boltzmann reweighting technique at a finite T to include 
+      anharmonicity. T cannot be small or 0. 
+      Returns the modified weights for new configurations
+      """
       def __init__(self,dynmat, mass, \
-                   disp_energy, disp_coords, opt_energy, opt_coord, \
+                   disp_energy, disp_coords, opt_energy, opt_coord, temperature, \
                    asr='none', remove_rot_trans=True):
-          super(anharm_reweighting,self).__init__(dynmat,mass)
+          super(boltzmann_reweighting,self).__init__(dynmat,mass)
           init_time = time.time()
           self.energy = np.array(disp_energy)-opt_energy
           self.disp = np.array(disp_coords)
+          self.temperature = temperature
 
           if self.energy.shape[0] != self.disp.shape[0]:
              raise ValueError("anharm_reweighting: Number of MD/MC snapshots in energy and disp_coords are not same!")
@@ -172,6 +178,8 @@ class anharm_reweighting(dm):
              raise ValueError("anharm_reweighting: Vector dimension of forces/displacement/opt_coord is not consistent with dynmatrix.")
           if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): pass
           else: ValueError("anharm_reweighting: The allowed values for asr are 'none', 'poly', 'lin', 'crystal")
+          if temperature < 1.0: 
+             raise ValueError("boltzmann_reweighting: Does not work for small or near-zero temperature")  
 
           self.apply_asr(opt_coord = opt_coord ,asr = asr)
           self.dynmatrix = self.refdynmatrix
@@ -180,9 +188,11 @@ class anharm_reweighting(dm):
           self.calc_hessian()
           self.opt_coord_com = self.opt_coord_com.flatten()
           if remove_rot_trans: self._remove_trans_rot(self.opt_coord_com)
-          for i in range(len(self.disp)): self.disp[i] -= self.opt_coord_com
+          self.nconfig = len(self.disp)
+          for i in range(self.nconfig): self.disp[i] -= self.opt_coord_com
 
           self._energy_decomp()
+          self._calc_weights()
 
       def _energy_decomp(self):
           """energy_decomposition: returns harmonic and anharmonic contribution of energy for a particular frame. 
@@ -195,7 +205,13 @@ class anharm_reweighting(dm):
           for i in range(len(self.energy)):
               self.harm_energy[i] = 0.5 * np.dot(self.disp[i],np.dot(self.hessian,self.disp[i]))
           self.anharm_energy = self.energy - self.harm_energy
-          
+
+      def _calc_weights(self):
+          self.weights = np.ones(self.nconfig, np.float64)
+          for i in range(self.nconfig):
+              self.weights[i] = np.exp(-self.anharm_energy[i] * ha2unit['K'] / self.temperature)
+          norm_fac = np.sum(self.weights)
+          self.weights /= norm_fac
    
       def _remove_trans_rot(self,ref_coord):
           for i in range(len(self.disp)):
