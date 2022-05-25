@@ -193,6 +193,7 @@ class boltzmann_reweighting(dm):
 
           self._energy_decomp()
           self._calc_weights()
+          self._anharm_measure()
 
       def _energy_decomp(self):
           """energy_decomposition: returns harmonic and anharmonic contribution of energy for a particular frame. 
@@ -206,14 +207,25 @@ class boltzmann_reweighting(dm):
               self.harm_energy[i] = 0.5 * np.dot(self.disp[i],np.dot(self.hessian,self.disp[i]))
           self.anharm_energy = self.energy - self.harm_energy
 
+      def _anharm_measure(self):
+          """It is an anharm measure analogous to KPSC measure but based on energies.
+             Here it is defined as the ratio of standard deviation of anharmonic energy and total energy.
+          """
+          anh_var = np.var(self.anharm_energy); tot_var = np.var(self.energy)
+          self.anharm_measure = np.sqrt(anh_var/tot_var)
+
       def _calc_weights(self):
-          self.weights = np.ones(self.nconfig, np.float64)
+          """
+          Calculates Boltzmann weights based on anharmonic energy
+          """
+          self.weights = np.ones(self.nconfig, np.float128)
           for i in range(self.nconfig):
               self.weights[i] = np.exp(-self.anharm_energy[i] * ha2unit['K'] / self.temperature)
-          norm_fac = np.sum(self.weights)
-          self.weights /= norm_fac
+          norm_fac = self.nconfig / np.sum(self.weights)
+          self.weights *= norm_fac
    
       def _remove_trans_rot(self,ref_coord):
+          """ Removes translation of com and angular momentum  """
           for i in range(len(self.disp)):
               self.disp[i], self.forces[i] = remove_trans_rot( ref_coord = ref_coord, \
                                           coord = self.disp[i], forces = self.forces[i], mass = self.mass)   
