@@ -7,12 +7,14 @@ import scipy.stats
 from ipi_file_read import ipi_info
 from elph_classes import dm
 from constants import *
+from coord_util import * 
 
 
 class nm_info:
       def __init__(self,ipi_restart_file):
           ipi = ipi_info(file_path=ipi_restart_file)
           dyn_mat = dm(dynmat=ipi.dynmatrix, mass = ipi.mass)
+          self.mass = dyn_mat.mass
           self.mode_vectors = dyn_mat.V
           self.omega = np.sqrt(abs(dyn_mat.w2))
           self.total_modes = len(self.mode_vectors)
@@ -42,6 +44,7 @@ class xyz2nmode:
           self.mode_vectors = nm_info.mode_vectors
           self.omega = nm_info.omega
           self.nmstart = nm_info.nmstart
+          self.mass = nm_info.mass
 
 
       def getcoord(self, xyz_lines=None, frame_no=1, pos_unit="angstrom"):
@@ -86,14 +89,18 @@ class xyz2nmode:
           #print(pos_unit,cell_unit)
           return natoms, nframes, file_lines, pos_unit   #, cell_unit 
       
-      def get_nm_coeff(self,frame_no,mode_list=None,freq_scaled = True):
+      def get_nm_coeff(self,frame_no,mode_list=None,freq_scaled = True, remove_rot_trans=True):
           if mode_list is None:
              mode_list = [i+1 for i in range(self.nmstart,len(self.omega))]
              #header = "#Coefficients along all modes printed in column."
           #else :
              #header = "#coefficients along modes: "+ str(mode_list) + "printed in columns."
          
-          cart_disp = self.getcoord(self.traj_lines,frame_no,self.pos_unit) - self.ref_coord
+          cart_disp = self.getcoord(self.traj_lines,frame_no,self.pos_unit)
+          if remove_rot_trans:
+             cart_disp = remove_trans_rot( ref_coord = self.ref_coord, \
+                         coord = cart_disp, mass = self.mass)
+          cart_disp -= self.ref_coord
           mode_coeff = np.zeros(len(mode_list),np.float64)
           imode = 0
           for modes in mode_list:
@@ -130,9 +137,9 @@ class prob_dist_on_nm:
          hist_nbin = Number of bins on the probability density histogram
       """
       def __init__(self, ipi_restart_file, ref_struc, traj_file, prefix,
-                         start_frame = 1, end_frame = None, par_exec = True,
-                         mode_list = None, freq_scaled = True, nmode_traj = True, 
-                         hist_start = -5.0, hist_end = 5.0, hist_nbin = 1001):
+                   start_frame = 1, end_frame = None, remove_rot_trans=True, 
+                   par_exec = True,mode_list = None, freq_scaled = True, 
+                   nmode_traj = True, hist_start = -5.0, hist_end = 5.0, hist_nbin = 1001):
           
           init_time = time.time()
           global MPI, mpi
@@ -146,6 +153,7 @@ class prob_dist_on_nm:
                  print("Package mpi4Py not found. Reverting to serial execution.")
           #global MPI, mpi
           
+          self.remove_rot_trans = remove_rot_trans
           nmode = nm_info(ipi_restart_file=ipi_restart_file)
           self.traj = xyz2nmode(ref_struc=ref_struc, traj_file=traj_file, nm_info=nmode)
           self.frame_start = start_frame
@@ -256,7 +264,7 @@ class prob_dist_on_nm:
           iframe = 0
           #print(self.mode_list)
           for frame in range(frame_range[0],frame_range[1]):
-              nmode_coeff[iframe,:] = self.traj.get_nm_coeff(frame,self.mode_list,self.freq_scaled)
+              nmode_coeff[iframe,:] = self.traj.get_nm_coeff(frame,self.mode_list,self.freq_scaled,self.remove_rot_trans)
               iframe += 1
          #print(nmode_coeff)
          
@@ -330,7 +338,7 @@ class prob_dist_on_nm:
           iframe = 0
           #print(self.mode_list)
           for frame in range(self.frame_start,self.frame_end + 1):
-              nmode_coeff[iframe,:] = self.traj.get_nm_coeff(frame,self.mode_list,self.freq_scaled)
+              nmode_coeff[iframe,:] = self.traj.get_nm_coeff(frame,self.mode_list,self.freq_scaled,self.remove_rot_trans)
               iframe += 1
           self.__write_nm_traj(self.mode_list, nmode_coeff)
        
