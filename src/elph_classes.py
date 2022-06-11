@@ -45,6 +45,13 @@ def coord_com(coord, mass, flatten=True):
     else: coord_com = coord - com
     return coord_com, com
 
+def write_dynmat(dynmat,out_file_name,header='#\n'):
+    outfil = open(out_file_name,'w+')
+    outfil.write("######  This output is produced by PyEPFD. #####\n")
+    outfil.write(header+'\n')
+    for i in range(len(dynmat)):
+            outfil.write(" ".join(map(str, dynmat[i])) + "\n")
+    outfil.close()        
 
 class central_diff:
       """
@@ -152,7 +159,8 @@ class dm:
           #print(self.massinv)
           for i in range(len(self.V)):
             self.V[:, i] *= self.massinv
-          #print(self.V)  
+          #print(self.V)
+          self.asr = None
     
       def calc_hessian(self):
           """Hessian matrix without mass weighting"""
@@ -197,7 +205,7 @@ class dm:
       def apply_asr(self,opt_coord,asr='none'):
           #print(self.mass)
           if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): 
-             pass
+             self.asr = asr
           else:
              raise ValueError("The allowed values for asr are 'none', 'poly', 'lin', 'crystal'") 
 
@@ -259,6 +267,14 @@ class dm:
           for i in range(len(self.V)):
             self.refV[:, i] *= self.massinv
           return
+
+      def write_dynmat(self,prefix):
+          """Prefix of the output file name"""
+          if self.asr is not None:
+             header = "# Dynamical matrix (in au) after refinement with asr = " + self.asr + ":"
+             write_dynmat(self.refdynmatrix, prefix+'.refdynmat', header) 
+          header = "# Dynamical matrix (in au):" 
+          write_dynmat(self.dynmatrix, prefix+'.dynmat') 
 
 class stoch_displacements(dm):
       """
