@@ -161,12 +161,18 @@ class xyz:
          Args: file_path = path of the XYZ file
                io = input/output status: Options r= reading a file and storing data; w = writing into an xyz
                atoms = A list containing atom symbols; mandatory in in 'io = w"' mode
-               pos_unit, cell_unit --> optional for 'io = w' mode; define unit of given coordinate and cell
+               xyz_unit, cell_unit --> optional for 'io = w' mode; define unit of given coordinate and cell
       """
-      def __init__(self, file_path, io='r', atoms=None, pos_unit='atomic_unit', cell_unit='atomic_unit'):
+      def __init__(self, file_path, io='r', atoms=None, xyz_unit='atomic_unit', cell_unit='atomic_unit', quantity='pos'):
           init_time = time.time()
           self.io = io
           if self.io == 'r':
+             if quantity == 'pos': self.pos = True
+             elif quantity == 'mom': self.mom = True
+             elif quantity == 'force': self.force = True
+             elif quantity == 'vel': self.vel = True
+             else: raise ValueError("Allowed values for quantity = 'pos', 'mom', 'force', 'vel'")
+             if not self.pos: print("Warning! mom, force or velocities must be in atomic_unit")
              self.__get_xyz_info(file_path)
              self.coords = np.zeros((self.nframes,3*self.natoms),np.float64)
              for i in range(self.nframes): 
@@ -175,7 +181,7 @@ class xyz:
              self.out_xyz = open(file_path,"w+")
              if atoms is None:
                 sys.exit("Cannot initialize xyz class in 'io = w' mode without a list of atoms")
-             self.atoms = atoms; self.pos_unit = pos_unit; self.cell_unit = cell_unit; self.natoms = len(atoms)
+             self.atoms = atoms; self.xyz_unit = xyz_unit; self.cell_unit = cell_unit; self.natoms = len(atoms)
              self.iconfg = 0
           else:
              raise NotImplementedError("xyz class: io status must be r or w.")
@@ -188,7 +194,7 @@ class xyz:
           print("Time spent on xyz class: " + str(exec_time) + " s.")
 
           #### Printing to test global variables:
-          #print(self.atoms); print(self.natoms); print(self.pos_unit); print(self.cell_unit)
+          #print(self.atoms); print(self.natoms); print(self.xyz_unit); print(self.cell_unit)
           
 
       def __get_xyz_info(self,file_path):
@@ -207,13 +213,13 @@ class xyz:
               self.atoms.append(self.traj_lines[iline].split()[0])
           self.cell_tag = None
           comment = self.traj_lines[1].split()
-          self.pos_unit = "angstrom"; self.cell_unit = "angstrom"
+          self.xyz_unit = "angstrom"; self.cell_unit = "angstrom"
           ### detecting i-PI style comments
           if 'CELL(abcABC):' in comment:
               self.cell_tag='CELL(abcABC):'
           if self.cell_tag is not None:
              if ('x_centeroid{atomic_unit}' in comment) or ('positions{atomic_unit}' in comment):
-                self.pos_unit='atomic_unit'
+                self.xyz_unit='atomic_unit'
              if 'cell{atomic_unit}' in comment:
                 self.cell_unit='atomic_unit'
           
@@ -235,7 +241,8 @@ class xyz:
               for value in line_values[1:]:
                   coord[icoord] = value
                   icoord += 1
-          cell[0:3] *= unit2bohr[self.cell_unit]; coord *= unit2bohr[self.pos_unit]  ### converting to atomic unit( Bohr)                 
+          cell[0:3] *= unit2bohr[self.cell_unit]; 
+          if self.pos: coord *= unit2bohr[self.xyz_unit]  ### converting to atomic unit( Bohr)                 
           return cell, coord
 
       def __read_cell(self, comment_line):
@@ -271,7 +278,7 @@ class xyz:
              raise NotImplementedError("xyz class: write not implemented for io = r")          
           if len(coord) != 3*self.natoms:
              sys.exit("xyz class: dimensions of atoms and coord supplied to write are not consistent.")
-          coord_angstrom = coord * unit2ang[self.pos_unit]   
+          coord_angstrom = coord * unit2ang[self.xyz_unit]   
           coord_angstrom = coord_angstrom.reshape((self.natoms,3))
           self.out_xyz.write("%d\n"%(self.natoms))
           if cell_write:

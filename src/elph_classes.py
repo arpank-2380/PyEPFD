@@ -1,4 +1,4 @@
-__all__=["dm","epce_calculator","phonon_calculator"]
+__all__=["dm","epce_calculator","phonon_calculator", "reorder_dynmat"]
 
 """ This file contains all the classes relavant to frozen phonon calculation """
 
@@ -52,6 +52,73 @@ def write_dynmat(dynmat,out_file_name,header='#\n'):
     for i in range(len(dynmat)):
             outfil.write(" ".join(map(str, dynmat[i])) + "\n")
     outfil.close()        
+
+
+def reorder_dynmat(dynmat,original_ord,new_ord,mass,atoms):
+    """
+    original_ord = python list of tuples defining the 
+                  first and last atom index in each block
+    new_order = python list of tuples defining the first and 
+               last atom index (in terms of original indices in new block  
+    """
+    natom_type = len(original_ord)
+    if len(new_ord) != natom_type:
+       raise ValueError("len(original_ord) != len(new_order)")
+    dynmat = np.array(dynmat)
+    block_index = []
+    for i in range(natom_type):
+        block_index.append(original_ord.index(new_ord[i]))
+
+    if mass is not None:
+       mass = np.array(mass)
+       mass_block = []
+       for i in range(natom_type):
+           start_ind = (original_ord[i][0]-1)*3
+           end_ind = original_ord[i][1]*3
+           mass_block.append( mass[start_ind:end_ind] )
+       new_mass = mass_block[ block_index[0] ]
+       for i in range(1,natom_type):
+           new_mass = np.hstack((new_mass,mass_block[block_index[i]]))
+    else:
+       new_mass = None
+
+    if atoms is not None:
+       atoms = np.array(atoms) 
+       atoms_block = []
+       for i in range(natom_type):
+           start_ind = original_ord[i][0]-1
+           end_ind = original_ord[i][1]
+           atoms_block.append(atoms[start_ind:end_ind])
+       new_atoms = atoms_block[ block_index[0] ]
+       for i in range(1,natom_type):
+           new_atoms = np.hstack((new_atoms,atoms_block[block_index[i]]))
+       new_atoms = np.ndarray.tolist(new_atoms)
+    else:
+       new_atoms = None
+
+    new_dynmat_vertical = []
+    for i in range(natom_type):
+        dynmat_blocks = []
+        for j in range(natom_type):
+            start_row_index = (original_ord[i][0]-1)*3
+            end_row_index = original_ord[i][1]*3
+            start_col_index = (original_ord[j][0]-1)*3
+            end_col_index = original_ord[j][1]*3
+
+            dynmat_blocks.append(\
+            dynmat[start_row_index:end_row_index, start_col_index:end_col_index] )
+                 
+        new_dynmat_vertical.append(dynmat_blocks[block_index[0]])
+        for j in range(1,natom_type):
+            new_dynmat_vertical[i] = np.hstack(( new_dynmat_vertical[i], dynmat_blocks[block_index[j]] ))
+
+   
+    new_dynmat = new_dynmat_vertical[ block_index[0] ]
+    for i in range(1,natom_type):
+        new_dynmat = np.vstack ( (new_dynmat, new_dynmat_vertical[ block_index[i] ] ))
+
+    return new_dynmat,new_mass, new_atoms 
+
 
 class central_diff:
       """
