@@ -401,7 +401,7 @@ class qbox:
       This class has methods related to qbox inputs and outputs 
 
       """
-      def __init__(self,file_path,io='w', atoms=None, run_cmd = None, reorder=True):
+      def __init__(self,file_path,io='w', atoms=None, run_cmd = None, reorder=True, reorder_seq=None):
           """
           Args: file_path = path of the qbox input or output file
           io = input/output status: Options r= reading from a qbox output and storing data; 
@@ -417,6 +417,8 @@ class qbox:
              try: self.nframes = self.etotals.shape[0]
              except IndexError: self.nframes = self.etotals.size
              self.forces = self.getv('<force>');   self.coords = self.getv('<position>')
+             self.reorder_seq = reorder_seq
+             if reorder_seq is not None: reorder = True
              if reorder: self._reorder()
           elif self.io == 'w':
              self.qbfil = open(file_path,"w+")
@@ -485,28 +487,45 @@ class qbox:
 
       def _reorder(self):
           """Reorders the forces and coordinates according to input indices"""
-          if self.input_indices == [i+1 for i in range(self.natoms)]:
+          if self.reorder_seq is None:
+             reord_indices = [i+1 for i in range(self.natoms)]
+          else:
+             reord_indices = [] 
+             for atom in self.reorder_seq: 
+                 for i, x in enumerate(self.atoms):
+                     if x == atom:
+                        reord_indices.append(self.input_indices[i]) 
+
+          if self.input_indices == reord_indices: 
              return
           else:
-              print("Reording atoms, forces, and coordinates according to input sequence.")
-              input_cart_ind = []
-              atoms = self.atoms.copy()
-              for i in range(self.natoms):
-                  self.atoms[self.input_indices[i]-1] = atoms[i]
-                  input_cart_ind.append((self.input_indices[i]-1)*3)
-                  input_cart_ind.append((self.input_indices[i]-1)*3+1)
-                  input_cart_ind.append((self.input_indices[i]-1)*3+2)
-              #print(input_cart_ind)    
-              for i in range(self.nframes):
-                  self.coords[i,:] = self._reorder_vec(input_cart_ind, self.coords[i,:])
-                  self.forces[i,:] = self._reorder_vec(input_cart_ind, self.forces[i,:])
+             print("Reording atoms, forces, and coordinates.")
+             cart_ind = []
+             atoms = self.atoms.copy()
+             jind = []
+             for i in range(self.natoms):
+                 j = reord_indices.index(self.input_indices[i]) 
+                 jind.append(j)
+                 self.atoms[j] = atoms[i]
+                 cart_ind.append(j*3); cart_ind.append(j*3+1); cart_ind.append(j*3+2)
+                 #self.atoms[self.input_indices[i]-1] = atoms[i]
+                 #cart_ind.append((self.input_indices[j]-1)*3)
+                 #cart_ind.append((self.input_indices[j]-1)*3+1)
+                 #cart_ind.append((self.input_indices[j]-1)*3+2)
+             #print("jind:")    
+             #print(jind)   
+             #print("cart_ind")
+             #print(cart_ind)   
+             for i in range(self.nframes):
+                 self.coords[i,:] = self._reorder_vec(cart_ind, self.coords[i,:])
+                 self.forces[i,:] = self._reorder_vec(cart_ind, self.forces[i,:])
 
-      def _reorder_vec(self,input_cart_ind,vec):
-          """reorders a vector according to input indices"""
+      def _reorder_vec(self,cart_ind,vec):
+          """reorders a vector according to given cartesian indices"""
           reord_vec = np.copy(vec)
           for i in range(len(vec)):
-              #print(i, input_cart_ind[i])
-              reord_vec[input_cart_ind[i]] = vec[i]
+              #print(i, cart_ind[i])
+              reord_vec[cart_ind[i]] = vec[i]
           return reord_vec    
           
 
