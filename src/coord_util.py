@@ -38,6 +38,16 @@ def h2abc(h):
     return np.array([a, b, c, alpha, beta, gamma])
 
 
+def reorder_vec(cart_ind,vec):
+    """reorders a vector according to given cartesian indices"""
+    reord_vec = np.copy(vec)
+    for i in range(len(vec)):
+        #print(i, cart_ind[i])
+        reord_vec[cart_ind[i]] = vec[i]
+    return reord_vec
+
+
+
 def grep(file_path, pattern, cols):
     """
     It greps a line from a file and then reads specic columns from that line
@@ -163,7 +173,8 @@ class xyz:
                atoms = A list containing atom symbols; mandatory in in 'io = w"' mode
                xyz_unit, cell_unit --> optional for 'io = w' mode; define unit of given coordinate and cell
       """
-      def __init__(self, file_path, io='r', atoms=None, xyz_unit='atomic_unit', cell_unit='atomic_unit', quantity='pos'):
+      def __init__(self, file_path, io='r', atoms=None, xyz_unit='atomic_unit', cell_unit='atomic_unit', \
+                   quantity='pos', reorder_seq=None):
           init_time = time.time()
           self.io = io
           if self.io == 'r':
@@ -175,8 +186,12 @@ class xyz:
              if not self.pos: print("Warning! mom, force or velocities must be in atomic_unit")
              self.__get_xyz_info(file_path)
              self.coords = np.zeros((self.nframes,3*self.natoms),np.float64)
+             self.cell = np.zeros((self.nframes,6),np.float64)
              for i in range(self.nframes): 
-                 self.coords[i] = (self.get_frame(frame=i+1))[1]
+                 self.cell[i], self.coords[i] = self.get_frame(frame=i+1)
+             if reorder_seq is not None:
+                self.reorder_seq = reorder_seq
+                self._reorder()
           elif self.io == 'w':
              self.out_xyz = open(file_path,"w+")
              if atoms is None:
@@ -220,6 +235,12 @@ class xyz:
           if self.cell_tag is not None:
              if ('x_centeroid{atomic_unit}' in comment) or ('positions{atomic_unit}' in comment):
                 self.xyz_unit='atomic_unit'
+             if ('f_centeroid{atomic_unit}' in comment) or ('forces{atomic_unit}' in comment):
+                self.xyz_unit='atomic_unit'; self.force=True ; self.pos = False
+             if ('p_centeroid{atomic_unit}' in comment) or ('momenta{atomic_unit}' in comment):
+                 self.xyz_unit='atomic_unit'; self.mom=True; self.pos = False
+             if ('v_centeroid{atomic_unit}' in comment) or ('velocities{atomic_unit}' in comment):    
+                 self.xyz_unit='atomic_unit'; self.vel=True; self.pos = False
              if 'cell{atomic_unit}' in comment:
                 self.cell_unit='atomic_unit'
           
@@ -256,6 +277,21 @@ class xyz:
                  cell[i] = comment_line[cell_tag_index+i+1]
              return cell    
 
+      def _reorder(self):
+          reord_indices = []
+          for atom in self.reorder_seq:
+              for i, x in enumerate(self.atoms):
+                  if x == atom:
+                     reord_indices.append(i)
+          cart_ind = []
+          atoms = self.atoms.copy()
+          for i in range(self.natoms):
+              j = reord_indices[i]
+              self.atoms[j] = atoms[i]
+              cart_ind.append(j*3); cart_ind.append(j*3+1); cart_ind.append(j*3+2)
+
+          for i in range(self.nframes):
+                 self.coords[i,:] = reorder_vec(cart_ind, self.coords[i,:])
 
       def write(self, cell, coord):
           """
@@ -509,32 +545,18 @@ class qbox:
              print("Reording atoms, forces, and coordinates.")
              cart_ind = []
              atoms = self.atoms.copy()
-             jind = []
              for i in range(self.natoms):
                  j = reord_indices.index(self.input_indices[i]) 
-                 jind.append(j)
                  self.atoms[j] = atoms[i]
                  cart_ind.append(j*3); cart_ind.append(j*3+1); cart_ind.append(j*3+2)
                  #self.atoms[self.input_indices[i]-1] = atoms[i]
                  #cart_ind.append((self.input_indices[j]-1)*3)
                  #cart_ind.append((self.input_indices[j]-1)*3+1)
                  #cart_ind.append((self.input_indices[j]-1)*3+2)
-             #print("jind:")    
-             #print(jind)   
-             #print("cart_ind")
-             #print(cart_ind)   
              for i in range(self.nframes):
-                 self.coords[i,:] = self._reorder_vec(cart_ind, self.coords[i,:])
-                 self.forces[i,:] = self._reorder_vec(cart_ind, self.forces[i,:])
+                 self.coords[i,:] = reorder_vec(cart_ind, self.coords[i,:])
+                 self.forces[i,:] = reorder_vec(cart_ind, self.forces[i,:])
 
-      def _reorder_vec(self,cart_ind,vec):
-          """reorders a vector according to given cartesian indices"""
-          reord_vec = np.copy(vec)
-          for i in range(len(vec)):
-              #print(i, cart_ind[i])
-              reord_vec[cart_ind[i]] = vec[i]
-          return reord_vec    
-          
 
       @staticmethod
       def __getsystem__(file_path):
