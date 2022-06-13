@@ -364,6 +364,7 @@ class ionic_mover:
              self._nm_disp()  
 
           elif self.mode == 'sd':
+             algo = algo.lower()
              if (dynmat is None) | (temperature is None):
                 sys.exit("For sd modes dynamical matrix and a temperature must be supplied to ionic_mover class") 
              self.temperature = temperature
