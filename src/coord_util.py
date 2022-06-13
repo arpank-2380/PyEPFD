@@ -38,16 +38,6 @@ def h2abc(h):
     return np.array([a, b, c, alpha, beta, gamma])
 
 
-def reorder_vec(cart_ind,vec):
-    """reorders a vector according to given cartesian indices"""
-    reord_vec = np.copy(vec)
-    for i in range(len(vec)):
-        #print(i, cart_ind[i])
-        reord_vec[cart_ind[i]] = vec[i]
-    return reord_vec
-
-
-
 def grep(file_path, pattern, cols):
     """
     It greps a line from a file and then reads specic columns from that line
@@ -278,6 +268,7 @@ class xyz:
              return cell    
 
       def _reorder(self):
+          print("reording atoms and x,y,z coordinates")
           reord_indices = []
           for atom in self.reorder_seq:
               for i, x in enumerate(self.atoms):
@@ -287,11 +278,13 @@ class xyz:
           atoms = self.atoms.copy()
           for i in range(self.natoms):
               j = reord_indices[i]
-              self.atoms[j] = atoms[i]
+              self.atoms[i] = atoms[j]
               cart_ind.append(j*3); cart_ind.append(j*3+1); cart_ind.append(j*3+2)
 
           for i in range(self.nframes):
-                 self.coords[i,:] = reorder_vec(cart_ind, self.coords[i,:])
+                 vec = np.copy(self.coords[i,:])
+                 for j in range(len(vec)):
+                     self.coords[i,j] = vec[cart_ind[j]] 
 
       def write(self, cell, coord):
           """
@@ -554,9 +547,16 @@ class qbox:
                  #cart_ind.append((self.input_indices[j]-1)*3+1)
                  #cart_ind.append((self.input_indices[j]-1)*3+2)
              for i in range(self.nframes):
-                 self.coords[i,:] = reorder_vec(cart_ind, self.coords[i,:])
-                 self.forces[i,:] = reorder_vec(cart_ind, self.forces[i,:])
+                 self.coords[i,:] = self._reorder_vec(cart_ind, self.coords[i,:])
+                 self.forces[i,:] = self._reorder_vec(cart_ind, self.forces[i,:])
 
+      def _reorder_vec(self,cart_ind,vec):
+          """reorders a vector according to given cartesian indices"""
+          reord_vec = np.copy(vec)
+          for i in range(len(vec)):
+              #print(i, cart_ind[i])
+              reord_vec[cart_ind[i]] = vec[i]
+          return reord_vec
 
       @staticmethod
       def __getsystem__(file_path):
