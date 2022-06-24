@@ -2,6 +2,7 @@
 import sys
 import numpy as np
 from ipi_file_read import ipi_info
+from pyepfd_io import *
 from constants import *
 from degeneracy_class import degeneracy
 from elph_classes import *
@@ -18,12 +19,12 @@ class epfd:
         file path should be given in inp_dir
            eigval_file = eigenvalue file name
            etotal_file = "etotal" i.e. BO energy file name
-           ipi_restart_file = Name of the iPI RESTART file
+           phonon_info_file = Name of the iPI RESTART file
            overlap_file= Name of the overlap file
            Other arguments are self explanetory. 
       """
       def __init__(self,eigval_file,etotal_file="etotal.dat",
-                        ipi_restart_file="RESTART", overlap_file=None,
+                        phonon_info_file="phonon.xml", overlap_file=None,
                         degeneracy_cutoff=0.5,output_prefix = "epfd",
                         epce_unit="meV", vib_freq_unit="cm-1"):
         
@@ -39,7 +40,20 @@ class epfd:
 
           energy = np.loadtxt(inp_dir+etotal_file)
 
-          ipi = ipi_info(file_path=inp_dir+ipi_restart_file)
+          ph_file = open(inp_dir+phonon_info_file,'r+')
+          root_tag = ph_file.readline()
+          ph_file.close()
+          if "<simulation" in root_tag:
+             ipi = ipi_info(file_path=inp_dir+phonon_info_file)
+             dynmat = ipi.dynmatrix; mode=ipi.vibration_mode
+             mass = ipi.mass; asr = ipi.asr
+             deltax = ipi.pos_shift; deltae = ipi.energy_shift
+          elif "<pyepfd" in root_tag:
+             pyepfd = read_pyepfd_info(file_path = inp_dir+phonon_info_file)
+             dynmat = pyepfd.inp_dynmatrix; mode = pyepfd.phonon_mode
+             mass = pyepfd.mass; asr = pyepfd.asr
+             deltax = pyepfd.deltax; deltae = pyepfd.deltae
+          else: raise SyntaxError("Root tag of the phonon_info file not understood.")    
 
           if overlap_file is not None:
              overlap_file = inp_dir + overlap_file
@@ -53,11 +67,11 @@ class epfd:
                                 degeneracy_cutoff = degeneracy_cutoff,\
                                 logfile = self.logfile)
 
-          self.eph = epce_calculator(dynmat = ipi.dynmatrix, mass = ipi.mass,\
+          self.eph = epce_calculator(dynmat = dynmat, mass = mass,\
                                      energy=energy, eigval=orbitals.eigval,\
                                      logfile = self.logfile,
-                                     mode=ipi.vibration_mode, asr=ipi.asr,\
-                                     deltax = ipi.pos_shift, deltae = ipi.energy_shift,\
+                                     mode=mode, asr=asr,\
+                                     deltax = deltax, deltae = deltae,\
                                      epce_unit=epce_unit, vib_freq_unit = vib_freq_unit)
           #self.eph.zpr.sort() 
           print("ZPR ("+ self.eph.epce_unit + ") for "+ output_prefix + ":") 
