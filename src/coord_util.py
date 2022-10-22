@@ -329,18 +329,18 @@ class ionic_mover:
          Args:
              atoms = An N-dim character array containing atom Symbols
              opt_coord = 3N-dim column vector of cartesian coordinates of optimized geometry/struc.
-             mode = Finite difference mode FD, NMFD, ENMFD or SNMFD
+             mode = Finite difference mode FD, NMFD, ENMFD, SD, NMS, ENMS
              deltax = displacement in au
              deltae  = energy scaled displacement in au
       """
       def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,\
-                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal',algo='osap'):
+                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal',algo='osap', nmode_only=None):
           init_time = time.time()
           self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)          
           if len(self.opt_coord) != 3*self.natoms:
              sys.exit("dimensions of atoms and coordinates supplied to ionic_mover class are not consistent.") 
           self.mode = mode.lower(); self.deltax = deltax; self.deltae = deltae
-          self.dynmat = dynmat; self.mass = mass; self.asr = asr
+          self.dynmat = dynmat; self.mass = mass; self.asr = asr; self.nmode_only = nmode_only
 
           self.__define_mass()
 
@@ -354,13 +354,25 @@ class ionic_mover:
              elif ngrid==3 : self.step_list = [3.0,2.0,1.0,-1.0,-2.0,-3.0]
              elif ngrid==4 : self.step_list = [4.0,3.0,2.0,1.0,-1.0,-2.0,-3.0,-4.0]
              else: raise ValueError("ionic_mover class: For 'fd' moves allowed values of ngrid are 1,2,3 and 4")
+          
+          if 'ms' in self.mode:
+             for i in range(2*ngrid*len(nmode_only)):
+                 self.disp_coord = np.column_stack((self.disp_coord,self.opt_coord))
+             pos_steps = []; neg_steps = []
+             for i in range(ngrid,0,-1): 
+                 pos_steps.append(i*1.0)
+             for i in range(1,ngrid+1): 
+                 neg_steps.append(-1.0*i)
+             self.step_list = pos_steps + neg_steps
+             if self.mode == 'nms': self.mode = 'nmfd'
+             if self.mode == 'enms': self.mode = 'enmfd'
 
           if self.mode == 'fd':
               self._cart_disp()    
 
           elif (self.mode == 'nmfd') | (self.mode == 'enmfd'): 
              if self.dynmat is None:
-                sys.exit("For nmfd/enmfd/snmfd modes dynamical matrix must be supplied to ionic_mover") 
+                sys.exit("For nmfd/enmfd/sd/nms/enms modes dynamical matrix must be supplied to ionic_mover") 
              self._nm_disp()  
 
           elif self.mode == 'sd':
@@ -402,7 +414,11 @@ class ionic_mover:
                                           mode = self.mode, deltax = self.deltax, deltae = self.deltae)
           idisp = 1
           #print(nmfd.displacements)
-          for imode in range(len(nmfd.displacements)):
+          if self.nmode_only is None:
+             sampled_modes = [i for i in range(len(nmfd.displacements))] 
+          else:
+             sampled_modes = [i-1 for i in self.nmode_only] 
+          for imode in sampled_modes:
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
@@ -423,7 +439,7 @@ class ionic_mover:
           """
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
                                       asr = self.asr, temperature = self.temperature,\
-                                      ngrid = ngrid, algo = algo)
+                                      ngrid = ngrid, algo = algo, nmode_only = self.nmode_only)
           for idisp in range(len(nmmc.nmdisp)):
               self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
 

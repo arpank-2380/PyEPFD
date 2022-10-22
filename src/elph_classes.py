@@ -359,8 +359,9 @@ class stoch_displacements(dm):
                            'mcap': The same as 'mc' but for each sampled point it's antethetic pair would be included
             ngrid = number of integration grid (sample points); with antethetic pairs ('ap') actual number of
                     single point calculation (sample points) will be 2 * ngrid
+            nmode_only = A python list of normal modes over which only the displacements would be performed.         
       """
-      def __init__(self,dynmat,mass,asr='none',temperature=0,algo='osap',ngrid=1):
+      def __init__(self,dynmat,mass,asr='none',temperature=0,algo='osap',ngrid=1,nmode_only=None):
           super(stoch_displacements,self).__init__(dynmat,mass)
           self.algo = algo.lower(); self.ngrid = ngrid 
           if (self.algo == 'os')|(self.algo == 'osap')|(self.algo == 'osr')|\
@@ -370,9 +371,15 @@ class stoch_displacements(dm):
              raise NotImplementedError("Allowed values for algo are: 'os', 'osap', 'osr', 'osrap', 'mc' or 'mcap'")
           sigma = np.zeros(self.nmodes,np.float64)
           #print(temperature)
-          for mode in range(self.nmodes):
-              be = bose_einstein(self.omega[mode],omega_unit='Ha',T=temperature)
-              sigma[mode] = np.sqrt(np.abs((be+0.5)/self.omega[mode]))  ## negative frequencies converted to +ve
+          if nmode_only is None:
+             for mode in range(self.nmodes):
+                 be = bose_einstein(self.omega[mode],omega_unit='Ha',T=temperature)
+                 sigma[mode] = np.sqrt(np.abs((be+0.5)/self.omega[mode]))  ## negative frequencies converted to +ve
+          else:
+            for mode in nmode_only:
+                mode -= 1
+                be = bose_einstein(self.omega[mode],omega_unit='Ha',T=temperature)
+                sigma[mode] = np.sqrt(np.abs((be+0.5)/self.omega[mode]))
 
           if asr == 'crystal': self.nmstart = 3
           elif asr == 'lin':   self.nmstart = 5
