@@ -22,7 +22,12 @@ class nm_info:
              asr = ipi.asr
           elif "<pyepfd" in root_tag:
              pyepfd = read_pyepfd_info(file_path = phonon_info_file)
-             dyn_mat = dm(dynmat=pyepfd.inp_dynmatrix, mass= pyepfd.mass)
+             if pyepfd.ref_dynmatrix is not None:
+                dyn_mat = dm(dynmat=pyepfd.ref_dynmatrix, mass= pyepfd.mass)
+             elif pyepfd.dynmatrix:
+                dyn_mat = dm(dynmat=pyepfd.dynmatrix, mass= pyepfd.mass) 
+             else:
+                raise ValueError("Dynamical matrix not found in " + phonon_info_file) 
              asr = pyepfd.asr
           self.mass = dyn_mat.mass
           self.mode_vectors = dyn_mat.V
