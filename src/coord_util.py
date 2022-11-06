@@ -417,8 +417,12 @@ class ionic_mover:
           if self.nmode_only is None:
              sampled_modes = [i for i in range(len(nmfd.displacements))] 
           else:
-             sampled_modes = [i-1 for i in self.nmode_only] 
+             sampled_modes = [i-1 for i in self.nmode_only]
+          #print("#Mode-index        Disp(au)   Disp(Freq-scaled)") 
           for imode in sampled_modes:
+              print("#Mode = %6d Disp-step(au) = %10.4f Disp-step(Freq-scaled) = %10.4f"\
+                  %(imode+1, nmfd.displacements[imode],\
+                    nmfd.displacements[imode]*np.sqrt(nmfd.omega[imode])))
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
