@@ -420,16 +420,19 @@ class ionic_mover:
              sampled_modes = [i-1 for i in self.nmode_only]
           #print("#Mode-index        Disp(au)   Disp(Freq-scaled)") 
           for imode in sampled_modes:
+              freq_scaling = np.sqrt(nmfd.omega[imode])
               print("#Mode = %6d Disp-step(au) = %10.4f Disp-step(Freq-scaled) = %10.4f"\
                   %(imode+1, nmfd.displacements[imode],\
-                    nmfd.displacements[imode]*np.sqrt(nmfd.omega[imode])))
+                    nmfd.displacements[imode]*freq_scaling))
+              print("#Config    Disp(au)   Disp(Freq-scaled)")
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
                   #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
                   self.disp_coord[:,idisp] +=  nmfd.nm2cart_disp(nm_disp)
                   idisp += 1
-                  print("idisp = %d"%idisp)
+                  print(" %d  %12.4f  %12.4f"\
+                       %(idisp,nm_disp[imode],nm_disp[imode]*freq_scaling))
                   #print(nm_disp)    
 
       def _stoch_disp(self,algo,ngrid):
