@@ -80,7 +80,7 @@ def quaternion_fit(ref_coord, coord, mass):
 
             **coord** = A vector of 3N cartesian coordinates for the rotated rigid body
 
-            **mass** = A mass-matrix (3N x 3N)
+            **mass** = A (3 *N* ) numpy array of mass
 
         **Returns:** 
 
