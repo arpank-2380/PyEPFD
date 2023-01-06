@@ -1,5 +1,5 @@
 import sys
-import cube 
+from pyepfd.cube import * 
 import numpy as np
 from mpi4py import MPI
 #nmode = sys.argv[1]

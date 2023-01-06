@@ -1,8 +1,8 @@
 import sys, os, time
 import numpy as np
-from coord_util import *
-from constants import *
-from elph_classes import dm
+from pyepfd.coord_util import *
+from pyepfd.constants import *
+from pyepfd.elph_classes import dm
 
 class anharm_measure(dm):
       """

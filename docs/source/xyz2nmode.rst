@@ -1,7 +1,7 @@
 xyz2nmode module
 ================
 
-.. automodule:: xyz2nmode
+.. automodule:: pyepfd.xyz2nmode
    :members:
    :undoc-members:
    :show-inheritance:

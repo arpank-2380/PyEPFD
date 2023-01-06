@@ -5,7 +5,7 @@
 
 import sys, os
 import sphinx_rtd_theme
-sys.path.insert(0,os.path.abspath('../../src/'))
+sys.path.insert(0,os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -49,7 +49,7 @@ exclude_patterns = ['_build', '_static']
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-html_favicon = 'favicon.png'
+#html_favicon = 'favicon.png'
 html_logo = 'pyepfd_logo.png'
 
 html_theme_options = {

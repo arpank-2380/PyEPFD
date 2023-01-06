@@ -1,8 +1,8 @@
 import sys, os, re, time
 import xml.etree.ElementTree as ET
 import numpy as np
-from constants import *
-from elph_classes import nm_sym_displacements,stoch_displacements, coord_com
+from pyepfd.constants import *
+from pyepfd.elph_classes import nm_sym_displacements,stoch_displacements, coord_com
 
 
 def abc2h(abc):

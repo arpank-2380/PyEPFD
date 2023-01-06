@@ -1,7 +1,7 @@
 elph\_classes module
 ====================
 
-.. automodule:: elph_classes
+.. automodule:: pyepfd.elph_classes
    :members: 
    :undoc-members: 
    :show-inheritance:

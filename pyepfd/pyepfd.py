@@ -8,11 +8,11 @@ difference method.
 """
 import sys
 import numpy as np
-from ipi_file_read import ipi_info
-from pyepfd_io import *
-from constants import *
-from degeneracy_class import degeneracy
-from elph_classes import *
+from pyepfd.ipi_file_read import ipi_info
+from pyepfd.pyepfd_io import *
+from pyepfd.constants import *
+from pyepfd.degeneracy_class import degeneracy
+from pyepfd.elph_classes import *
 
 inp_dir = "./"
 out_dir = "./"

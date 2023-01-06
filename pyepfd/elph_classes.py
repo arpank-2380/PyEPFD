@@ -3,8 +3,8 @@ __all__=["dm","epce_calculator","phonon_calculator", "reorder_dynmat"]
 """ This file contains all the classes relavant to frozen phonon calculation """
 import sys
 import numpy as np
-from ipi_file_read import ipi_info
-from constants import *
+from pyepfd.ipi_file_read import ipi_info
+from pyepfd.constants import *
 
 
 def bose_einstein(omega,omega_unit='Ha',T=0.0):

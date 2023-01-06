@@ -4,11 +4,11 @@ import sys,os,time
 import numpy as np
 import scipy
 import scipy.stats
-from pyepfd_io import *
-from ipi_file_read import ipi_info
-from elph_classes import dm
-from constants import *
-from coord_util import * 
+from pyepfd.pyepfd_io import *
+from pyepfd.ipi_file_read import ipi_info
+from pyepfd.elph_classes import dm
+from pyepfd.constants import *
+from pyepfd.coord_util import * 
 
 
 class nm_info:
