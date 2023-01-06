@@ -5,10 +5,33 @@ import sys, os, time
 
 class ipi_info:
       """
-        This class reads and store essential information from an iPI restart file,
-        that has been created after a successful completion of an 
-        iPI NMFD/ENMFD phonon calculation
-        Arg: Only the path of the iPI file
+      This class reads and store essential information from an iPI restart file,
+      that has been created after a successful completion of an 
+      iPI NMFD/ENMFD phonon calculation.
+
+        **Arguments:** 
+            **file_path** = Path to the iPI file RESTART file
+
+        **Returns:**
+            Creates following objects within the class.
+                
+                **asr** = A *string* storing asr information.
+
+                **pos_shift** = Normal mode displacement (
+                **deltax** in other classes) information.
+
+                **energy_shift** = Energy scaled displacement 
+                (**deltae** in other classes) in atomic_unit (Hartree)
+
+                **dynmatrix** = Dynamical matrix
+
+                **mass** = Mass matrix
+
+                **coord** = Coordinates of optimized geometry. 
+                A *float* array of length *N*.
+
+                **atoms** = A list of atoms with length *N* .
+
       """
       def __init__(self,file_path="RESTART"):
           init_time = time.time()

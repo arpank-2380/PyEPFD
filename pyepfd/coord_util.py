@@ -7,6 +7,9 @@ from elph_classes import nm_sym_displacements,stoch_displacements, coord_com
 
 def abc2h(abc):
     """
+    --------------
+    Function abc2h
+    --------------
     Returns a lattice vector (in input units) matrix in upper triangular form
     i.e., each columns of the matrix represent the unit vectors
     given a description in terms of the lattice vector lengths
@@ -25,6 +28,9 @@ def abc2h(abc):
 
 def h2abc(h):
     """
+    --------------
+    Function h2abc
+    --------------
     Returns abc(a,b,c,alpha,beta,gamma) when cell vectors (h) in upper triangular matrix are provided.
     Return unit: angles in degree, lengths in supplied unit
     """
@@ -40,12 +46,19 @@ def h2abc(h):
 
 def grep(file_path, pattern, cols):
     """
+    \----------------------
+    Function Grep
+    \----------------------
     It greps a line from a file and then reads specic columns from that line
     and returns it as an array.
-    Args:
-         file_path = A string specifying a path of the file to be read
-         pattern = A pattern (string) that we look for
-         cols = A tuple of columns that we want to read from the grepped line
+    
+        **Arguments:**
+
+            **file_path** = A string specifying a path of the file to be read
+    
+            **pattern** = A pattern (string) that we look for
+
+            **cols** = A tuple of columns that we want to read from the grepped line
     """
     os.system("grep '"+ pattern + "' " + file_path + " > tmp")
     data_array = np.genfromtxt("tmp",usecols = cols,dtype=np.float64)
@@ -54,12 +67,24 @@ def grep(file_path, pattern, cols):
 
 def quaternion_fit(ref_coord, coord, mass):
     """
+    -----------------------
+    Function quaternion_fit
+    -----------------------
     This function fits a quaternion that rotates a set of 3N-coordinates into a a set of ref coordinates.
+
     Citation: SIMON K. KEARSLEY, Acta Cryst. (1989). A45, 208-210
-    Args: ref_coord = 3N cartesian coordinates for the reference structure
-          coord = 3N cartesian coordinates for the rotated rigid body
-          mass = mass-matrix
-    Returns rotated_coordinate and rotation matrix
+    
+        **Arguments:**
+
+            **ref_coord** = A vector of 3N cartesian coordinates for the reference structure
+
+            **coord** = A vector of 3N cartesian coordinates for the rotated rigid body
+
+            **mass** = A mass-matrix (3N x 3N)
+
+        **Returns:** 
+
+            A (3 x 3) rigid-body rotation matrix
     """
     if len(ref_coord) != len(coord):
        raise ValueError("len(ref_coord) != len(coord)")
@@ -109,7 +134,20 @@ def quaternion_fit(ref_coord, coord, mass):
     return rot_matrix
 
 def rotate_vector(rot_matrix,vector):
-    """Rigid body rotation of a 3N dimensional vector given a rotation matrix"""
+    """
+    ----------------------
+    Function rotate_vector
+    ----------------------
+    Performs a rigid body rotation of a 3N dimensional vector given a rotation matrix, 
+    and returns resultant 3N dimensional vector.
+
+        **Arguments:**
+
+            rot_matrix = A (3 x 3) rigid-body rotation matrix
+
+            vector = A 3N dimensional vector
+            
+    """
     natoms = len(vector)//3; vector = np.reshape(vector,(natoms,3))
     rot_vector = np.array([])
     for i in range(natoms):
@@ -118,15 +156,45 @@ def rotate_vector(rot_matrix,vector):
 
 def remove_trans_rot(ref_coord, coord, mass, rotation=True, forces=None, wrt_com=False):
     """
+    -------------------------
+    Function remove_trans_rot
+    -------------------------
     Rotates coordinates and forces(optional) so that the coordinates
     superimposed to a reference coordinates by rigid body rotation.
-    This is to be used to remove rotation from a trajectory
-    Args: ref_coord = 3N cartesian coordinates for the reference structure
-          coord = 3N cartesian coordinates for the rotated rigid body
-          mass = mass-matrix
-          rotation = if True, angular momentum would be removed from coord w.r.t ref_coord
-          forces = if supplied then forces would be rotated back to ref_coord frame
-          wrt_com = if True, coordinates w.r.t c.o.m would be returned
+    This is to be used to remove rotation from a trajectory.
+
+        **Arguments:**
+
+            **ref_coord** = A 3N-dimensional vector of cartesian coordinates defining the 
+            reference configuration of the rigid body
+
+            **coord** = A 3N-dimensional vector of cartesian coordinates defining the
+            rotated rigid body
+
+            **mass** = A (3N x 3N) matrix of mass of 3N particles.
+
+            **rotation** = Do you want to remove angular momentum/rotation?
+            Allowed values are:
+            **(1)** *True*(Default): Angular momentum would be removed from **coord** w.r.t **ref_coord**
+            OR
+            **(2)** *False*: Angular momentum would not be removed.
+
+            **forces** (optional) = *None* (Default) OR 
+            A 3N-dimensional vector of forces in rotated reference frame
+            if supplied then forces would be rotated back to ref_coord frame
+
+            **wrt_com** = Do you want to obtain the coordinates with tespect to center of mass (c.o.m)?
+            Allowed values are:
+            **(1)** *True*: Coordinates with respect to c.o.m would be returned
+            OR
+            **(2)** *False*(Default): Coordinates with respect to original refence point 
+            would be returned.
+
+        **Returns:**
+
+            (1) A 3N-dimensional vector of Cartesian coordinates after back-rotation
+
+            (2) A 3N-dimensional vector of Cartesian forces after back-rotation if **forces** is **not None**
     """
     #print("removing translational and rotational motion")
     natoms = len(coord)//3
@@ -157,11 +225,45 @@ def remove_trans_rot(ref_coord, coord, mass, rotation=True, forces=None, wrt_com
 
 class xyz:
       """
-         This class contains methods related to xyz file
-         Args: file_path = path of the XYZ file
-               io = input/output status: Options r= reading a file and storing data; w = writing into an xyz
-               atoms = A list containing atom symbols; mandatory in in 'io = w"' mode
-               xyz_unit, cell_unit --> optional for 'io = w' mode; define unit of given coordinate and cell
+      ===========
+      Class XYZ
+      ===========
+         This class contains methods related to xyz file. It can read a given xyz file or 
+         given atoms and coordinates it can create an xyz file.
+
+            **Arguments:** 
+
+                **file_path** = path of the XYZ file
+
+                **io** = input/output status. Allowed values are:
+                **(1)** *'r'*: In this mode the class would read an xyz file and store data;
+                OR
+                **(2)** *'w'* = In this mode the class would write an xyz file.
+
+                **atoms** = A python list containing atom symbols. 
+                This is mandatory while ``io = 'w'``.
+
+                **xyz_unit** = Position unit. Allowed values are:
+                **(1)** *'atomic_unit'* (default), OR
+                **(2)** *'angstrom'*.
+                This argument is optional for **io** = *'w'* mode; 
+                while in ``io = 'r'`` mode this argument is not used. 
+
+                **cell_unit** = Cell parameter unit. Allowed values are:
+                **(1)** *'atomic_unit'* (default), OR
+                **(2)** *'angstrom'*.
+                This argument is optional for ``io = 'w'`` mode; 
+                while in ``io = 'r'`` mode this argument is not used.
+
+                **quantity** = Allowed values are:
+                **(1)** *'pos'* (default): positions, OR
+                **(2)** *'mom'*: momentums, OR
+                **(3)** *'force'*: forces, OR
+                **(4)** *'vel'*: velocities
+                This is only valid for ``io = 'r'`` mode.
+
+                **reorder_seq** (optional) = A python list of atom symbols defining the order in which the information
+                read from an xyz file would be saved. Only valid for ``io = 'r'`` mode. 
       """
       def __init__(self, file_path, io='r', atoms=None, xyz_unit='atomic_unit', cell_unit='atomic_unit', \
                    quantity='pos', reorder_seq=None):
@@ -236,7 +338,21 @@ class xyz:
           
 
       def get_frame(self, xyz_lines=None, frame=1):
-          """Returns coordinates and cells of a specified frame in atomic_unit"""
+          """
+          ----------------
+          Get Frame Method 
+          ----------------
+          This method returns coordinates and cells of a specified frame in atomic_unit
+
+            **Arguments:**
+
+                **xyz_lines** = A python list containing lines from an xyz file. 
+                Default value is *None* in which case all lines of the given xyz file
+                is included.
+
+                **frame** = An *integer* defining the frame number from the given xyz 
+                trajectory which we would like to save.
+          """
           if self.io == 'w':
              raise NotImplementedError("xyz class: getframe is not implemented for io = w.")
           if xyz_lines is None:
@@ -257,7 +373,9 @@ class xyz:
           return cell, coord
 
       def __read_cell(self, comment_line):
-          """Reads i-PI style cell parameters"""
+          """
+          Reads i-PI style cell parameters
+          """
           if self.cell_tag is None:
              return None
           else:
@@ -268,6 +386,10 @@ class xyz:
              return cell    
 
       def _reorder(self):
+          """
+          Reorders atoms and coordinates according to the supplied
+          reorder_seq.
+          """
           print("reording atoms and x,y,z coordinates")
           reord_indices = []
           for atom in self.reorder_seq:
@@ -288,8 +410,21 @@ class xyz:
 
       def write(self, cell, coord):
           """
+          --------------
+          Write Method
+          --------------
           This method writes the atoms & coordinates in an XYZ file with output unit angstrom
-          cell parameters would be written in abcABC format
+          cell parameters would be written in abcABC format.
+
+            **Arguments:**
+
+                **cell** = A *numpy array* of length **6** or **9** containing the
+                cell-parameters. If the length of the array is 6, it will assume
+                that the supplied format is abcABC (lengths and angles). Otherwise, 
+                it will assume that all three cell vectors are supplied.
+                
+                **coord** = A 3N-dimensional vector of cartesian coordinates.
+
           """
           cell_write=True
           if cell is not None:
@@ -324,17 +459,131 @@ class xyz:
           
 
 class ionic_mover:
-      """ 
-         This class moves ions according to FD/NMFD/ENMFD/SD stochastic displacements(SD).
-         Args:
-             atoms = An N-dim character array containing atom Symbols
-             opt_coord = 3N-dim column vector of cartesian coordinates of optimized geometry/struc.
-             mode = Finite difference mode FD, NMFD, ENMFD, SD, NMS, ENMS
-             deltax = displacement in au
-             deltae  = energy scaled displacement in au
+      """
+      ========================
+      Class ionic_mover
+      ========================
+         This class moves the ions(nuclei) according to 
+         **FD**: Finite Displacement in Cartesian, OR 
+         **NMFD**: Normal Mode Finite Displacement, OR 
+         **ENMFD**: Energy-scaled Normal Mode Finite Displacement, OR 
+         **SD**: Stochastic Displacement.
+
+            **Arguments**:
+
+                **atoms** = An N-dimensional character array containing atom Symbols
+
+                **opt_coord** = 3N-dim column vector of cartesian coordinates of optimized geometry/struc.
+
+                **mode** = Finite displacement mode. 
+                    Options are:
+                        **(1)** *'FD'*: Finite Displacement in Cartesian , 
+                    OR
+                        **(2)** *'NMFD'*: Normal Mode Finite Displacement, 
+                    OR 
+                        **(3)** *'ENMFD'*: Energy-scaled Normal Mode Finite Displacement, 
+                    OR
+                        **(4)** *'SD'*: Stochastic Displacement, 
+                    OR
+                        **(5)** *'NMS'*: Normal Mode Sampling, 
+                    OR 
+                        **(6)** *'ENMS'*: Energy-scaled Normal Mode Sampling
+
+                   More Information
+                    FD must be used for computing Cartesian normal-mode frequencies.
+                    The dynamical matrix obtained in this way, can be used for 
+                    NMFD/ENMFD/SD/NMS/ENMS calculations. NMFD/ENMFD can be used to refine
+                    Cartesian frequencies or electron-phonon renormalizations. SD can be 
+                    used to compute zero-point energy, vibrational energy including 
+                    nuclear-quantum effects or electronic properties at a finite *T*.
+                    NMS/ENMS can be used to scan/sample a few specific normal modes and
+                    plot how energies/band gaps/ HOMO / LUMO changes along these few 
+                    normal modes.
+
+                    .. note::
+                        For **FD/NMFD/ENMFD/NMS/ENMS** symmetric displacement is used.
+
+
+                **deltax** = A displacement (*float*) in atomic unit (Bohr)
+
+                **deltae**  = Energy scaled displacement (*float*) in atomic_unit (Hartree)
+
+                **dynmat** = 3N x 3N dynamical matrix. Must be supplied for all modes except
+                ``mode=FD``.
+
+                **mass** = Mass-matrix
+
+                **asr** = acoustic sum rule. 
+                    Options are:
+                        **(1)** *'none'* (Default): asr is **not** applied,
+                    OR
+                        **(2)** *'crystal'*: For infinite systems / crystals,
+                    OR
+                        **(3)** *'poly'*: For poly-atomic non-linear molecules,
+                    OR
+                        **(4)** *'lin'*: For any linear molecules
+
+                **temperature** = A *float*. Default value is 0. It is only used for ``mode = SD``.
+              
+                **algo** = Algorithms to use for ``mode = SD``. 
+                    Options are:
+                        **(1)** *'OS'*: One-Shot method proposed by Zacharius and Giustino,
+                        see Zacharius, M.; Giustino, F. 
+                        One-shot calculation of temperature-dependent optical spectra and 
+                        phonon-induced band-gap renormalization.
+                        *Phys. Rev. B.* **2016**, *94*, 075125
+                    OR
+                        **(2)** *'OSAP'*: (Default): One-Shot method but with anti-thetic pair.
+                    OR
+                        **(3)** *'OSR'*: One-shot sampling of random signs as described in the 
+                        paper: Karsai, F.; Engel, M.; Flage-Larsen, E; Kresse, G.
+                        Electron-phonon coupling in semiconductors within the GW approximation.
+                        *New J. Phys.* **2018**, *20*, 123008.
+                        This is essentiatially same as the thermal line sampling proposed by 
+                        Monserrat, see 
+                        Monserrat, B. Vibrational averages along thermal lines.
+                        *Phys. Rev. B* **2016**, *93*, 014302.
+                    OR
+                        **(4)** *'OSRAP'*: Same as OSR but including the antithetic-pairs.
+                    OR
+                        **(5)** *'MC'*: Monte-Carlo sampling along normal modes assuming harmonic
+                        probability density
+                    OR
+                        **(6)** *'MCAP'*: Same as MC but including the antithetic pairs.
+
+                **ngrid** = The number of displacement grid points.
+                    Allowed values:
+                        **(A)** *1-4* for ``mode = FD/NMFD/ENMFD``. Default value is 1.
+
+                        **(B)** *Any positive integer* is allowed for ``mode = NMS/ENMS``.
+
+                        **(C)** *1* for ``mode = SD`` and ``algo = OS/OSAP``.
+
+                        **(D)** *Any positive integer* for ``mode = SD`` and 
+                        ``algo = OSR/OSRAP/MC/MCAP``.
+
+                **mode_only** (Optional) = A python-list of normal-mode indices 
+                along which displacements are performed.
+                
+        **Returns**:
+            *None*. Stores the displaced coordinates within the object 
+            **coord_util.ionic_mover.disp_coord**
+
+            .. note::
+                In the set of displaced coordinates, undistorted structure is always included.
+                Since FD/NMFD/NMS/ENMS employes symmetric displacement, for each normal mode
+                additional 2*ngrid number of displaced coordinates would ve created. 
+                
+                For ``mode = SD``, 
+                if ``algo = OS``: only 1 additional displaced coordinate would be created.
+                If ``algo = OSAP``: only 1 additional displaced coordinates would be created.
+                If ``algo = OSR/MC``: ngrid number of additional displaced coordinates would be created.
+                If ``algo = OSRAP/MCAP``: 2*ngrid number of additional displaced coordinates 
+                would be created.
+            
       """
       def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,\
-                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='crystal',algo='osap', nmode_only=None):
+                  dynmat=None,mass=None,ngrid=1,temperature=0,asr='none',algo='osap', nmode_only=None):
           init_time = time.time()
           self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)          
           if len(self.opt_coord) != 3*self.natoms:
@@ -458,17 +707,56 @@ class ionic_mover:
 
 class qbox:
       """
+      ===================
+      Class qbox
+      ===================
       This class has methods related to qbox inputs and outputs 
+        
+        **Arguments:**
+
+            **file_path** = Path to the qbox output/input file.
+            
+            **io** = input/output status. 
+                Options are:
+                    **(1)** *'r'*: In this mode the class would read a qbox output file
+                    and store the data;
+                OR
+                    **(2)** *'w'* = In this mode the class would write a qbox input file.
+
+            **atoms** = A list of atom symbols needed for ``io = 'w'`` mode
+
+            **run_cmd** = A list of qbox run commands
+
+            .. warning::
+                Currently, ``io='w'`` is experimental and not recomended to be used. 
+                Any keys such as ``atoms``, ``run_cmd``, that is associated with 
+                ``io = 'w'`` mode should not be used as well.
+
+            .. note::
+                Qbox reorders the atom sequence and print the results with reordered
+                atom sequence. This creates problem while post-processing the files to compute
+                for example, normal modes. The next two arguments help to interpret and store
+                qbox output data by nullyfying the reordering done by qbox and store them 
+                according to the atoms sequence user needs.
+            
+            **reorder** = This key is valid while ``io = 'r'``. Do you want to reorder the atom sequence?
+                options are: 
+                    (1) *True* (Default): Reorders according to given sequence. 
+                OR  
+                    (2) *False*: Stores everything according to qbox output sequence.
+
+            **reorder_seq** = A python list of atom symbols specifying the atom sequence. Only valid 
+            if ``reorder = True``.
+
+                **More Information on how to use.**
+                For example ``reorder_seq = ['C','H','O','N']`` would store all informations on 
+                Carbon, Hydrogen, Oxygen and Nitrogen atoms sequentially. 
+                For the default value *None*, atoms would be
+                ordered according to the input sequence.
+
 
       """
       def __init__(self,file_path,io='w', atoms=None, run_cmd = None, reorder=True, reorder_seq=None):
-          """
-          Args: file_path = path of the qbox input or output file
-          io = input/output status: Options r= reading from a qbox output and storing data; 
-                                            w = writing a qbox input file
-          atoms = A list containing atom symbols; mandatory in in 'io = w' mode
-          internal length units are Bohr and angle units are degrees. 
-          """
           init_time = time.time()
           self.io = io; self.file_path = file_path
           if self.io == 'r':
@@ -501,8 +789,25 @@ class qbox:
 
       def write(self, cell, coord):
           """
-          This method writes the atoms & coordinates in an XYZ file with output unit angstrom 
-          Arg: cell and coord in atomic_unit
+          --------------------
+          Write Method
+          --------------------
+          This method writes the atoms & coordinates in a qbox input file. 
+          This method can be used only if qbox class is initiated with ``io = 'w'``.
+
+            .. warning::
+                For future use. Currently not recommended.
+
+            **Arguments:**
+
+                cell = cell vectors in atomic_unit. A numpy array of length 9.
+
+                coord = coordinates in atomic_unit. A numpy array of length 3*N*.
+
+            **Returns**
+                qbox input file(s) at the path specified by ``file_path`` while 
+                intitiating the qbox class.
+
           """
           #if len[cell] == 6: h = abc2h(cell)
           #elif len[cell] == 9: pass
@@ -530,8 +835,19 @@ class qbox:
           self._iconfg += 1
 
       def getv(self, quantity):
-          """ get vectors (forces or xyz positions") and returns it as a 2D vectors where
-              each rows are 3N coordinates of a snapshot/configuration
+          """ 
+          --------------------------
+          Get Vector(*getv*) Method
+          --------------------------
+          This method gets the vectors (forces or xyz positions") from a a qbox output 
+          and returns it as a 2D vector where each rows are 3N 
+          coordinates of a snapshot/configuration. 
+          This function is only valid is the qbox class is initiated with
+          ``io = 'r'``.
+
+            **Arguments:**
+
+                **quantity** = ``'<force>'`` OR ``'<position>'``
           """
           if (quantity == '<force>') | (quantity == '<position>'): pass
           else: raise NotImplementedError("quantity must be '<force>' or '<position>'")
@@ -540,6 +856,12 @@ class qbox:
           return v
 
       def getenergy(self):
+          """
+          -------------------
+          Get Energy Method
+          -------------------
+          This method gets the energies from a a qbox output and returns it as a numpy array.
+          """
           etotals = np.array( grep(file_path = self.file_path, pattern = "<etotal>", cols=(1)) )
           try: len(etotals)
           except TypeError: etotals = np.array([etotals])
@@ -584,6 +906,13 @@ class qbox:
 
       @staticmethod
       def __getsystem__(file_path):
+          """
+          --------------------------
+          Get System Method
+          --------------------------
+          This method collects atoms, cell-parameters from the qbox output
+          and stores them.
+          """
           qbout = open(file_path, 'r')
           read = True
           store_xml = False
@@ -609,11 +938,42 @@ class qbox:
 
 def write_nmode(atoms, cell_v, opt_coord, mode_v, mode_freq, file_path='dynmat',fmt = 'axsf'):
     """
+    ---------------------------------
+    Function for Writing Normal Modes
+    ---------------------------------
     It takes atoms, cell vectors, their positions (optimized)
     and normal mode (mass scaled) coordinates and normal mode frequencies as arguments
-    and writes them into (i)   animated xsf (axsf) file or 
-                         (ii)  VMD normal mode file (nmd) or
-                         (iii) molden file
+    and writes them into either an
+    **(i) animated xsf (.axsf) file** that can be visualized with Xcrysden program
+    OR
+    **(ii) An normal mode file (.nmd)** that can be visualized with VMD program
+    OR
+    **(iii) molden file (.molden)** that can be visualized with molden program.
+
+        **Arguments:**
+
+            **atoms** = A list of atom-symbols. An character array with length *N*, where
+            *N* is the number of atoms.
+
+            **cell_v** = Cell vectors in atomic_unit. A numpy *float* array with length 9.
+
+            **opt_coord** = Cartesian coordinates of optimized geometry in atomic units.
+            A numpy array with length 3*N*.
+
+            **mode_v** = Normal mode vectors. A 3*N* x 3*N* dimensional numpy array.
+
+            **mode_freq** = A numpy array (len = *N*) of mode frequencies (in atomic unit).
+
+            **file_path** = Full directory path + file prefix of the file where normal mode 
+            info would be written
+
+            **fmt** = A format of the normal mode file. 
+            Options are: **(1)** ``'axsf'``, OR **(2)** ``'nmd'``, OR (3) ``'molden'`` 
+
+        **Returns:**
+
+            An .axsf/.nmd/.molden file with the specified directory path + file prefix.
+
     """
     nmodes = len(mode_v)
     natoms = len(atoms)

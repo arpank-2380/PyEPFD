@@ -6,12 +6,42 @@ from elph_classes import dm
 
 class anharm_measure(dm):
       """
-      This class have all methods to compute anharmonicity measure
-      Args: dynmat = dynamical matrix ; mass = mass matrix
-            forces = (n,3N)matrix: n 3N-dimensional vector containing cartesian forces from n MD/MC snapshots
-            disp_coords = (n,3N) matrix: n 3N-dimensional vector containing cartesian coordinates from #n MD/MC snapshots
-            opt_coord = 3N-dimensional vector of cartesian coordinates of a optimized geometry/structure
-            asr = acoustic sum rule; allowed values 'crystal', 'poly', 'lin'
+      ============================
+      Anharm Measure Class
+      ============================
+      This class have all methods to compute anharmonicity measure. Currently only anharmonic measure 
+      proposed by Knoop, Purcell, Scheffler, and Carbogno is implemented. 
+      
+      Citation: Phys. Rev. Mater 4, 083809 (2020)
+
+          **Arguments:**
+
+            **dynmat** = dynamical matrix, a numpy array of 3 *N* x 3 *N*; where *N*
+            is the number of atoms. 
+
+            **mass** = mass matrix
+            
+            **forces** = A (n,3N) matrix: n 3N-dimensional vector containing cartesian forces from 
+            n number of MD/MC snapshots
+            
+            **disp_coords** = (n,3N) matrix: n 3N-dimensional vector containing cartesian coordinates 
+            from n number of MD/MC snapshots
+            
+            **opt_coord** = 3N-dimensional vector of cartesian coordinates of a optimized geometry/structure
+            
+            **asr** = acoustic sum rule; allowed values are:
+            **(1)** *'none'* (Default): asr is **not** applied, 
+            OR 
+            **(2)** *'crystal'*: For infinite systems / crystals, 
+            OR
+            **(3)** *'poly'*: For poly-atomic non-linear molecules, 
+            **OR** 
+            **(4)** *'lin'*: For any linear molecules
+
+            **mode_resolved** = Allowed values are 
+            **(1)** *True*: Mode-resolved anharmonic measure is computed, 
+            OR
+            **(2)** *False*: Mode-resolved anharmonic measure is **not** computed.
       """
       def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none', \
                    mode_resolved=True, remove_rot_trans=True):
@@ -45,12 +75,29 @@ class anharm_measure(dm):
 
       
       def _remove_trans_rot(self,ref_coord):
+          """
+          This function removes the global translation/rotation from the trajectory
+
+            **Arguments:**
+
+                **ref_coord** = Any refrernce coordinates with respect to which global rotation/translations
+                must be removed. 3N-dimensional vector of cartesian coordinates. 
+
+          """
           for i in range(len(self.disp)):
               self.disp[i], self.forces[i] = remove_trans_rot( ref_coord = ref_coord, \
                                           coord = self.disp[i], forces = self.forces[i], mass = self.mass)
 
       def _measure(self,mode_resolved=True): 
-          """if mode_resolved=True it also calculates mode resolved anharmonic measure"""
+          """
+          This function performs the anharmonic measure
+
+            **Arguments:**
+
+                **mode_resolved**= Allowed values are: 
+                *True*(Default): calculates mode resolved anharmonic measure
+                *False*: does **not** calculate mode-resolved anharmonic measure
+          """
           self.cart_anh_var, self.cart_tot_var, self.cart_anh_mes, \
           self.mode_anh_var, self.mode_tot_var, self.mode_anh_mes = self._KPSC_anh_measure(mode_resolved)
           self.atom_anh_var, self.atom_tot_var, self.atom_anh_mes = self._atom_resolved(self.cart_anh_var,self.cart_tot_var)
@@ -61,8 +108,19 @@ class anharm_measure(dm):
                      self._sum_measure(anh_var = self.mode_anh_var, tot_var = self.mode_tot_var)
 
       def _force_decomp(self,hessian, forces, disp):
-          """force_decomposition: returns harmonic and anharmonic forces for a particular frame. 
-             Args: disp, forces = n rows of 3N-dim cartesian vectors, hess = 3N*3N cartesian hessian"""
+          """
+          This function does the force_decomposition: returns harmonic and anharmonic forces for a particular frame. 
+
+            **Arguments:** 
+                **disp** = A  3-N dimensional vector of displaced co-ordinates,
+
+                **forces** = A 3N-dim cartesian vectors of forces at displaced coordinated
+                computed from first-principles, 
+
+                **hessian** = 3N*3N cartesian hessian
+
+          It terurns harmonic and anharmonic forces for a particular frame.   
+          """
 
           harm_forces = np.array(forces)
           for i in range(len(forces)):
@@ -71,8 +129,10 @@ class anharm_measure(dm):
           return anharm_forces, harm_forces
 
       def _variance(self,vector):
-          """Args: vector = (n x m) matrice where n is the number of MD/MC snapshot and 
-                   m is the dimension of the vector(force,displacement etc)"""
+          """
+          Args: vector = (n x m) matrice where n is the number of MD/MC snapshot and 
+                   m is the dimension of the vector(force,displacement etc)
+          """
           vector = np.array(vector)
           variance = np.zeros(vector.shape[1],np.float64)
           for i in range(len(vector)):
@@ -107,7 +167,9 @@ class anharm_measure(dm):
           return anh_var,tot_var, anh_measure, anh_var_mode, tot_var_mode, anh_measure_mode
 
       def _atom_resolved(self,cart_anh_var,cart_tot_var):
-          """Sum up the variances for 3 cartesian coordinates of an atom"""
+          """
+          Sum up the variances for 3 cartesian coordinates of an atom
+          """
           atom_res_anh_var = np.zeros(self.natoms)
           atom_res_tot_var = np.zeros(self.natoms)
           for iatom in range(self.natoms):
@@ -128,6 +190,31 @@ class anharm_measure(dm):
           return sum_anh_var, sum_tot_var, sum_anh_mes
       
       def write(self,file_path,atoms,vib_freq_unit='cm-1'):
+          """
+          ----------------------------------------
+          Write method 
+          ----------------------------------------
+          This function writes the anharmonic measure for each mode and atoms.
+
+            **Arguments:**
+
+                **file_path** = path to the output files where anharmonic measure values would be written
+
+                **atoms** = A python list of all atoms
+
+                **vib_freq_unit** = The unit in which vibrational frequency of normal modes would be printed.
+                The allowed values are: 
+                **(1)** *'cm-1'*(Default), OR
+                **(2)** *'THz'*, OR
+                **(3)** *'K'*, OR
+                **(4)** *'meV'*.
+          
+            **Returns:**
+
+                In the given **file_path** it will create files with suffix **_atom_res_anh_mes.out** and 
+                **_mode_res_anh_mes.out** (if **mode_resolved** = *True*) where anharmonic 
+                measure would be printed.
+          """
           if len(atoms) != self.natoms:
               raise ValueError("anharm_measure.write(): len(atoms) != anharm.natoms.")
           if (vib_freq_unit=='cm-1') | (vib_freq_unit=='K') | (vib_freq_unit=='THz') | (vib_freq_unit=='meV'): 
@@ -159,9 +246,47 @@ class anharm_measure(dm):
 
 class boltzmann_reweighting(dm):
       """
+      =========================================================================
+      Boltzmann Reweighting Class
+      =========================================================================
+      .. warning:: 
+         This class is experimental and not recommended for use.
+      
       This class uses a Boltzmann reweighting technique at a finite T to include 
       anharmonicity. T cannot be small or 0. 
-      Returns the modified weights for new configurations
+     
+        **Arguments:**
+            
+            **dynmat** = dynamical matrix 
+
+            **mass** = mass matrix
+            
+            **disp_coords** = (n,3N) matrix: n 3N-dimensional vector containing cartesian coordinates 
+            from n number of MD/MC snapshots
+           
+            **opt_coord** = 3N-dimensional vector of cartesian coordinates of a optimized geometry/structure
+           
+            **opt_energy** = A *float* representing energy (atomic_unit) of the optimized coordinates
+
+            **temperature** = A *float* representing Temperature (in K)
+
+            **asr** = acoustic sum rule; allowed values are:
+            **(1)** *'none'* (Default): asr is **not** applied, 
+            OR 
+            **(2)** *'crystal'*: For infinite systems / crystals, 
+            OR
+            **(3)** *'poly'*: For poly-atomic non-linear molecules, 
+            OR 
+            **(4)** *'lin'*: For any linear molecules
+
+            **remove_rot_trans** = Allowed values are:
+            **(1)** *True*: removes global translations and rotations, 
+            OR
+            **(2)** *False*: does not remove global translations and rotations, from the **disp_coords** 
+
+        **Returns:**
+
+            The modified weights for new configurations as an object **anharm.boltzmann_reweighting.weights**.
       """
       def __init__(self,dynmat, mass, \
                    disp_energy, disp_coords, opt_energy, opt_coord, temperature, \

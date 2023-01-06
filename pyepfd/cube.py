@@ -4,8 +4,8 @@ import numpy as np
 
 class cube_data:
       """
-         This includes methods to read cube files and perform a set of
-         operations on them, e.g., squaring, integrating a cube file
+      This includes methods to read cube files and perform a set of
+      operations on them, e.g., squaring, integrating a cube file
       """
 
       def __init__(self,fname=None):
@@ -25,7 +25,7 @@ class cube_data:
 
       def calc_ipr(self):
           """
-             Calculates inverse participation ratio (IPR) 
+          Calculates inverse participation ratio (IPR) 
           """
           square_integral,square = self.power_cube(power=2)
           power4_integral,power4 = self.power_cube(power=4)
@@ -34,8 +34,9 @@ class cube_data:
       
       def read_cube_file(self,fname):
           """
-            Method to read cube file.
-            Arg: fname => filename
+          Method to read cube file.
+
+          Argument: fname => filename
           """
       
           infil = open(fname, 'r')
@@ -72,8 +73,8 @@ class cube_data:
       def power_cube(self,power=2,integrate=True):
 
           """
-             Function to raise cube data to a power. Squares cube data by default.
-             And to integrate the new data
+          Function to raise cube data to a power. Squares cube data by default.
+          And to integrate the new data
           """
           power=self.data**power
           if integrate:
@@ -95,6 +96,12 @@ class cube_data:
           return integral
 
 def cube_multiplication(files):
+    """
+    This function multiplies the cube files that are supplied as
+    arguments.
+
+        Arguments: files = A list of file names.
+    """
     cube_datas = [cube_data(infil) for infil in files]
     cube_out = copy.deepcopy(cube_datas[0])
     for cube_tmp in cube_datas[1:]:
@@ -105,6 +112,8 @@ def cube_multiplication(files):
 def overlap_integral(files):
     """
       Calculates the overlap integral between two cube files
+
+      Arguments: files = A list of two file names.
     """
     if len(files) != 2:
        print("Overlap integral can be calculated between 2 cube files only!.")

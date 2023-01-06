@@ -9,8 +9,21 @@ from constants import *
 
 def bose_einstein(omega,omega_unit='Ha',T=0.0):
     """
-      Function to calculate the Bose Einstein occupation
+      This function calculates the Bose Einstein occupation
+
+        **Arguments:**
+
+            **omega** = A *float* number signifying mode-frequencies.
+
+            **omega_unit** = Unit of omega. Options: ``'Ha'`` (default) OR ``'eV'``.
+
+            **T** = Temperature in K
+
+        **Returns:**
+
+            A *float* number. Bose Einstein occupation for the given mode at *T*.
     """
+
     if T < 1e-8:
        bose_einstein = 0.00000000e+00
     else:
@@ -25,12 +38,24 @@ def bose_einstein(omega,omega_unit='Ha',T=0.0):
 
 def coord_com(coord, mass, flatten=True):
     """
-    Retruns coordinates with respect to center of mass (com) and com coordinates
-          coord = 3N dimensional cartesian coordinates for N atoms
-          mass = N dimensional mass matrix
-    Returns: coord_com = coordinates with respect to c.o.m and
-             com = center of mass coordinate
+    This function retruns coordinates with respect to center of mass (com) 
+    and com coordinates.
+
+        **Arguments:**
+
+            **coord** = 3N dimensional cartesian coordinates for N atoms
+
+            **mass** = Numpy array of mass matrix. 
+                .. note::
+                    This function can accept mass matrix with length *N* or 3 *N* 
+    
+        **Returns:**
+
+            (1) coord_com = coordinates with respect to c.o.m 
+        AND
+            (2) com = center of mass coordinate
     """
+
     natoms = len(coord)//3
     if len(mass) == len(coord):
        mass = np.array([mass[3*i] for i in range(natoms)])
@@ -46,6 +71,19 @@ def coord_com(coord, mass, flatten=True):
     return coord_com, com
 
 def write_dynmat(dynmat,out_file_name,header='#\n'):
+    """
+    This function can write the dynamical matrix row-wise.
+
+        **Arguments:**
+
+            **dynmat** = dynamical matrix, a (3 *N* x 3 *N* ) numpy array; where *N*
+            is the number of atoms. 
+
+            **out_file_name** = path to the output file
+
+            **header** = A header string
+    """
+
     outfil = open(out_file_name,'w+')
     outfil.write("######  This output is produced by PyEPFD. #####\n")
     outfil.write(header+'\n')
@@ -56,10 +94,40 @@ def write_dynmat(dynmat,out_file_name,header='#\n'):
 
 def reorder_dynmat(dynmat,original_ord,new_ord,mass,atoms):
     """
-    original_ord = python list of tuples defining the 
-                  first and last atom index in each block
-    new_order = python list of tuples defining the first and 
-               last atom index (in terms of original indices in new block  
+    ---------------------------------------------------------------
+    Function to Reorder Dynamical Matrix According to Atom Sequence
+    ---------------------------------------------------------------
+    This function reorders a given dynamical matrix by changing its atom sequence.
+    This is sometimes necessary if the underlyfing first-principles code such as qbox 
+    reorders the atom sequences differently in two different calculations: (i) an MD 
+    and (ii) a normal mode calculation. Later, if we want to compare the normal-modes 
+    with the MD trajectory, the modes would be inconsistent due to atom-ordering. 
+    In that case dynamical matrix may be reordered to the atom-sequence we want. 
+    For example, in this case we want the dynamical matrix to be consistent with the 
+    sequence of the MD simulation.
+
+        **Arguments**:
+
+            **dynmat** = Dynamical matrix; a numpy array of 3 *N* x 3 *N*; where *N*
+            is the number of atoms.
+
+            **original_ord** = A python list of tuples defining the 
+            first and last atom index in each block
+
+            **new_order** = A python list of tuples defining the first and 
+            last atom index (in terms of original indices) in new block  
+
+            **mass** = Mass matrix in original atom order
+
+            **atoms** = List of atom-symbols in original order
+
+        **Returns:**
+
+            **(1)** New dynamical matrix with desired atom ordering.
+
+            **(2)** New mass matrix with desired atom ordering.
+
+            **(3)** New atom-symbol list with desired atom ordering.
     """
     natom_type = len(original_ord)
     if len(new_ord) != natom_type:
@@ -122,18 +190,33 @@ def reorder_dynmat(dynmat,original_ord,new_ord,mass,atoms):
 
 class central_diff:
       """
+      ========================
+      Class Central Difference
+      ========================
       This class calculates the 1st and 2nd order central difference 
-      of any energy quantity (Orbital energies or total energies) when displacements are symmetric
-      arg: x = column matrix of width of displacement grids. 
-           y = column matrix containing values of a function (can be energy or gradient) 
-               whose derivatives are to be calculated. this must be clustered in such a way that
-               first ngrid contiguous values related to x(0), 
-               next ngrid contiguous values related to x(1), and so on and so forth. 
-           order = order of central difference
-           ngrid = symmetric displacement grid for central difference,allowed values 1,2,3 or 4.
-                   actual number of points would be double as we do symmetric displacements.
-           decreasing = if True the displacements are in decreasing  order , i.e +2h,+h,-h,-2h        
+      of any quantity (Orbital energies, total energies, forces) when displacements are symmetric.
+
+        **Arguments:**
+            **x** = A numpy column vector containing the width of displacement grids.
+
+            **y** = A numpy column vector containing values of a function (can be energy or forces) 
+            whose derivatives are to be calculated. this must be clustered in such a way that
+            first ngrid contiguous values related to x(0), 
+            next ngrid contiguous values related to x(1), and so on and so forth. 
+
+            **order** = Order of central difference. 
+            Allowed values: (1) ``1``: Gradients, OR (2) ``2``: Hessian.
+
+            **ngrid** = Symmetric displacement grid for central difference.
+            Allowed values: ``1``, ``2``, ``3`` or ``4``.
+
+                .. note::
+                    Actual number of points would be double as we do symmetric displacements.
+
+            **decreasing** = If ``True``: the displacements are in decreasing  order , i.e +2h,+h,-h,-2h.
+            ``False``: Otherwise.
       """
+
       def __init__(self,x,y,order=2,ngrid=4,decreasing=True):    
           #print("Central_diff class speaking")
           self.x = x; self.y = y
@@ -162,13 +245,18 @@ class central_diff:
       def __cd__(x,y,order=2,ngrid=1):
           """
             Method to calculate the central difference.
-            Arg: x = Array of displacement values
-                 y = Array of functional values
-                 order = central diff order 
-                            1 ==> 1st derivative
-                            2 ==> 2nd derivative
-                 ngrid = Stencils/ No of symmetric displacements. 
-                         Value allowed up to 4.
+
+                Arguments: 
+
+                    **x** = Array of displacement values
+                
+                    **y** = Array of functional values
+                    
+                    **order** = central diff order. ``1``: 1st derivative
+                    ``2`` : 2nd derivative
+                 
+                    **ngrid** = Stencils/ No of symmetric displacements. 
+                    Allowed values: ``1``, ``2``, ``3``, OR ``4``.
           """
           if len(y) != 2*ngrid:
              raise ValueError("Given column of data (y) is not consistent with grid size.")
@@ -206,13 +294,41 @@ class central_diff:
 
 class dm:
       """
-      A class that stores the essentials of a dynamical matrix.
-      w2[i] = Eigenvalues in ascending order
-      V[:,i] = i-th eigenvector
-      It has a method that takes a normal mode displacement as a column vector 
-      and converts them into a column vector of cartesian displacements
-      dynmatrix is the mass weighted hessian, while hessian is not mass weighted
+      =====================================
+      Class Dynamical Matrix
+      =====================================
+      This class stores the essential informations of a dynamical matrix.
+      It also diagonalizes the dynamical matrix and stores the
+      normal mode vectors as objects. This is class is used as a base class for many 
+      classes in PyEPFD. It has methods to transform from normal mode cordinates
+      to Cartesian coordinates and *vice versa*.
+      
+        **Arguments:**
+
+            **dynmat** = dynamical matrix, a numpy array of 3 *N* x 3 *N*; where *N*
+            is the number of atoms.
+
+            **mass** = (3 *N* x 3 *N* ) mass matrix
+            
+        **Objects:**    
+
+            **dynmatrix** = Here the input dynamical matrix object is saved.
+            This is mass-weighted Hessian matrix.
+
+            **w2** = 1-D numpy array of Eigenvalues in ascending order
+
+            **V[:,i]** = i-th eigenvector
+
+            **omega** = array of normal mode frequencies (atomic unit).
+
+            **natoms** = Number of atoms
+
+            **massinv** = A 1-D array of inverse mass i.e., (1/sqrt(mass))
+
+            **hessian** = Hessian matrix without mass-weighting
+
       """
+
       def __init__(self,dynmat,mass):
           if len(dynmat) != len(mass):
              sys.exit("Dynamical matrix and mass matrix are not consistent.")
@@ -230,14 +346,29 @@ class dm:
           self.asr = None
     
       def calc_hessian(self):
-          """Hessian matrix without mass weighting"""
+          """
+          ------------------------
+          Calculate Hessian Method
+          ------------------------
+          This method calculates Hessian matrix without mass weighting and
+          stores them into an object name **hessian**. 
+
+            .. note::
+                While dynamical matrix object **dynmatrix** is Mass-weighted Hessian, 
+                here **hessian** object is not mass weighted.
+          """
+
           self.hessian = np.copy(self.dynmatrix)
           for imode in range(self.nmodes):
               self.hessian[imode] = self.dynmatrix[imode] / (self.massinv[imode] * self.massinv)
 
       def nm2cart_disp(self, nm_disp):
-          """ nm_disp = A 3N-dim column vector of normal mode displacements,
-              returns cart_disp, a 3N-dim column vec containing cartesian displacements.
+          """
+          -------------------------------------------------------------------------
+          Method to Transform Normal Mode Displacement into Cartesian Displacements
+          -------------------------------------------------------------------------
+          This method take a a 3N-dim column vector of normal mode displacements, ``nm_disp``,
+          and transforms it into  a 3N-dim column vec containing cartesian displacements, *cart_disp*.
           """
           if len(nm_disp) != self.nmodes:
              sys.exit("Dimension of NM displacement is not consistent with dynamical matrix.")
@@ -248,12 +379,41 @@ class dm:
           return cart_disp        
 
       def nm2cart_matrix(self,Mnm):
-          """Converts any matrix (Mnm) represented in normal modes to that represented in cartesian(Mcart)"""
+          """
+          --------------------------------------------------------------
+          Method for Normal Mode to Cartesian Transformation of a Matrix
+          --------------------------------------------------------------
+            Argument:
+                **Mnm** =  Any 3 *N* x 3 *N* matrix represented in normal modes 
+
+            Returns:  
+                **Mcart** = **Mnm** represented in cartesian
+          """
+
           Mcart = np.dot(self.U, np.dot(Mnm, np.transpose(self.U)))
           return Mcart
 
       def cart2nm_vec(self,cart_v,normed=False,mass_weight=True):
-          """Projects a 3N-dim cartesian vector (coordinate or force) into a normal mode and return coeff"""
+          """
+          --------------------------------------------------------------------
+          Method for Transforming a Cartesian Vector into a Normal Mode Vector
+          --------------------------------------------------------------------
+          This function projects a 3 *N* dimensional cartesian vector (coordinate or force) 
+          into normal modes and return the coefficients along the normal modes
+          as a numpy array of length 3 *N*.
+
+            **Arguments:**
+
+                **cart_v** = A numpy array of length 3 *N* containing a 3 *N* dimensional 
+                Cartesian Vector (coordinates or forces of atoms of a particular configuration).
+
+                **normed** =  Should the normal-mode vector be normalized to 1?
+                Allowed values: (1) ``True`` OR (2) ``False`` (Default).
+
+                **mass_weight** = Should the considered normal modes be mass-weighted?
+                Allowed values: (1) ``True`` (Default) OR (2) ``False``
+          """
+
           nm_v = np.zeros(len(self.V), np.float64)
           if mass_weight:
              for mode_no in range(len(self.V)):
@@ -270,6 +430,41 @@ class dm:
           return nm_v
 
       def apply_asr(self,opt_coord,asr='none'):
+          """
+          ----------------------------------------------------------------------
+          Method For Applying Acoustic Sum Rule (ASR) 
+          ----------------------------------------------------------------------
+          This method can be used to apply acoustic sum rule to a dynamical matrix to project out the
+          global rotation and/or translation from the dynamical matrix. After applying this method, 
+          two several new objects would be created within the ``dm`` class containing the refined 
+          dynamical matrix, eigenvectors, frequencies.
+
+            **Arguments:**
+
+                **opt_coord** = 3N-dimensional vector of cartesian coordinates of a optimized geometry/structure
+
+                **asr** = acoustic sum rule; Options are:
+                **(1)** ``'none'`` (Default): asr is **not** applied,
+                OR
+                **(2)** ``'crystal'`` : For infinite systems / crystals,
+                OR
+                **(3)** ``'poly'`` : For poly-atomic non-linear molecules,
+                **OR**
+                **(4)** ``'lin'``: For any linear molecules
+
+            **Returns:**
+
+            New objects within ``dm`` class.
+
+                **refdynmat** = Refined dynamical matrix after applying ASR    
+
+                **refw2** =  Refined eigen values in increasing order.
+                
+                **refV** = Refined eigen vectors. A (3 *N* x 3 *N* ) numpy array.
+
+                **refomega** = Refined mode-frequencies. A numpy array of length 3 *N*.
+
+          """
           #print(self.mass)
           if (asr == 'none') | (asr == 'poly') | (asr == 'lin') | (asr == 'crystal'): 
              self.asr = asr
@@ -345,22 +540,50 @@ class dm:
 
 class stoch_displacements(dm):
       """
-      This class calculates the stochastic displacements along normal modes given algorithm
-      Args: dynmat = Dynamical matrix
-            mass = mass matrix
-            asr = Acoustic sum rule; allowed values: 'crystal', 'lin', 'poly'
-            temperature = Temperature for which displacements are chosen
-            algo = algorithm 
-                   Options:'os': one-shot, 
-                           'osap': one-shot with anthetic pair
-                           'osr': oneshot where displacement signs chosen at random
-                           'osrap': The same as 'osr' but for each sampled point it's antethetic pair would be included
-                           'mc': Monte Carlo where displacements are chosen at random from a Gaussian
-                           'mcap': The same as 'mc' but for each sampled point it's antethetic pair would be included
-            ngrid = number of integration grid (sample points); with antethetic pairs ('ap') actual number of
-                    single point calculation (sample points) will be 2 * ngrid
-            nmode_only = A python list of normal modes over which only the displacements would be performed.         
+      ========================================================
+      Class Stochastic Displacements
+      ========================================================
+      This class calculates the stochastic displacements along normal modes given an algorithm.
+        **Arguments:** 
+            **dynmat** = Dynamical matrix
+
+            **mass** = mass matrix
+
+            **asr** = Acoustic sum rule; 
+            allowed values: ``'none'``, ``'crystal'``, ``'lin'``, ``'poly'``
+            
+            **temperature** = Temperature for which displacements are chosen. A *float*.
+
+            **algo** = algorithm 
+                Options:
+                    **(1)** ``'os'`` : one-shot,
+                OR
+                    **(2)** ``'osap'`` : one-shot with anthetic pair
+                OR
+                    **(3)** ``'osr'`` : oneshot where displacement signs chosen at random
+                OR
+                    **(4)** ``'osrap'`` : Same as ``'osr'`` but for each sampled point it's 
+                    antethetic pair would be included.
+                OR
+                    **(5)** ``'mc'`` : Monte Carlo where displacements are chosen at random from a Gaussian
+                OR
+                    **(6)** ``'mcap'`` : The same as ``'mc'`` but for each sampled point it's 
+                    antethetic pair would be included
+
+            **ngrid** = number of integration grid (sample points); 
+                .. note::
+                    with antethetic pairs ('ap') actual number of
+                    single point calculation (sample points) will be 2 x ngrid.
+
+            **nmode_only** = A python list of normal modes over which only 
+            the displacements would be performed.         
+
+        **Returns:**
+
+            A new object **nmdisp** would be created containing the displacements in normal 
+            modes.
       """
+
       def __init__(self,dynmat,mass,asr='none',temperature=0,algo='osap',ngrid=1,nmode_only=None):
           super(stoch_displacements,self).__init__(dynmat,mass)
           self.algo = algo.lower(); self.ngrid = ngrid 
@@ -406,6 +629,9 @@ class stoch_displacements(dm):
                  self.nmdisp = np.vstack((self.nmdisp,ap_nmdisp))
 
       def _gen_signs(self):
+          """
+          This method would generate random signs
+          """
           if 'r' in self.algo:
              #print("r ")
              options = np.array([-1,1],np.int64)
@@ -427,11 +653,37 @@ class stoch_displacements(dm):
 
 class nm_sym_displacements(dm):
       """
-        This is a daughter class of dm.
-        It determines the values of normal mode displacements
-        used in i-PI. Only nmfd/enmfd vibrationl modes in i-PI are 
-        consistent with this.
+      ======================================================
+      Class Normal Mode Symmetric Displacements
+      ======================================================
+      This class computes the values of normal mode displacements
+      (consistent with i-PI code). 
+      
+        **Arguments**:
+
+            **dynmat** = dynamical matrix, a numpy array of 3 *N* x 3 *N*; where *N*
+            is the number of atoms. 
+
+            **mass** = mass matrix
+
+            **mode** = Finite displacement mode.
+                Options are:
+                    **(1)** ``'nmfd'`` : Normal Mode Finite Displacement,
+                OR
+                    **(2)** ``'enmfd'`` : Energy-scaled Normal Mode Finite Displacement.
+
+                    .. warning:: 
+                        Unlike **ionic_mover_class** other modes: NMS/ENMS/SD etc are not allowed.
+
+            **deltax** = A displacement (*float*) in atomic unit (Bohr)
+
+            **deltae**  = Energy scaled displacement (*float*) in atomic_unit (Hartree)
+
+        **Returns:**
+            Creates a new object **displacements**, a numply *float* array of length 3 *N* 
+            containing displacement grid-width for each normal mode.
       """
+
       def __init__(self,dynmat,mass,mode,deltax,deltae): 
           self.mode = mode
           if (self.mode == 'enmfd') | (self.mode == 'nmfd'): 
@@ -464,16 +716,46 @@ class nm_sym_displacements(dm):
 
 class phonon_calculator:
       """
-         This class accepts forces and displacements and computes dynamical matrix as Jacobian of force.
-         Arg:
-             forces = (2*ngrid, 3*N) 2D-array. Each row represents 3N-force components
-                      for a specific displaced struc. There are 2*ngrid such displaced struc.
-             mass = mass matrix
-             ngrid = symmetric displacement grid for central difference,allowed values 1,2,3 or 4.
-                     actual number of points would be double as we do symmetric displacements.
-             mode = fd/nmfd/enmfd        
-             
+      ============================================
+      Phonon Calculator Class
+      ============================================
+      This class accepts forces and displacements and computes dynamical matrix as Jacobian of force.
+
+        **Arguments:**
+
+            **ngrid** = Number of displacement grid points for central difference,
+            allowed values: ``1``, ``2``, ``3`` or ``4``.
+
+                ..note::
+                    Actual number of points would be double as we do symmetric displacements.
+
+            **forces** = A (2 x ``ngrid``, 3 x *N*) numpy array. Each row represents 3N-force components 
+            for a specific displaced struc.
+
+            **mass** = mass matrix
+
+            **mode** = Options: (1) ``'fd'``, (2) ``'nmfd'`` OR (3) ``'enmfd```.
+
+            **deltax** = A displacement (*float*) in atomic unit (Bohr)
+
+            **deltae**  = Energy scaled displacement (*float*) in atomic_unit (Hartree)
+
+                .. note::
+                    Use same value for the ``mode``, ``deltax`` and ``deltae``
+                    that was used for creating the displacements using **ionic_mover_class**.
+
+            **dynmat** = 3N x 3N dynamical matrix. Must be supplied for all modes except
+            ``mode=FD``.
+
+        **Returns:**
+
+            It creates two new objects:
+                
+                (1) **dynmat** = Dynamical Matrix
+            AND
+                (2) **hessian** = Hessian Matrix           
       """
+
       def __init__(self,forces,mass,ngrid=1, mode = 'fd', deltax = 0.005, dynmat = None, deltae =0.001):
           #print("phonon_calculator class speaking:")
           self.nconfg = forces.shape[0]; self.nmode = forces.shape[1]   ## no of config and no of modes (degrees of freedom)
@@ -507,9 +789,12 @@ class phonon_calculator:
           #print("phonon_calculator class speaking:")
           #print(self.displacements)
           
-          self.calc_phonon()
+          self._calc_phonon()
 
-      def calc_phonon(self):
+      def _calc_phonon(self):
+          """
+          This method calculates phonon
+          """
           #print("phonon_calculator.calc_phonon speaking:")
           for imode in range(self.nmode):
               istart = 2*self.ngrid * imode + 1; iend =  2*self.ngrid*(imode+1)+1
@@ -530,9 +815,12 @@ class phonon_calculator:
              for imode in range(self.nmode): 
                  self.hessian[imode] = self.dynmat[imode] / (self.massinv[imode] * self.massinv)
 
-          self.symmetrize()       
+          self._symmetrize()       
 
-      def symmetrize(self):
+      def _symmetrize(self):
+          """
+          This method symmetrizes the dynamical matrix
+          """
           #print("phonon_calculator.symmetrize() speaking:")
           dm = self.dynmat.copy()
           self.dynmat = 0.50 * ( dm + dm.T)
@@ -541,23 +829,78 @@ class phonon_calculator:
 
 class epce_calculator:
       """
-        This class calculates the all important electron phonon related properties, e.g.,
-        elceton phonon coupling energies (epce) for each phonon mode,
-        total zero point renormalization (zpr) of an orbital eigenvalue, 
-        or thermal average of eigen values.
-        Arg:
-           dynmat = A numpy array (3N * 3N) of dynamical matrix, where N number of atoms
-           mass = A numpy  array of mass in au (3N)
-           energy = An array(6N+1) of Born-Oppenheimer energies of equilibrium geometry (energy[0])
-                    and 2 displaced structures along each normal modes, starting from the 1st mode.
-           logfile = logfile path
-           asr = acoustaic sum rule used in iPI calculation
-           mode = vibrational mode used in iPI calculation
-           deltax = pos_shift used in iPI calculation
-           deltae = energy_shift used in iPI calculation
-           vib_freq_unit = Output unit for vibrational frequencies
-           epce_unit = Output unit for  EPCE
+      ==================================================
+      Electron Phonon Coupling Energy Calculator Class
+      ==================================================
+      This class calculates the all important electron phonon related properties, e.g.,
+      elceton phonon coupling energies (epce) for each phonon mode,
+      total zero point renormalization (zpr) of an orbital eigenvalue, 
+      or thermal average of eigen values.
+
+        .. warning::
+            Currently, stencils are not implemented for this class. 
+            To compute EPCEs and ZPR, one must choose ``ngrid=1`` during 
+            finite displacements using **ionic_mover_class** and phonon calculations
+            using **phonon_claculator** class.
+
+        Arguments:
+
+            **dynmat** = A numpy *float* array (3 *N* x 3 *N* ) of dynamical matrix, 
+            where *N* is the number of atoms
+
+            **mass** = A numpy *float* array of mass in atomic unit (length = 3 *N* )
+
+            **energy** = An *float* array of length (6 *N* + 1) of Born-Oppenheimer energies. The first array element
+            (energy[0]) should be the energy of the equilibrium geometry. Later array elements correspond 
+            to the 2 displaced structures along each normal modes, starting from the 1st mode.
+
+            **eigval** = A (6 *N* + 1 x *n*) numpy *float* array where *n* denotes the number of orbitals. 
+
+            **logfile** = logfile path; a *string*.
+            
+            **asr** = acoustaic sum rule. A *string*. 
+                Options are:
+                        **(1)** *'none'* (Default): asr is **not** applied,
+                    OR
+                        **(2)** *'crystal'*: For infinite systems / crystals,
+                    OR
+                        **(3)** *'poly'*: For poly-atomic non-linear molecules,
+                    OR
+                        **(4)** *'lin'*: For any linear molecules
+
+            **mode** = Finite displacement mode used for displacements. 
+            Options: ``'nmfd'`` or ``'enmfd'``
+
+            **deltax** = Displacement (in Bohr) used while displacing the ions. A *float* number.
+
+            **deltae** = Energy scaled displacement (*float*) in atomic_unit (Hartree) 
+            used while displacing the ions.
+
+            **vib_freq_unit** = Output unit for vibrational frequencies.
+            Options are: 
+            **(1)** ``'Ha'`` , **(2)** ``'cm-1'``, **(3)** ``'eV'``, **(4)** ``'meV'``,
+            **(5)** ``'kcal/mol'``, **(6)** ``'kJ/mol'``, **(7)** ``'K'``, **(8)** ``'THz'``.
+            Default: ``'cm-1'``
+
+            **epce_unit** = Output unit for  EPCE. Options are same as **vib_freq_unit**
+            Default: ``'meV'``
+
+        **Returns:**
+
+            Creates the following objects within the class:
+
+                **vib_freq** = A numpy *float* array of length 3 *N* containing vibrational 
+                frequencies computed from Normal Mode Hessian.
+
+                **epce** = A (3 *N* -m , n ) numpy *float* array containing EPCEs of *n* orbitals
+                m = 0/3/5/6 depending on ``asr = 'none'``, ``asr = 'crystal'``, ``asr = 'lin'`` and 
+                ``asr = 'poly'``, respectively.
+                
+                **zpr** = A numpy *float* array of length *n* containing zero-point renormalizations
+                of *n* orbitals.
+
       """
+
       def __init__(self, dynmat, mass,energy, eigval, logfile,\
                          asr= None, mode='enmfd', deltax=0.001, deltae=0.001, \
                          vib_freq_unit='cm-1',epce_unit='meV'):          
@@ -670,8 +1013,17 @@ class epce_calculator:
 
       def renorm_eigval_at_temp(self,T):
           """
-            Calculates renormalized eigenvalues by doing a thermal average using the 
-            Bose Einstein factor. Return renormalized eigenvalues in Ha.
+          --------------------------------------------------------------------
+          Method to Calculate Renormalized Band Energy At a Finite Temperature
+          --------------------------------------------------------------------
+          This method calculates renormalized band energy, for example Kohn-Sham eigenvalues 
+          by performing a thermal average using the Bose Einstein factor. It returns renormalized 
+          eigenvalues in Ha.
+
+            **Argument:** **T** = Temperatute (a *float*) in K
+
+            **Returns:** A numpy *float* array of length *n* containing renormalized
+            band energies for *n* bands/orbitals at temperature *T*. 
           """
           be_factor = np.array([1.0+2*bose_einstein(omega=self.omega[i],omega_unit='Ha',T=T) for i in range(self.nmstart,len(self.nm_disp))])
           renorm = np.zeros(self.no_of_orbitals,np.float64)
@@ -690,6 +1042,10 @@ class epce_calculator:
           return renorm_eigval
 
       def __write__omega__vib_freq(self):
+          """
+          Writes the vibrational frequencies obtained from Normal Mode Hessian as well as
+          from input dynamical matrix.
+          """
           self.logfile.write("#------------------------------------------------------------------------------------------------\n")
           self.logfile.write("# Normal mode #                          Frequency("+self.vib_freq_unit+")\n")
           self.logfile.write("#------------------------------------------------------------------------------------------------\n")

@@ -4,14 +4,21 @@ import numpy as np
 
 class degeneracy:
       """
+      ======================
+      Class Degeneracy
+      ======================
       This class will read the Kohn Sham eigenvalues from a file
       and divide it into defferent set of degenerate eigenvalues based on a defined
       degeneracy cut_off.
-      Arg: 
-      logfile = Logfile path
-      eigval_file = A file where each column defined KS eigenvalue with a particular orbital-index
-      overlap_file = overlap_file contains overlap matrix to map orbitals between two normal-mode displaced structures    
-      degeneracy_cutoff = Any two elements within a degenerate state would be smaller than this value
+
+        **Arguments:**
+      
+            **logfile** = Logfile path
+
+            **eigval_file** = A file path where each column defined KS eigenvalue with a particular orbital-index
+
+            **overlap_file** = overlap_file path contains overlap matrix to map orbitals between two normal-mode displaced structures    
+            degeneracy_cutoff = Any two elements within a degenerate state would be smaller than this value
       """
       def __init__(self,logfile,eigval_file,overlap_file=None,degeneracy_cutoff=0.002):
           self.logfile = logfile
@@ -45,7 +52,7 @@ class degeneracy:
                 return overlap_matrix
       
       
-      def group(self,data,cutoff):
+      def _group(self,data,cutoff):
           """
              This method will group the degenerate orbitals based on
              the givven degeneracy cutoff
@@ -105,7 +112,7 @@ class degeneracy:
              if self.degeneracy_cutoff is not None:
                 for row in range(self.nrow):
                     orbital_energies = self.eigval[row,:]
-                    degenerate_energies, degenerate_indices = self.group(orbital_energies, self.degeneracy_cutoff)
+                    degenerate_energies, degenerate_indices = self._group(orbital_energies, self.degeneracy_cutoff)
                     self.__average_degenerate_eigval(row,degenerate_energies)
              else:
                 pass  
@@ -116,7 +123,7 @@ class degeneracy:
              for row in range(self.nrow):
                  nmode_index = row//2-1
                  orbital_energies = self.eigval[row,:]
-                 degenerate_energies, degenerate_indices = self.group(orbital_energies, self.degeneracy_cutoff)
+                 degenerate_energies, degenerate_indices = self._group(orbital_energies, self.degeneracy_cutoff)
                  if (row == 0) or (row%2 != 0) or len(degenerate_energies) == 1 :
                     pass
                  else:
@@ -154,7 +161,10 @@ class degeneracy:
       def rewrite_ks_eigval(self,filename):
           """
           Method to rewrite the modified eigenvalues in a separate file. 
-          Arg: filename
+          **Argument:** filename
+
+            .. warning::
+                Usually used for debugging.
           """
           outfile = open(filename,"w")
           for row in range(self.nrow):
