@@ -1,7 +1,7 @@
 overlap module
 ===============
 
-.. automodule:: pyepfd.overlap
+.. automodule:: overlap
    :members:
    :no-undoc-members:
    :show-inheritance:

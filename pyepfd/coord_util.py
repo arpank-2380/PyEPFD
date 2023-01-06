@@ -46,9 +46,9 @@ def h2abc(h):
 
 def grep(file_path, pattern, cols):
     """
-    \----------------------
+    ----------------------
     Function Grep
-    \----------------------
+    ----------------------
     It greps a line from a file and then reads specic columns from that line
     and returns it as an array.
     

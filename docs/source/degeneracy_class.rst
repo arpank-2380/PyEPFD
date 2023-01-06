@@ -1,7 +1,7 @@
 degeneracy\_class module
 ========================
 
-.. automodule:: pyepfd.degeneracy_class
+.. automodule:: degeneracy_class
    :members:
    :undoc-members:
    :show-inheritance:

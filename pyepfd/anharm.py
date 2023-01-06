@@ -16,32 +16,32 @@ class anharm_measure(dm):
 
           **Arguments:**
 
-            **dynmat** = dynamical matrix, a numpy array of 3 *N* x 3 *N*; where *N*
+            **dynmat** = dynamical matrix, a (3 *N* x 3 *N*) numpy array of *floats* ; where *N*
             is the number of atoms. 
 
-            **mass** = mass matrix
+            **mass** = A numpy array of length 3 *N* containing mass matrix
             
-            **forces** = A (n,3N) matrix: n 3N-dimensional vector containing cartesian forces from 
+            **forces** = A (n,3N) numpy *float* matrix: n 3N-dimensional vector containing cartesian forces from 
             n number of MD/MC snapshots
             
-            **disp_coords** = (n,3N) matrix: n 3N-dimensional vector containing cartesian coordinates 
+            **disp_coords** = A (n,3N) numpy *float* matrix: n 3N-dimensional vector containing cartesian coordinates 
             from n number of MD/MC snapshots
             
             **opt_coord** = 3N-dimensional vector of cartesian coordinates of a optimized geometry/structure
             
-            **asr** = acoustic sum rule; allowed values are:
-            **(1)** *'none'* (Default): asr is **not** applied, 
+            **asr** = Acoustic Sum Rule; a *string.* Allowed values are:
+            **(1)** ``'none'`` (Default): asr is **not** applied, 
             OR 
-            **(2)** *'crystal'*: For infinite systems / crystals, 
+            **(2)** ``'crystal'`` : For infinite systems / crystals, 
             OR
-            **(3)** *'poly'*: For poly-atomic non-linear molecules, 
+            **(3)** ``'poly'`` : For poly-atomic non-linear molecules, 
             **OR** 
-            **(4)** *'lin'*: For any linear molecules
+            **(4)** ``'lin'`` : For any linear molecules
 
             **mode_resolved** = Allowed values are 
-            **(1)** *True*: Mode-resolved anharmonic measure is computed, 
+            **(1)** ``True`` : Mode-resolved anharmonic measure is computed, 
             OR
-            **(2)** *False*: Mode-resolved anharmonic measure is **not** computed.
+            **(2)** ``False`` : Mode-resolved anharmonic measure is **not** computed.
       """
       def __init__(self,dynmat, mass, forces, disp_coords, opt_coord, asr='none', \
                    mode_resolved=True, remove_rot_trans=True):
@@ -119,7 +119,7 @@ class anharm_measure(dm):
 
                 **hessian** = 3N*3N cartesian hessian
 
-          It terurns harmonic and anharmonic forces for a particular frame.   
+          It returns harmonic and anharmonic forces for a particular frame.   
           """
 
           harm_forces = np.array(forces)
@@ -198,21 +198,21 @@ class anharm_measure(dm):
 
             **Arguments:**
 
-                **file_path** = path to the output files where anharmonic measure values would be written
+                **file_path** = A *string*; path to the output files where anharmonic measure values would be written
 
-                **atoms** = A python list of all atoms
+                **atoms** = A python list of *strings* containing symbols of all atoms
 
-                **vib_freq_unit** = The unit in which vibrational frequency of normal modes would be printed.
+                **vib_freq_unit** = A *string.* The unit in which vibrational frequency of normal modes would be printed.
                 The allowed values are: 
-                **(1)** *'cm-1'*(Default), OR
-                **(2)** *'THz'*, OR
-                **(3)** *'K'*, OR
-                **(4)** *'meV'*.
+                **(1)** ``'cm-1'`` (Default), OR
+                **(2)** ``'THz'`` , OR
+                **(3)** ``'K'`` , OR
+                **(4)** ``'meV'`` .
           
             **Returns:**
 
                 In the given **file_path** it will create files with suffix **_atom_res_anh_mes.out** and 
-                **_mode_res_anh_mes.out** (if **mode_resolved** = *True*) where anharmonic 
+                **_mode_res_anh_mes.out** (if ``mode_resolved = True`` ) where anharmonic 
                 measure would be printed.
           """
           if len(atoms) != self.natoms:
@@ -257,9 +257,9 @@ class boltzmann_reweighting(dm):
      
         **Arguments:**
             
-            **dynmat** = dynamical matrix 
+            **dynmat** = Dynamical matrix 
 
-            **mass** = mass matrix
+            **mass** = Mass matrix
             
             **disp_coords** = (n,3N) matrix: n 3N-dimensional vector containing cartesian coordinates 
             from n number of MD/MC snapshots
@@ -270,24 +270,25 @@ class boltzmann_reweighting(dm):
 
             **temperature** = A *float* representing Temperature (in K)
 
-            **asr** = acoustic sum rule; allowed values are:
-            **(1)** *'none'* (Default): asr is **not** applied, 
+            **asr** = acoustic sum rule; a *string.* Allowed values are:
+            **(1)** ``'none'`` (Default): asr is **not** applied, 
             OR 
-            **(2)** *'crystal'*: For infinite systems / crystals, 
+            **(2)** ``'crystal'`` : For infinite systems / crystals, 
             OR
-            **(3)** *'poly'*: For poly-atomic non-linear molecules, 
+            **(3)** ``'poly'`` : For poly-atomic non-linear molecules, 
             OR 
-            **(4)** *'lin'*: For any linear molecules
+            **(4)** ``'lin'`` : For any linear molecules
 
-            **remove_rot_trans** = Allowed values are:
-            **(1)** *True*: removes global translations and rotations, 
+            **remove_rot_trans** = A *boolean.* Allowed values are:
+            **(1)** ``True`` : removes global translations and rotations, 
             OR
-            **(2)** *False*: does not remove global translations and rotations, from the **disp_coords** 
+            **(2)** ``False`` : does not remove global translations and rotations, from the **disp_coords** 
 
         **Returns:**
 
             The modified weights for new configurations as an object **anharm.boltzmann_reweighting.weights**.
       """
+
       def __init__(self,dynmat, mass, \
                    disp_energy, disp_coords, opt_energy, opt_coord, temperature, \
                    asr='none', remove_rot_trans=True):

@@ -6,6 +6,7 @@
 import sys, os
 import sphinx_rtd_theme
 sys.path.insert(0,os.path.abspath('..'))
+sys.path.append('../pyepfd')
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -32,6 +33,8 @@ extensions = [
             ]
 
 autodoc_member_order = 'bysource'
+
+autodoc_mock_imports = ["pyepfd","mpi4py"]
 
 templates_path = ['_templates']
 

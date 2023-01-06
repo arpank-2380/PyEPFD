@@ -1,7 +1,7 @@
 pyepfd module
 =============
 
-.. automodule:: pyepfd.pyepfd
+.. automodule:: pyepfd
    :members:
    :undoc-members:
    :show-inheritance:

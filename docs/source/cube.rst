@@ -1,7 +1,7 @@
 cube module
 ===========
 
-.. automodule:: pyepfd.cube
+.. automodule:: cube
    :members:
    :no-undoc-members: 
    :show-inheritance:

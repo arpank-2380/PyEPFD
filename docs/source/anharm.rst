@@ -1,7 +1,7 @@
 anharm module
 =============
 
-.. automodule:: pyepfd.anharm
+.. automodule:: anharm
    :members:
    :undoc-members:
    :show-inheritance:
