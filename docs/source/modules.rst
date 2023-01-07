@@ -11,6 +11,6 @@ Code Documentation
    elph_classes
    ipi_file_read
    overlap
-   pyepfd
+   epfd
    pyepfd_io
    xyz2nmode
