@@ -1,5 +1,5 @@
 import sys
-from pyepfd.cube import * 
+import pyepfd.cube as cube
 import numpy as np
 from mpi4py import MPI
 #nmode = sys.argv[1]
@@ -16,6 +16,13 @@ class mode_overlap():
       ==========================================================
       This class computes the overlap integral between displaced structures along each
       normal modes. This code is parallelized with MPI4Py. Therefore, MPI4Py is needed.
+
+        .. warning::
+
+            Parallelization is done over normal modes.  
+            The chosen number of MPI tasks should not be within 1/2 of ``nmode`` and ``nmode``.
+            For example if there are 9 normal modes, the number of chosen MPI tasks should not
+            be 5 to 8. Otherwise the calculation would crash due to improper load distribution. 
 
         **Arguments:**
             
@@ -99,7 +106,7 @@ class mode_overlap():
               #print('rank %d has files: %s'%(rank,file_list))
               #print('rank %d has overlap integral list: %s'%(rank,str(overlap_integral)))
               if rank == 0:
-                 print(overlap_integral_tmp)
+                 #print(overlap_integral_tmp)
                  #overlap_integral = np.zeros(norb_space,nmode,norb*norb,np.float64)
                  imode = 1
                  for process_id in range(size):
@@ -136,12 +143,13 @@ class frame_overlap():
       (defined by indices, file type: cube files) at a structure 
       (usually from MD or Frozen phonon) and a reference structure 
       (usually optimized structure)
+
       
         **Arguments:**
 
             **ref_frame** = *Integer.* Index of the reference frame within the cube files
 
-            **start_fram** = *Integer.* Index of the first frame whose overlap to be computed
+            **start_frame** = *Integer.* Index of the first frame whose overlap to be computed
 
             **last_frame** = *Integer.* Index of the last frame whose overlap to be computed
 
