@@ -156,13 +156,13 @@ class read_pyepfd_info:
 
                 **ngrid** = Number of displacement grid points for central difference
 
-                **inp_dynmat** = Input dynamical matrix for NMFD/ENMFD phonon.
+                **inp_dynmatrix** = Input dynamical matrix for NMFD/ENMFD phonon.
                 It is a numpy array of 3 *N* x 3 *N*; where *N* is the number of atoms.
 
-                **dynmat** = Obtained dynamical matrix after FD/NMFD/ENMFD phonon calculation.
+                **dynmatrix** = Obtained dynamical matrix after FD/NMFD/ENMFD phonon calculation.
                 It is also numpy array of 3 *N* x 3 *N*; where *N* is the number of atoms.
 
-                **ref_dynmat** = Refined dynamical matrix after FD/NMFD/ENMFD phonon calculation.
+                **ref_dynmatrix** = Refined dynamical matrix after FD/NMFD/ENMFD phonon calculation.
                 Refinement is done applying asr to **dynmat**.
                 It is also a numpy array of 3 *N* x 3 *N*; where *N* is the number of atoms.
 
@@ -214,7 +214,7 @@ class read_pyepfd_info:
           if self.coord_tree is None:
               sys.exit("Optimized geometry coordinates not found in file" + file_path)
           else:
-              self.coord_shape = eval(self.coord_tree.attrib["shape"])[1]
+              self.coord_shape = eval(self.coord_tree.attrib["shape"])
               self.coord = np.array([float(element.strip(",")) for element in self.coord_tree.text.split()[1:-1]])
 
           ### Reading  atoms
