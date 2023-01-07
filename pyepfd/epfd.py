@@ -1,7 +1,4 @@
 """
-===========================
-pyepfd Module
-===========================
 This Module contains the metods and epfd class that an user would need to 
 compute Electron Phonon Renormalization using  frozen phonon finite 
 difference method.
