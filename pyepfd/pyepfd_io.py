@@ -26,7 +26,10 @@ class write_pyepfd_info:
             It is also a numpy array of 3 *N* x 3 *N*; where *N* is the number of atoms.
 
             **mass** = (3 *N* ) numpy array of mass matrix
-            
+
+            **cell** =  A numpy array of length 6. First 3 numbers are cell length (atomic unit)
+            and last three numbers are angles (degrees) between cell vectors.
+
             **etotals** = (6 *N* + 1) numpy array of Born-Openheimer energies (<etotals> for qbox)
 
             **opt_coord** = (3 *N*) numpy array of Cartesian coordinates of optimized geometry.
@@ -50,7 +53,7 @@ class write_pyepfd_info:
 
       """
       def __init__(self,inp_dynmat=None,dynmat=None,ref_dynmat=None,mass=None,etotals=None,
-              opt_coord=None, atoms=None, mode='enmfd',deltax=0.001,deltae=0.001,ngrid=1,\
+              opt_coord=None, atoms=None, cell=None, mode='enmfd',deltax=0.001,deltae=0.001,ngrid=1,\
               file_name='test.xml', asr='crystal'):
           init_time = time.time()
           self.outfile = open(file_name, 'w+')
@@ -69,6 +72,8 @@ class write_pyepfd_info:
           if ref_dynmat is not None:   
              self._dynmat2xml(dynmat = ref_dynmat, key = 'ref_dynmat') 
           self.outfile.write('  </phonon>\n')
+          if cell is not None:
+             self._array2xml(array=cell,key='cell',shape = '('+str(len(cell))+')') 
           if mass is not None:
              self._array2xml(array=mass,key='mass',shape = '('+str(len(mass))+')')
           if opt_coord is not None:
@@ -173,6 +178,9 @@ class read_pyepfd_info:
 
                 **atoms** = A list of atoms with length *N* .
 
+                **cell** = A numpy array of length 6. First 3 numbers are cell length (atomic unit)
+                and last three numbers are angles (degrees) between cell vectors.
+
       """
       def __init__(self,file_path="RESTART"):
           init_time = time.time()
@@ -200,6 +208,12 @@ class read_pyepfd_info:
           self._read_dynmat('dynmat')
           self._read_dynmat('ref_dynmat')
 
+          self.cell_tree = file_tree.find("./cell")
+          if self.cell_tree is None:
+             print("Warning! Cell parameters are not found!")
+          else:
+             self.cell = np.array([float(element.strip(",")) \
+             for element in self.cell_tree.text.split()[1:-1]])
              
           self.mass_tree = file_tree.find("./mass")
           if self.mass_tree is None:

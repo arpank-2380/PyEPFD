@@ -760,7 +760,7 @@ class qbox:
           init_time = time.time()
           self.io = io; self.file_path = file_path
           if self.io == 'r':
-             self.cellabc, self.atoms, self.input_indices = self.__getsystem__(self.file_path);   
+             self.cell, self.atoms, self.input_indices = self.__getsystem__(self.file_path);   
              self.natoms = len(self.atoms) ; self.etotals = self.getenergy();  
              try: self.nframes = self.etotals.shape[0]
              except IndexError: self.nframes = self.etotals.size
