@@ -674,6 +674,10 @@ class ionic_mover:
                   %(imode+1, nmfd.displacements[imode],\
                     nmfd.displacements[imode]*freq_scaling))
               print("#Config    Disp(au)   Disp(Freq-scaled)")
+              """
+              .. note::
+                The below loop will be parallelized using MPI4Py in next version.
+              """
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
@@ -696,6 +700,10 @@ class ionic_mover:
           nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
                                       asr = self.asr, temperature = self.temperature,\
                                       ngrid = ngrid, algo = algo, nmode_only = self.nmode_only)
+          """
+          .. note::
+            The below loop will be parallellized using mpi4py in the next version.
+          """
           for idisp in range(len(nmmc.nmdisp)):
               self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
 
