@@ -7,3 +7,34 @@ from .epfd import *
 from .pyepfd_io import *
 from .ipi_file_read import *
 from .xyz2nmode import *
+
+__version__ = "1.0"
+
+def header():
+    """Prints welcome header """
+    import datetime
+
+    print("          ███████████                            ")  
+    print("         ░░███░░░░░███                           ")
+    print("          ░███    ░███ █████ ████                ")
+    print("          ░██████████ ░░███ ░███                 ")
+    print("          ░███░░░░░░   ░███ ░███                 ")
+    print("          ░███         ░███ ░███                 ")
+    print("          █████        ░░███████                 ")
+    print("         ░░░░░          ░░░░░███                 ")
+    print("                        ███ ░███                 ")
+    print("                       ░░██████                  ")
+    print("                        ░░░░░░                   ")
+    print(" ██████████ ███████████  ███████████ ██████████  ")
+    print("░░███░░░░░█░░███░░░░░███░░███░░░░░░█░░███░░░░███ ")
+    print(" ░███  █ ░  ░███    ░███ ░███   █ ░  ░███   ░░███")
+    print(" ░██████    ░██████████  ░███████    ░███    ░███")
+    print(" ░███░░█    ░███░░░░░░   ░███░░░█    ░███    ░███")
+    print(" ░███ ░   █ ░███         ░███  ░     ░███    ███ ")
+    print(" ██████████ █████        █████       ██████████  ")
+    print("░░░░░░░░░░ ░░░░░        ░░░░░       ░░░░░░░░░░   ")
+
+    print("PyEPFD version     : ", __version__)
+    print("Today              : ", datetime.datetime.today())
+
+header()
