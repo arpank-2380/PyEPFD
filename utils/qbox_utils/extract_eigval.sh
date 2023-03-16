@@ -1,7 +1,7 @@
 #!/bin/bash 
 ##### Script that collects eigenvalues of different orbitals during molecular dynamics runs ##########
 
-prefix=h2o-
+prefix=enmfd
 norb_strt=1
 norb_end=6
 md_start=1
@@ -100,7 +100,7 @@ function conv_eigval {
 
 ############ Setting default values for skip ##############
 if $skip_default; then
-   no_setxc=`grep -c "set xc" ${prefix}${md_start}.r`
+   no_setxc=`grep -c "set xc" ${prefix}-${md_start}.r`
    #echo no_setxc=$no_setxc
    if [ "$no_setxc" -le 1 ]; then
       skip=0
@@ -114,7 +114,7 @@ if $skip_default; then
 fi
 
 
-module load qbox
+#module load qbox
 cd $root_dir
 
 if [[ -d 'Eigenvalues' ]]; then
@@ -126,21 +126,21 @@ fi
 ##### Extracting the converged eigenvalues only inside the Eigenvalues directory for each MD simulation ############
 cd Eigenvalues
 
-module load parallel
+#module load parallel
 
 sem --max-procs ${max_proc}% -L 14                                                 #parallely spwaning many processes
 #sem -j +0
 for mdjob in `seq ${md_start} ${md_end}`
 do
-  if [[ -f ../${prefix}${mdjob}.r ]]; then
-    if [[ -f eigvals.${prefix}${mdjob} ]]; then
-       echo "File eigvals.${prefix}${mdjob} exists"
-       echo "Skipping extracting eigenvalues from ${prefix}${mdjob}.r"
+  if [[ -f ../${prefix}-${mdjob}.r ]]; then
+    if [[ -f eigvals.${prefix}-${mdjob} ]]; then
+       echo "File eigvals.${prefix}-${mdjob} exists"
+       echo "Skipping extracting eigenvalues from ${prefix}-${mdjob}.r"
     else
-       conv_eigval ../${prefix}${mdjob}.r ${skip} > eigvals.${prefix}${mdjob}
+       conv_eigval ../${prefix}-${mdjob}.r ${skip} > eigvals.${prefix}-${mdjob}
     fi
   else
-    echo "File ${prefix}${mdjob}.r doesn't exist"
+    echo "File ${prefix}-${mdjob}.r doesn't exist"
   fi 
 done
 #sem --wait
@@ -159,15 +159,15 @@ for mdjob in `seq ${md_start} ${md_end}`
 do
     for norb in `seq -w $norb_strt $norb_end`
     do 
-        if [[ -f ../eigvals.${prefix}${mdjob} ]]; then
-          if [[ -f orbital${norb}.${prefix}${mdjob} ]]; then
-             echo "File orbital${norb}.${prefix}${mdjob} exists"
-             echo "Skipping extracting eigenvalues for Orbital-${norb} from eigvals.${prefix}${mdjob}"
+        if [[ -f ../eigvals.${prefix}-${mdjob} ]]; then
+          if [[ -f orbital${norb}.${prefix}-${mdjob} ]]; then
+             echo "File orbital${norb}.${prefix}-${mdjob} exists"
+             echo "Skipping extracting eigenvalues for Orbital-${norb} from eigvals.${prefix}-${mdjob}"
           else
-             qbox_eig.py $ispin $kp1 $kp2 $kp3 $norb  ../eigvals.${prefix}${mdjob} > orbital${norb}.${prefix}${mdjob} 
+             qbox_eig.py $ispin $kp1 $kp2 $kp3 $norb  ../eigvals.${prefix}-${mdjob} > orbital${norb}.${prefix}-${mdjob} 
           fi
         else
-           echo "File Eigenvalues/eigvals.${prefix}${mdjob} doesn't exist"
+           echo "File Eigenvalues/eigvals.${prefix}-${mdjob} doesn't exist"
         fi
     done
 done
@@ -181,7 +181,7 @@ do
    cat_arg=''
    for mdjob in `seq ${md_start} ${md_end}`
    do
-       cat_arg=${cat_arg}'orbital'${norb}.${prefix}${mdjob}' '
+       cat_arg=${cat_arg}'orbital'${norb}.${prefix}-${mdjob}' '
    done
    sem --max-procs ${max_proc}% cat header ${cat_arg} | sed '/ispin=/d' > orbital${norb}.tmp
    paste_arg=${paste_arg}'orbital'${norb}'.tmp '

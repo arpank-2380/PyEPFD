@@ -9,7 +9,7 @@ module load python
 clear
 
 #### Put the path to xyz2qbox.py below ###
-executable=/path/to/xyz2qbox.py
+executable=xyz2qbox.py
 
 function xyz2qbox {
 python3 $executable $1 $2
