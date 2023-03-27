@@ -35,6 +35,8 @@ def header():
     print("░░░░░░░░░░ ░░░░░        ░░░░░       ░░░░░░░░░░   ")
 
     print("PyEPFD version     : ", __version__)
+    print("Author             : Arpan Kundu")
+    print("Author Email       : arpan.kundu@gmail.com")
     print("Today              : ", datetime.datetime.today())
 
 header()
