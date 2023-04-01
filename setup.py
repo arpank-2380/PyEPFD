@@ -11,6 +11,7 @@ setup(
     author="Arpan Kundu",
     author_email="arpan.kundu@gmail.com",
     description="A python package for computing electron-phonon renormalizations from finite displacements",
+    license='GPLv3',
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=['pyepfd'], #find_packages(),

@@ -1,7 +1,8 @@
 """
-This Module contains the metods and epfd class that an user would need to 
+This Module contains the metods and fph class that an user would need to 
 compute Electron Phonon Renormalization using  frozen phonon finite 
-difference method.
+difference method. This module also contains mc_convergence class that
+is needed to test convergence as well as obtaining the renormalized band gap and stochastic error bar from a stochastic displacement calculation.
 """
 import sys
 import numpy as np
@@ -219,4 +220,79 @@ def write_temp_vs_energy(temp_grid,energy,col_header,output_prefix,energy_unit="
         for col in range(len(energy[0])):
             outfile.write(" %14.6f "%(energy[itemp,col]))  
         outfile.write("\n")
+
+class mc_convergence:
+      """
+      =============================================================
+      Class Monte Carlo Convergence
+      =============================================================
+      This class contains the methods to compute the electron-phonon
+      renormalized properties from a stochastic calculation as well 
+      as its stochastic errorbar.
+
+        **Arguments:**
+
+          **file_path** = Name of the file containing Kohn-Sham eigen values (band energies).
+
+          **algo** = Algorithm used for the stochastic displacement.
+          Allowed values are: (1) *'OS'*, (2) *'OSAP'*, (3) *'OSR'*,
+          (4) *'OSRAP'*, (5) *'MC'*, (6) *'MCAP'*
+          See coord_util module for more information.
+
+          usecols = The index of the columns of the file given in *file_path*
+          for computing renormalized properties.
+      """
+
+      def __init__(self,file_path,algo,usecols=None):
+          self.file_path = file_path
+          self.algo = algo.lower()
+          self.usecols = usecols
+          self._get_data()
+          ndata = self.data.shape[0]
+          try: ncol = self.data.shape[1]
+          except IndexError: ncol =1
+          self.avg = np.zeros((ndata,ncol),np.float64)
+          self.sd_mean = np.zeros((ndata,ncol),np.float64)
+          for i in range(ndata):
+              self.avg[i], self.sd_mean[i] = \
+                      self._moving_average(self.data, data_range = (0,i+1))
+              
+      def _get_data(self):
+          """
+          This function refines the data based on algorithm of MC sampling
+          """
+          raw_data = np.genfromtxt(self.file_path,usecols=self.usecols)
+          nsample = len(raw_data)
+
+          if 'ap' in self.algo:
+             if nsample%2 != 0:
+                raise ValueError("Number of samples must be divisible by 2 for antethetic pairs (ap)")
+             data_sample = raw_data[0:nsample//2]
+             data_ap = raw_data[nsample//2:nsample]
+             self.data = np.zeros(nsample//2,np.float64)
+             self.data = (data_sample + data_ap)/2.0
+          else:
+             self.data = raw_data
+          
+      def _moving_average(self,data,data_range,weights=None,axis=0):
+          """data = numpy array
+             data_range = A tuple with 2 number upto which you want to compute moving averages
+          """
+          data_chunk = data[ data_range[0] : data_range[1] ]
+          if weights is not None:
+             weights_chunk = weights[ data_range[0] : data_range[1] ]
+          average = np.average(data_chunk,weights = weights, axis = axis)
+          if weights is None:
+             sd_mean = np.sqrt( np.var(data_chunk, axis = axis)/float(data_chunk.shape[0] - 1) )
+          else:
+              try:
+                  from statsmodels.stats.weightstats import DescrStatsW
+                  norm_fac = float(data_chunk.shape[0]) / np.sum(weights_chunk)
+                  weights_chunk *= norm_fac
+                  weighted_stats = DescrStatsW(array, weights=weights, ddof=1)
+              except ModuleNotFoundError:
+                 print(" Package statsmodels is not found. \n Cannot compute standard error of weighted mean.")
+                 sd_mean = None
+          return average, sd_mean
+
 
