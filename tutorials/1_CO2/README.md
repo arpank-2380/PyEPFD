@@ -43,3 +43,7 @@ TUTORIAL-1: CO2 Molecule
 		    			          trajectory to compute 
 					          vibrational density along a mode
                                                   or anharmonic measure
+-----------------------------------------------------------------------------------
+
+pseudos directory contains the pseudopotentials required to do Qbox calculations.
+------------------------------------------------------------------------------------
