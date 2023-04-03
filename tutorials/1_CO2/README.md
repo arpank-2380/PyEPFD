@@ -1,11 +1,11 @@
 TUTORIAL-1: CO2 Molecule
 ========================
 
-  NO  |   Directory | jupyter-notebook file  |    Description
+  No.    |   Directory  |  jupyter-notebook file  |    Description
 ------------------------------------------------------------------------------
-  1.1    1_cartesian_phonon                    A Cartesian Phonon Calculation
+  1.1    | 1_cartesian_phonon                     | A Cartesian Phonon Calculation
 
-  1.1.1             1_cart_phonon.ipynb        Displacing the atoms and 
+  1.1.1  |          1_cart_phonon.ipynb        Displacing the atoms and 
 					       storing into a XYZ file.
   1.1.2             2_cart_phonon.ipynb        Preparing Qbox input files from
 					       the XYZ files created in 1.1.1
