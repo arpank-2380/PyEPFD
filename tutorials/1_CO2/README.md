@@ -39,7 +39,7 @@ TUTORIAL-1: CO2 Molecule
 
   1.4    | 4_stochastic/1_stoch_mc.ipynb      |Stochastic Calculation of ZPR       
 
-  1.5    5_trajectory_analysis/1_analysis.ipynb  |Analysis of MD (or MC) 
+  1.5    | 5_trajectory_analysis/1_analysis.ipynb  |Analysis of MD (or MC) 
 		    			          trajectory to compute 
 					          vibrational density along a mode
                                                   or anharmonic measure
