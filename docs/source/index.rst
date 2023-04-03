@@ -10,7 +10,8 @@ Welcome to pyEPFD's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   installation     
+   installation
+   tutorials   
    modules
 
 Indices and tables
