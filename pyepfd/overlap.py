@@ -39,12 +39,14 @@ class mode_overlap():
 
             **directory** = Directory path where wave function cube files are located.
 
+            **cube_prefix** = *String* Prefix of the cube files.
+
         **Returns:**
             Files with names orbital-0.overlap, orbital-1.overlap, ... containing overlap
             matrices for 1st, 2nd,... orbital spaces, respectively.
       """
 
-      def __init__(self,nmode,orbital_space,directory='../cube_files.1/'):
+      def __init__(self,nmode,orbital_space,directory='../cube_files.1/',cube_prefix='wf'):
 
           #global nmode, directory, orbital_space      
           comm = MPI.COMM_WORLD
@@ -92,8 +94,8 @@ class mode_overlap():
                   iorb = 0
                   for orbital1 in orbitals:
                       for orbital2 in orbitals:
-                          files = ["%swf%d_frame-%d.cube"%(directory,orbital1,frames[0]),\
-                                   "%swf%d_frame-%d.cube"%(directory,orbital2,frames[1])]       
+                          files = ["%s%s%d_frame-%d.cube"%(directory,cube_prefix,orbital1,frames[0]),\
+                                   "%s%s%d_frame-%d.cube"%(directory,cube_prefix,orbital2,frames[1])]       
                           #print(files)
                           value = cube.overlap_integral(files)
                           overlap_integral_list[imode,iorb] = value

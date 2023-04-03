@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # generate a Qbox input file from an xyz file
 # Written by Arpan Kundu 
 # Version: June 29, 2021
@@ -15,7 +16,7 @@ conv2bohr= {
 
 color = True
 #### Put the correct path where you keep your pseudopotentials
-pseudo_dir="./"
+pseudo_dir="../pseudos/"
 
 ###### Default unit parameters, Qbox commands, Qbox variables ########
 pos_unit= "angstrom"
@@ -54,7 +55,7 @@ if color:
    warning = "\033[91m"                ## Red for warning
    statement = "\033[95m"             ## Pink for printing statements
    prompt = "\033[92m"                ## Green promt for asking input
-   cached = "\033[97m"                ## White for printing default/cached value
+   cached = "\033[94m"                ## White for printing default/cached value
    colorexit="\033[00m"               ## Exiting color
 else:
    warning = ""; statement = ""; prompt = ""; cached = ""; colorexit = ""
