@@ -12,7 +12,7 @@ clear
 executable=xyz2qbox.py
 
 function xyz2qbox {
-python3 $executable $1 $2
+$executable $1 $2
                   }
 
 tot_arg=`echo "$#"`

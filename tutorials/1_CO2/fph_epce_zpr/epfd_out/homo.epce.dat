@@ -1,0 +1,10 @@
+# Column-1 ==> Normal Mode Number
+# Column-2 ==> Normal Mode Frequency (cm-1)calculated based on normal mode hessian.
+# Column-3 ==> EPCE: value(meV) [percentage] for Orbital-7
+# Column-4 ==> EPCE: value(meV) [percentage] for Orbital-8
+     6      676.086354     10.7385 [  10.818 ]       20.0616 [  17.015 ]  
+     7      676.087602     10.7386 [  10.818 ]       20.0617 [  17.015 ]  
+     8     1345.456097    0.499236 [   0.503 ]      0.499236 [   0.423 ]  
+     9     2361.832806     77.2852 [  77.860 ]       77.2852 [  65.547 ]  
+#   EPCE SUM (meV) =        99.2615 [ 100.000 ]       117.908 [ 100.000 ]  
+#      ZPR (meV) =          49.6307 [ 100.000 ]       58.9538 [ 100.000 ]  
