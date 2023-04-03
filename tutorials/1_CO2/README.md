@@ -1,7 +1,7 @@
 TUTORIAL-1: CO2 Molecule
 ========================
 
-  NO     Directory  jupyter-notebook file      Description
+  NO  |   Directory | jupyter-notebook file  |    Description
 ------------------------------------------------------------------------------
   1.1    1_cartesian_phonon                    A Cartesian Phonon Calculation
 
