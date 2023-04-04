@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <eigenvalue_sum>  -5.23920734 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.307793723425   -31.263747819271   -15.760663616467   -14.580814321965   -14.450235563230
+   -14.450235563198   -10.509136120898   -10.509136120808    -0.929776948173     0.166009661901
+     0.653852956752     0.654251137503     0.720211353336
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52801335 </etotal_int>
+  <ekin>        25.96972730 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.48927079 </eps>
+  <enl>         -0.99531803 </enl>
+  <ecoul>      -17.38357477 </ecoul>
+  <exc>         -8.62957705 </exc>
+  <esr>          3.21001632 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52801335 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52801335 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00000000 0.00000000 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 0.00000812 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.00000000 0.00000000 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 -0.00072706 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.00000000 0.00000000 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 0.00071874 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.23930403 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.308900175530   -31.264487695027   -15.760456744545   -14.580566882827   -14.450397313069
+   -14.450397312873   -10.509182319751   -10.509182319484    -0.930072804482     0.165337152394
+     0.653806887571     0.654030800971     0.720623126242
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52805984 </etotal_int>
+  <ekin>        25.96977317 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.48926857 </eps>
+  <enl>         -0.99538976 </enl>
+  <ecoul>      -17.38356823 </ecoul>
+  <exc>         -8.62960644 </exc>
+  <esr>          3.21001632 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52805984 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52805984 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.00000000 -0.00000000 0.28867200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 0.00010429 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.00000000 -0.00000000 2.47534000 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 0.00005565 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.00000000 -0.00000000 -1.89798700 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 -0.00049421 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24171539 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.308899937082   -31.264487551189   -15.760456566060   -14.580566708469   -14.450397121406
+   -14.450397120259   -10.509182131230   -10.509182130746    -0.930091011638     0.165153596616
+     0.652841254329     0.654181807702     0.656019350249
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52805985 </etotal_int>
+  <ekin>        25.96977317 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.48926857 </eps>
+  <enl>         -0.99538977 </enl>
+  <ecoul>      -17.38356823 </ecoul>
+  <exc>         -8.62960645 </exc>
+  <esr>          3.21001632 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52805985 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52805985 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00000000 0.00000000 -0.28867800 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 -0.00008764 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.00000000 0.00000000 1.89799000 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 0.00048585 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.00000000 0.00000000 -2.47533700 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 -0.00006403 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24047995 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.164669240436   -31.114921417802   -15.817540661236   -14.565930837076   -14.338669916570
+   -14.338392258938   -10.501317018104   -10.501194144059    -0.949960571831     0.145912846437
+     0.442616072595     0.445764763168     0.656458127064
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52754654 </etotal_int>
+  <ekin>        25.86185042 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.28430637 </eps>
+  <enl>         -0.97306397 </enl>
+  <ecoul>      -17.52592352 </ecoul>
+  <exc>         -8.60610311 </exc>
+  <esr>          3.08893206 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52754654 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52754654 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.00000000 0.13824400 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000008 -0.00006758 -0.00002201 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.00000000 0.44862000 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000003 -0.00323971 -0.02318290 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.00000100 -0.17213100 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000002 0.00376597 0.02365503 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24046223 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.164669572883   -31.114921750741   -15.817540999332   -14.565931174924   -14.338670248888
+   -14.338392589050   -10.501317355303   -10.501194482823    -0.949901123643     0.146270313821
+     0.442626331416     0.445764487259     0.656516018757
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52754654 </etotal_int>
+  <ekin>        25.86185045 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.28430639 </eps>
+  <enl>         -0.97306398 </enl>
+  <ecoul>      -17.52592351 </ecoul>
+  <exc>         -8.60610311 </exc>
+  <esr>          3.08893206 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52754654 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52754654 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00000000 -0.13824400 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000008 0.00006760 -0.00002202 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.00000000 -0.44862000 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000003 0.00323974 -0.02318291 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.00000100 0.17213100 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000002 -0.00376594 0.02365502 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24009501 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.122418314085   -31.071265777134   -15.834591888609   -14.562099523158   -14.306531570565
+   -14.305829677875   -10.498513779430   -10.497985889827    -0.956117240186     0.140644227411
+     0.381503590056     0.384384713312     0.657451757400
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52715354 </etotal_int>
+  <ekin>        25.83040643 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.22494213 </eps>
+  <enl>         -0.96640441 </enl>
+  <ecoul>      -17.56700776 </ecoul>
+  <exc>         -8.59920567 </exc>
+  <esr>          3.05398868 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52715354 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52715354 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.00154200 -0.00000000 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00004822 -0.00000008 -0.00000353 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.35200800 -0.00000100 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00535721 0.00000003 -0.02995813 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.35508900 0.00000000 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00528724 0.00000004 0.02998094 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24010061 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.122418223968   -31.071265686501   -15.834591795095   -14.562099429772   -14.306531481578
+   -14.305829587134   -10.498513685829   -10.497985796856    -0.956132143266     0.140581522588
+     0.381516528174     0.384384444723     0.657363204488
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52715354 </etotal_int>
+  <ekin>        25.83040642 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.22494212 </eps>
+  <enl>         -0.96640441 </enl>
+  <ecoul>      -17.56700776 </ecoul>
+  <exc>         -8.59920566 </exc>
+  <esr>          3.05398868 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52715354 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52715354 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00154200 0.00000000 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00004821 0.00000009 -0.00000351 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.35200800 0.00000100 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00535721 -0.00000002 -0.02995812 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.35508900 -0.00000000 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00528725 -0.00000003 0.02998096 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24162762 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.308047861065   -31.263916261677   -15.759989050217   -14.580082433898   -14.450778357925
+   -14.450173511484   -10.510094365923   -10.508908852667    -0.930170318122     0.165197788217
+     0.652837952783     0.655045611923     0.656005373942
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52808833 </etotal_int>
+  <ekin>        25.96995496 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.48940012 </eps>
+  <enl>         -0.99544579 </enl>
+  <ecoul>      -17.38353155 </ecoul>
+  <exc>         -8.62966582 </exc>
+  <esr>          3.21001247 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52808833 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52808833 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.28867200 -0.00000000 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000859 -0.00000000 0.00000844 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.29040200 -0.00000100 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00024571 -0.00000001 -0.00018094 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.28694100 0.00000100 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00020028 0.00000001 0.00016438 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24162995 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.308047886732   -31.263916287515   -15.759989077021   -14.580082460628   -14.450778380885
+   -14.450173538090   -10.510094389441   -10.508908878769    -0.930176739382     0.165199491195
+     0.652836685625     0.654990087179     0.656003904112
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52808833 </etotal_int>
+  <ekin>        25.96995496 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.48940012 </eps>
+  <enl>         -0.99544579 </enl>
+  <ecoul>      -17.38353155 </ecoul>
+  <exc>         -8.62966582 </exc>
+  <esr>          3.21001247 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52808833 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52808833 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.28867200 0.00000000 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000859 0.00000000 0.00000843 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.29040200 0.00000100 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00024570 0.00000001 -0.00018094 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.28694100 -0.00000100 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00020028 -0.00000001 0.00016437 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.23948956 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.270590048311   -31.224895369526   -15.775110644975   -14.576264738638   -14.421041887098
+   -14.420662423095   -10.508022276177   -10.507268484282    -0.934850863757     0.160833122832
+     0.598473142671     0.649136753427     0.655366884399
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52805442 </etotal_int>
+  <ekin>        25.94148293 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.43528423 </eps>
+  <enl>         -0.98961774 </enl>
+  <ecoul>      -17.42116276 </ecoul>
+  <exc>         -8.62347263 </exc>
+  <esr>          3.17802331 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52805442 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52805442 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.00000000 -0.25818100 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000001 -0.00000559 0.00000429 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.00000000 -0.10002100 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000001 -0.00025156 -0.00640535 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.00000000 -0.41634000 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000001 -0.00011764 0.00652120 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24132266 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.270589568397   -31.224894819430   -15.775109932816   -14.576263996450   -14.421041441538
+   -14.420661982873   -10.508021558974   -10.507267763318    -0.934872709814     0.160637460881
+     0.598010939812     0.600074888896     0.655214047704
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52805442 </etotal_int>
+  <ekin>        25.94148264 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.43528391 </eps>
+  <enl>         -0.98961767 </enl>
+  <ecoul>      -17.42116291 </ecoul>
+  <exc>         -8.62347257 </exc>
+  <esr>          3.17802331 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52805442 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52805442 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00000000 0.25818100 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00000564 0.00000272 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.00000000 0.10002100 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00025151 -0.00640624 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.00000000 0.41634000 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00011757 0.00652053 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24733903 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.291452360499   -31.225665672983   -15.767845047905   -14.574580830920   -14.431952454565
+   -14.431851202864   -10.501391720266   -10.494668036040    -0.990291685671    -0.000683078525
+     0.610320220276     0.654534821119     0.657035691755
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52690255 </etotal_int>
+  <ekin>        25.95480099 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.45847476 </eps>
+  <enl>         -0.99192137 </enl>
+  <ecoul>      -17.40531942 </ecoul>
+  <exc>         -8.62598799 </exc>
+  <esr>          3.19162024 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52690255 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52690255 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.08378400 -0.02747800 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.01802851 0.00593443 0.00000821 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.03144800 0.01031400 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00841765 -0.00275719 -0.00284672 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.03144800 0.01031400 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00841729 -0.00275707 0.00283859 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24738890 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.291452214292   -31.225665527428   -15.767844906301   -14.574580690253   -14.431952308780
+   -14.431851056371   -10.501391575875   -10.494667892401    -0.990309734621    -0.000797707644
+     0.610135553168     0.654474371970     0.656055821667
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52690255 </etotal_int>
+  <ekin>        25.95480098 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.45847475 </eps>
+  <enl>         -0.99192137 </enl>
+  <ecoul>      -17.40531942 </ecoul>
+  <exc>         -8.62598799 </exc>
+  <esr>          3.19162024 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52690255 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52690255 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.08378400 0.02747800 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.01802851 -0.00593443 0.00000820 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.03144800 -0.01031400 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00841765 0.00275719 -0.00284675 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.03144800 -0.01031400 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00841728 0.00275707 0.00283856 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24566467 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.291452212774   -31.225665526120   -15.767844905252   -14.574580688782   -14.431952307719
+   -14.431851055369   -10.501391574934   -10.494667891409    -0.990310110391    -0.000801698469
+     0.643855205071     0.654997161760     0.668719382374
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52690255 </etotal_int>
+  <ekin>        25.95480098 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.45847475 </eps>
+  <enl>         -0.99192137 </enl>
+  <ecoul>      -17.40531942 </ecoul>
+  <exc>         -8.62598799 </exc>
+  <esr>          3.19162024 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52690255 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52690255 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.02747800 0.08378400 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00593443 -0.01802851 0.00000820 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.01031400 -0.03144800 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00275719 0.00841765 -0.00284673 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.01031400 -0.03144800 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00275707 0.00841729 0.00283857 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24709766 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.291452233163   -31.225665547007   -15.767844918443   -14.574580702514   -14.431952325227
+   -14.431851072235   -10.501391589185   -10.494667905889    -0.990309412695    -0.000795405766
+     0.611873245979     0.655003848840     0.661707429192
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52690255 </etotal_int>
+  <ekin>        25.95480099 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.45847476 </eps>
+  <enl>         -0.99192137 </enl>
+  <ecoul>      -17.40531942 </ecoul>
+  <exc>         -8.62598799 </exc>
+  <esr>          3.19162024 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52690255 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52690255 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.02747800 -0.08378400 -0.00000300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00593443 0.01802850 0.00000820 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.01031400 0.03144800 2.18666500 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00275719 -0.00841766 -0.00284672 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.01031400 0.03144800 -2.18666200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00275707 -0.00841730 0.00283859 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24010427 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.111394014962   -31.060088798384   -15.838857219200   -14.558848907676   -14.299088024021
+   -14.299088023852   -10.495537912275   -10.495537911992    -0.958807344737     0.136158831706
+     0.366752901431     0.366753154848     0.655961816807
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52702210 </etotal_int>
+  <ekin>        25.82173119 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.20861799 </eps>
+  <enl>         -0.96454969 </enl>
+  <ecoul>      -17.57830448 </ecoul>
+  <exc>         -8.59728115 </exc>
+  <esr>          3.04437992 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52702210 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52702210 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.00000000 -0.00000000 -0.00000400 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00000000 0.00000947 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.00000000 0.00000000 2.21685700 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00000000 -0.03128720 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.00000000 0.00000000 -2.21685300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00000000 0.03127757 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.26244521 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.505673044260   -31.472508910723   -15.679899451133   -14.606367137779   -14.606367137765
+   -14.602163839666   -10.522408878497   -10.522408878494    -0.904569447015     0.193174273094
+     0.653105962680     0.653387456329     0.723133402913
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52700642 </etotal_int>
+  <ekin>        26.12473031 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.78381446 </eps>
+  <enl>         -1.02667366 </enl>
+  <ecoul>      -17.17835017 </ecoul>
+  <exc>         -8.66289845 </exc>
+  <esr>          3.38436419 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52700642 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52700642 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00000000 0.00000000 -0.00000200 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 0.00000617 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.00000000 -0.00000000 2.15647300 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 0.03488667 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.00000000 -0.00000000 -2.15647100 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 -0.03489302 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24017840 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.431449529656   -31.145212425006   -15.773805814428   -14.569674885575   -14.470870482396
+   -14.470870482286   -10.494621364128   -10.494621364091    -0.930371315051     0.165308506272
+     0.653946361523     0.654035473518     0.714566837719
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52700281 </etotal_int>
+  <ekin>        25.97372437 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.49741317 </eps>
+  <enl>         -0.99558684 </enl>
+  <ecoul>      -17.37749900 </ecoul>
+  <exc>         -8.63022818 </exc>
+  <esr>          3.21491940 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52700281 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52700281 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> 0.00000000 -0.00000000 -0.02407400 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 0.06136129 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> -0.00000000 0.00000000 2.19570000 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 -0.02917196 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> -0.00000000 0.00000000 -2.17762700 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 0.00000000 -0.03217683 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+  <eigenvalue_sum>  -5.24220454 </eigenvalue_sum>
+<eigenset>
+  <eigenvalues spin="0" kpoint="0.00000000 0.00000000 0.00000000" weight="1.00000000" n="13">
+   -32.431388136526   -31.145270613509   -15.773798449369   -14.569680761227   -14.470859059954
+   -14.470859059937   -10.494629033591   -10.494629033587    -0.930398827328     0.165122711800
+     0.653753032377     0.653796235284     0.660067801070
+  </eigenvalues>
+</eigenset>
+  <etotal_int>     -37.52700337 </etotal_int>
+  <ekin>        25.97372220 </ekin>
+  <econf>        0.00000000 </econf>
+  <eps>        -36.49740873 </eps>
+  <enl>         -0.99558670 </enl>
+  <ecoul>      -17.37750231 </ecoul>
+  <exc>         -8.63022782 </exc>
+  <esr>          3.21491673 </esr>
+  <eself>       23.40461378 </eself>
+  <ets>          0.00000000 </ets>
+  <eexf>         0.00000000 </eexf>
+  <etotal>     -37.52700337 </etotal>
+  <epv>          0.00000000 </epv>
+  <eefield>      0.00000000 </eefield>
+  <enthalpy>   -37.52700337 </enthalpy>
+<atomset>
+<unit_cell 
+    a=" 20.00000000   0.00000000   0.00000000"
+    b="  0.00000000  20.00000000   0.00000000"
+    c="  0.00000000   0.00000000  20.00000000" />
+  <atom name="C3" species="C_species">
+    <position> -0.00000000 0.00000000 0.02406800 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 -0.06134444 </force>
+  </atom>
+  <atom name="O1" species="O_species">
+    <position> 0.00000000 -0.00000000 2.17763000 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> -0.00000000 -0.00000000 0.03216721 </force>
+  </atom>
+  <atom name="O2" species="O_species">
+    <position> 0.00000000 -0.00000000 -2.19569700 </position>
+    <velocity> 0.00000000 0.00000000 0.00000000 </velocity>
+    <force> 0.00000000 -0.00000000 0.02916478 </force>
+  </atom>
+</atomset>
+<unit_cell_a_norm> 20.000000 </unit_cell_a_norm>
+<unit_cell_b_norm> 20.000000 </unit_cell_b_norm>
+<unit_cell_c_norm> 20.000000 </unit_cell_c_norm>
+<unit_cell_alpha>  90.000 </unit_cell_alpha>
+<unit_cell_beta>   90.000 </unit_cell_beta>
+<unit_cell_gamma>  90.000 </unit_cell_gamma>
+<unit_cell_volume> 8000.000 </unit_cell_volume>
+</root>

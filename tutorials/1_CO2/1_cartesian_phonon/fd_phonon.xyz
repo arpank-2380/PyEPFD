@@ -1,0 +1,95 @@
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 0 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 1 positions{angstrom} cell{angstrom}
+O       0.0026458862                0        1.1571323
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 2 positions{angstrom} cell{angstrom}
+O      -0.0026458862                0        1.1571323
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 3 positions{angstrom} cell{angstrom}
+O                  0     0.0026458862        1.1571323
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 4 positions{angstrom} cell{angstrom}
+O                  0    -0.0026458862        1.1571323
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 5 positions{angstrom} cell{angstrom}
+O                  0                0        1.1597782
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 6 positions{angstrom} cell{angstrom}
+O                  0                0        1.1544864
+O                  0                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 7 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O       0.0026458862                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 8 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O      -0.0026458862                0       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 9 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0     0.0026458862       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 10 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0    -0.0026458862       -1.1571307
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 11 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1544848
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 12 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1597766
+C                  0                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 13 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C       0.0026458862                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 14 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C      -0.0026458862                0    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 15 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C                  0     0.0026458862    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 16 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C                  0    -0.0026458862    -1.587531e-06
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 17 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C                  0                0     0.0026442987
+3
+# CELL(abcABC):   10.58354    10.58354    10.58354    90.00000    90.00000    90.00000  PyEPFD-Step: 18 positions{angstrom} cell{angstrom}
+O                  0                0        1.1571323
+O                  0                0       -1.1571307
+C                  0                0    -0.0026474738
