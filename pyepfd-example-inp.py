@@ -1,8 +1,8 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 import sys,os
 import numpy as np
 ### Insert the path where pyepfd is located
-pyepfd_path = '/home/arpank/Scripts/pyepfd/src'
+pyepfd_path = '/home/arku/Work_UChicago/Code-developments/EPFD/pyepfd/src'
 sys.path.insert(0,pyepfd_path)
 import pyepfd as ep
 

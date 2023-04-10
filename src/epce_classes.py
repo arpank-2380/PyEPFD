@@ -151,8 +151,10 @@ class nm_sym_displacements:
                  edelta = vknorm * np.sqrt(self.deltae * 2.0 / abs(self.dm.w2[step]))
                  if edelta > 100 * self.deltax:
                     edelta = 100 * self.deltax
+                    #print(edelta)
                  self.displacements[step] = edelta / vknorm
-          self.displacement2 = self.displacements*np.sqrt(abs(self.dm.w2[step]))
+          #self.displacement2 = self.displacements*np.sqrt(abs(self.dm.w2))
+          self.displacement2 = self.displacements*np.sqrt(abs(self.omega))
           #print(self.displacement2)                       
 
 class epce_calculator:
