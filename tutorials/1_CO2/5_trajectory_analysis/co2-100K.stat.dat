@@ -1,0 +1,13 @@
+#-----------------------------------------Information-----------------------------------
+#        Skewness = Fischer - Pearson coefficient of skewness (moment based)         
+#       Skew-Test Null Hypothesis: The distribution is drawn from a Gaussian         
+#   Therefore if p-value is less than 0.05 that means the distribution is skewed     
+#                      with (1 - 0.05)*100 = 95% confidence                          
+#               Mean, Median and Stdev are in Freq scaled coordinate                 
+#---------------------------------------------------------------------------------------
+# Mode No      Mean          Median          Stdev        Skewness    Skew-Test(p-value)
+#---------------------------------------------------------------------------------------
+      6      0.0150425      0.0139688       0.697128    -0.00828963       0.761954
+      7     0.00316282   -1.45686e-05       0.730729      0.0254228       0.352964
+      8      0.0972618      0.0554929       0.721932       0.137939    5.24893e-07
+      9     0.00258965    -0.00323408       0.719454      0.0350835       0.199971
