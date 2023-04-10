@@ -37,9 +37,9 @@ def h2abc(h):
     a = float(h[0, 0])
     b = np.sqrt(h[0, 1] ** 2 + h[1, 1] ** 2)
     c = np.sqrt(h[0, 2] ** 2 + h[1, 2] ** 2 + h[2, 2] ** 2)
-    gamma = np.acos(h[0, 1] / b) * 180 / np.pi
-    beta = np.acos(h[0, 2] / c) * 180 / np.pi
-    alpha = np.acos(np.dot(h[:, 1], h[:, 2]) / (b * c)) * 180 / np.pi
+    gamma = np.arccos(h[0, 1] / b) * 180 / np.pi
+    beta = np.arccos(h[0, 2] / c) * 180 / np.pi
+    alpha = np.arccos(np.dot(h[:, 1], h[:, 2]) / (b * c)) * 180 / np.pi
 
     return np.array([a, b, c, alpha, beta, gamma])
 
