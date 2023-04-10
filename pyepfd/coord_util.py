@@ -431,7 +431,7 @@ class xyz:
              cell = np.array(cell)
              if len(cell) == 6: cell[0:3] *= unit2ang[self.cell_unit]
              elif len(cell) == 9: 
-                h = cell*unit2ang[self.cell_unit]; del cell; cell = h2abc(h)
+                h = cell*unit2ang[self.cell_unit]; del cell; cell = h2abc(h.reshape(3,3))
              else: 
                 print("xyz.write: Incorrect cell dimension. Allowed dimensions: 6 or 9.")
                 cell_write = False
