@@ -25,6 +25,8 @@ class ipi_info:
 
                 **dynmatrix** = Dynamical matrix
 
+                **ref_dynmatrix** = Reference dynamical matrix
+
                 **mass** = Mass matrix
 
                 **coord** = Coordinates of optimized geometry. 
