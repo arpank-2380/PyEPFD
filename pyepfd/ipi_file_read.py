@@ -25,6 +25,8 @@ class ipi_info:
 
                 **dynmatrix** = Dynamical matrix
 
+                **ref_dynmatrix** = Reference dynamical matrix
+
                 **mass** = Mass matrix
 
                 **coord** = Coordinates of optimized geometry. 
@@ -72,7 +74,24 @@ class ipi_info:
           if (self.dynmatrix is None) & (dynmat_shape is not None):
              self.dynmatrix = np.array([float(element.strip(",")) \
              for element in dynmat_tree.text.split()[1:-1]]).reshape(dynmat_shape)
-          
+         
+
+          ref_dynmat_tree = vibrations_tree.find("refdynmat")
+          try:
+             if ref_dynmat_tree.attrib["mode"] == "file":
+                self.ref_dynmatrix = np.loadtxt(ref_dynmat_tree.text.strip())
+          except KeyError:
+                self.ref_dynmatrix = None
+          try:
+             ref_dynmat_shape = eval(ref_dynmat_tree.attrib["shape"])
+          except KeyError:
+             ref_dynmat_shape = None
+
+          if (self.ref_dynmatrix is None) & (ref_dynmat_shape is not None):
+             self.ref_dynmatrix = np.array([float(element.strip(",")) \
+             for element in ref_dynmat_tree.text.split()[1:-1]]).reshape(dynmat_shape)
+
+
           ### Reading self.mass related informations
           self.mass_tree = file_tree.find("./system/beads/m")
           #print(self.mass_tree)
