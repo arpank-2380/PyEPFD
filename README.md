@@ -1,6 +1,6 @@
 ![image](docs/source/pyepfd_logo.png)
 
-#PyEPFD Code Repository
+# PyEPFD Code Repository
 
 Welcome to **PyEPFD** - A Python library for computing Electron-Phonon 
 renormalizations from Finite Displacements (EPFD).
@@ -51,7 +51,7 @@ Quantum vibronic effects on the electronic properties of solid and
 molecular carbon.  
 *Phys. Rev. Materials* **2021**, *5*, L070801.
 
-##References
+## References
 
 [1] Monserrat, B. Electron-phonon coupling from finite differences. 
 *J. Phys: Condens, Matter* **2018**, *30*, 083001.
@@ -76,7 +76,7 @@ molecular carbon.
 [6] Knoop, F.; Purcell, T. A. R.; Scheffler, M., Carbogno, C.
 Anharmonicity measure for materials **2020**, *4*, 083809.
 
-#Tutorials & Documentation
+## Tutorials & Documentation
 
 Installation instructions, Tutorials and Full Documentation is available
 at the following location:
