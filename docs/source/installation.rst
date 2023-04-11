@@ -40,8 +40,17 @@ OR
    - ``scipy``
    - ``mpi4py``
 
-If using **pip** is not possible, one can manually install the above dependencies, and then include the directory of **PyEPFD** repository to the **PYTHONPATH** by appending the following command to the **.bashrc** file
+If using **pip** is not possible, one can manually install the above dependencies, and then go to the directory where env.sh file is located and use the following command,
 
 .. code:: bash
 
-   $ export PYTHONPATH=$PYTHONPATH:path/to/pyepfd
+   $ source env.sh
+
+This would create PyEPFD environment for that terminal session. You can also put the following lines in your **.bashrc** so that the environment is always available.
+
+.. code:: bash
+
+   source /path/to/PyEPFD/env.sh
+
+Hope you will find PyEPFD helpful for your research!
+
