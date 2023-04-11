@@ -6,6 +6,7 @@ Welcome to **PyEPFD** - A Python library for computing Electron-Phonon
 renormalizations from Finite Displacements (EPFD).
 
 ## Introduction
+
 PyEPFD provides a set of tools to compute electronic properties, 
 such as fundamental gap, at a finite temperature where 
 nuclear quantum effects are incorporated using harmonic approximation. 
@@ -18,6 +19,7 @@ depends on Qbox code (http://qboxcode.org/). However, it is very easy
 to use pyEPFD with any ab-inito code of your choice.     
 
 ## Features
+
 PyEPFD can perform the following tasks:
 
 (1) Compute normal-modes, dynamical matrix (mass-weighted Hessian matrix) 
@@ -41,6 +43,7 @@ anharmonic measure [6] can be computed to understand the impact of
 anharmonicity.
 
 ## Citation
+
 If you have used PyEPFD for your work, please cite the follwoing papers:
 
 (1) Kundu, A.; Govoni, M.; Yang, H.; Ceriotti, M.; Gygi, F.; Galli, G. 
@@ -49,6 +52,7 @@ molecular carbon.
 *Phys. Rev. Materials* **2021**, *5*, L070801.
 
 ##References
+
 [1] Monserrat, B. Electron-phonon coupling from finite differences. 
 *J. Phys: Condens, Matter* **2018**, *30*, 083001.
 
@@ -73,6 +77,7 @@ molecular carbon.
 Anharmonicity measure for materials **2020**, *4*, 083809.
 
 #Tutorials & Documentation
+
 Installation instructions, Tutorials and Full Documentation is available
 at the following location:
 
