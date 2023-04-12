@@ -1,12 +1,12 @@
-![image](docs/source/pyepfd_logo.png)
+.. _introduction:
 
-# PyEPFD Code Repository
-
+Introduction
+============
 Welcome to **PyEPFD** - A Python library for computing Electron-Phonon 
 renormalizations from Finite Displacements (EPFD).
 
-## Introduction
-
+Aims
+----
 PyEPFD provides a set of tools to compute electronic properties, 
 such as fundamental gap, at a finite temperature where 
 nuclear quantum effects are incorporated using harmonic approximation. 
@@ -18,8 +18,8 @@ trajectories are available. Currently, for the ab-initio part, PyEPFD
 depends on Qbox code (http://qboxcode.org/). However, it is very easy 
 to use pyEPFD with any ab-inito code of your choice.     
 
-## Features
-
+Features:
+---------
 PyEPFD can perform the following tasks:
 
 (1) Compute normal-modes, dynamical matrix (mass-weighted Hessian matrix) 
@@ -42,16 +42,17 @@ normal modes (see section S6 of ref. 5 for an example) or
 anharmonic measure [6] can be computed to understand the impact of
 anharmonicity.
 
-## Citation
-
-If you have used PyEPFD for your work, please cite the follwoing papers:
+Citation
+--------
+Hope, you will find PyEPFD helpful for your research. If you have used PyEPFD for obtaining exciting results that you cannot wait to see published, please acknowledge us by citing the follwoing papers:
 
 (1) Kundu, A.; Govoni, M.; Yang, H.; Ceriotti, M.; Gygi, F.; Galli, G. 
 Quantum vibronic effects on the electronic properties of solid and 
-molecular carbon.  *Phys. Rev. Materials* **2021**, *5*, L070801.
+molecular carbon.  
+*Phys. Rev. Materials* **2021**, *5*, L070801.
 
-## References
-
+References
+----------
 [1] Monserrat, B. Electron-phonon coupling from finite differences. 
 *J. Phys: Condens, Matter* **2018**, *30*, 083001.
 
@@ -74,10 +75,4 @@ molecular carbon.
 
 [6] Knoop, F.; Purcell, T. A. R.; Scheffler, M., Carbogno, C.
 Anharmonicity measure for materials **2020**, *4*, 083809.
-
-## Tutorials & Documentation
-
-Installation instructions, Tutorials and Full Documentation is available
-at the following location:
-
 

@@ -34,6 +34,11 @@ class ipi_info:
 
                 **atoms** = A list of atoms with length *N* .
 
+                **cell** = A numpy array of length 9. First three numbers 
+                represent the first row of the cell matrix, and so on. 
+                The cell matrix is in upper triangular form, 
+                i.e., each column of the matrix is a cell vector. 
+
       """
       def __init__(self,file_path="RESTART"):
           init_time = time.time()
@@ -59,7 +64,8 @@ class ipi_info:
           self.energy_shift = vibrations_tree.find("energy_shift")
           if self.energy_shift is not None:
              self.energy_shift = float(self.energy_shift.text.strip())
-          
+         
+          #Reading and storing dynamical matrix
           dynmat_tree = vibrations_tree.find("dynmat")
           try: 
              if dynmat_tree.attrib["mode"] == "file":
@@ -75,7 +81,7 @@ class ipi_info:
              self.dynmatrix = np.array([float(element.strip(",")) \
              for element in dynmat_tree.text.split()[1:-1]]).reshape(dynmat_shape)
          
-
+          #Reading and storing reference dynamical matrix
           ref_dynmat_tree = vibrations_tree.find("refdynmat")
           try:
              if ref_dynmat_tree.attrib["mode"] == "file":
@@ -96,7 +102,7 @@ class ipi_info:
           self.mass_tree = file_tree.find("./system/beads/m")
           #print(self.mass_tree)
           if self.mass_tree is None:
-             sys.exit("Mass information not found in file" + file_path)
+              sys.exit("Mass information not found in file: " + file_path)
           else:
              self.mass_shape = eval(self.mass_tree.attrib["shape"])   
              self.mass = np.array([[float(element.strip(",")), float(element.strip(",")),float(element.strip(","))] \
@@ -105,7 +111,7 @@ class ipi_info:
           ### Reading self.coord ==> coordinates
           self.coord_tree = file_tree.find("./system/beads/q")
           if self.coord_tree is None:
-              sys.exit("Optimized geometry coordinates not found in file" + file_path)
+              sys.exit("Optimized geometry coordinates not found in file: " + file_path)
           else:
               self.coord_shape = eval(self.coord_tree.attrib["shape"])[1]
               #print(self.coord_shape)
@@ -116,11 +122,19 @@ class ipi_info:
           self.atom_tree = file_tree.find("./system/beads/names")
           self.atoms = []
           if self.atom_tree is None:
-              sys.exit("Atoms not found in file" + file_path)
+              sys.exit("Atoms not found in file: " + file_path)
           else:
               for element in self.atom_tree.text.split()[1:-1]:
                   self.atoms.append(element.strip(","))
           #print(self.atoms)
+
+          #Reading cell vectors
+          self.cell_tree = file_tree.find("./system/cell")
+          if self.cell_tree is None:
+              sys.exit("Cell vectors not found in file: " + file_path)
+          else:
+              self.cell = np.array([float(element.strip(",")) \
+                      for element in self.cell_tree.text.split()[1:-1]]) 
 
           final_time = time.time()
           exec_time = final_time - init_time
