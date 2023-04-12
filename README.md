@@ -80,4 +80,4 @@ Anharmonicity measure for materials **2020**, *4*, 083809.
 Installation instructions, Tutorials and Full Documentation is available
 at the following location:
 
-
+https://pyepfd.readthedocs.io/en/latest/ 
