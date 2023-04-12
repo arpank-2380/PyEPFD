@@ -1,0 +1,8 @@
+sphinx==4.0.3
+sphinx_rtd_theme
+IPython==7.31.1
+nbsphinx==0.8.6
+sphinx-mathjax-offline
+numpy
+scipy
+mpi4py
