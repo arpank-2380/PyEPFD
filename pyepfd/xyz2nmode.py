@@ -282,7 +282,7 @@ class prob_dist_on_nm:
              frame_per_process = self.no_frame // size + 1
    
           if rank == 0:
-             nmode_coeff = np.zeros((size,frame_per_process,len(self.mode_list)),np.float)
+             nmode_coeff = np.zeros((size,frame_per_process,len(self.mode_list)),np.float64)
              frame_range = np.zeros((size,2),np.int)
              for pid in range(size):
                  frame_range[pid,0] = pid * frame_per_process + self.frame_start
@@ -372,7 +372,7 @@ class prob_dist_on_nm:
       def __get_prob_density_ser(self):
           """serial version of the code"""
 
-          nmode_coeff = np.zeros((self.no_frame,len(self.mode_list)),np.float)
+          nmode_coeff = np.zeros((self.no_frame,len(self.mode_list)),np.float64)
           iframe = 0
           #print(self.mode_list)
           for frame in range(self.frame_start,self.frame_end + 1):
