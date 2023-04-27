@@ -48,7 +48,13 @@ If you have used PyEPFD for your work, please cite the follwoing papers:
 
 (1) Kundu, A.; Govoni, M.; Yang, H.; Ceriotti, M.; Gygi, F.; Galli, G. 
 Quantum vibronic effects on the electronic properties of solid and 
-molecular carbon.  *Phys. Rev. Materials* **2021**, *5*, L070801.
+molecular carbon.  
+[*Phys. Rev. Materials* **2021**, *5*, L070801.](https://doi.org/10.1103/PhysRevMaterials.5.L070801)
+
+(2) Kundu, A.; Galli, G.
+Quantum vibronic effects on the electronic properties of molecular 
+crystals. *Submitted* **2023**. 
+[arXiv:2304.13687](https://arxiv.org/abs/2304.13687)
 
 ## References
 

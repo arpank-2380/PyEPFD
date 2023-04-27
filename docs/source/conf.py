@@ -30,6 +30,7 @@ extensions = [
             'sphinx.ext.viewcode',
             'sphinx_rtd_theme',
             'nbsphinx',
+            'sphinx.ext.autosectionlabel',
             #'IPython.sphinxext.ipython_console_highlighting',
             'sphinx.ext.napoleon'
             ]
