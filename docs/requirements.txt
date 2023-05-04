@@ -1,9 +1,6 @@
-python>=3.8,<=3.12
-sphinx==4.0.3
 sphinx_rtd_theme>=0.5.2
-IPython==7.31.1
 nbsphinx==0.8.6
 sphinx-mathjax-offline
 numpy
 scipy
-urllib3<2
+urllib<2
