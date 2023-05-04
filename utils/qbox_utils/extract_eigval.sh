@@ -72,7 +72,12 @@ done
 function conv_eigval {
    file=$1
    let skip_row=$2+1
-   
+   ## If error messages before XML starting line, removing them
+   xml_start_line=`grep -n "UTF-8" $file | awk -F[:] '{print $1}'`
+   if [ "$xml_start_line" -eq 0 ]; then
+      echo "Not a valid XML file."
+      exit
+   fi
    tot_line=`wc -l $file| awk '{print $1}'`
    iter_1st=`grep -m $skip_row -n '</iteration>' $file | awk -F[:] '{print $1}' | tail -n 1`
    eigval_last=`head -n $iter_1st $file | grep -n '<eigenset' | tail -n 1 | awk -F[:] '{print $1}'`
@@ -87,7 +92,7 @@ function conv_eigval {
    fi
    
    {
-   head -1 $file
+   sed -n "${xml_start_line},${xml_start_line}p" $file
    echo '<root>'
    } > tmp_header
    
