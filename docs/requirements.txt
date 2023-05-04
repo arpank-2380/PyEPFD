@@ -5,4 +5,4 @@ nbsphinx==0.8.6
 sphinx-mathjax-offline
 numpy
 scipy
-urllib<2.0
+urllib<2
