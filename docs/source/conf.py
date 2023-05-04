@@ -38,7 +38,7 @@ extensions = [
 autodoc_member_order = 'bysource'
 
 
-#autodoc_mock_imports = ["pyepfd","mpi4py"]
+autodoc_mock_imports = ["pyepfd","mpi4py"]
 
 templates_path = ['_templates']
 
