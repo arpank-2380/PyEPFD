@@ -1,5 +1,8 @@
 #!/bin/bash 
 ##### Script that collects eigenvalues of different orbitals during molecular dynamics runs ##########
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
 
 prefix=enmfd
 norb_strt=1

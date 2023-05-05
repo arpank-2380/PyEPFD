@@ -1,3 +1,7 @@
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 __all__=["prob_dist_on_nm"]
 
 import sys,os,time

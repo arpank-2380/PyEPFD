@@ -4,6 +4,10 @@ compute Electron Phonon Renormalization using  frozen phonon finite
 difference method. This module also contains mc_convergence class that
 is needed to test convergence as well as obtaining the renormalized band gap and stochastic error bar from a stochastic displacement calculation.
 """
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 import sys
 import numpy as np
 from pyepfd.ipi_file_read import ipi_info

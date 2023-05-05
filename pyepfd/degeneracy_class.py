@@ -1,4 +1,7 @@
-#!/usr/bin/python3
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 import sys, time
 import numpy as np
 

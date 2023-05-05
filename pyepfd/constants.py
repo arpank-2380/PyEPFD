@@ -1,3 +1,7 @@
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 """Energy onversion factors"""
 ha2unit = {
           'Ha':  1.00000000000000,

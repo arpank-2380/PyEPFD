@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 # generate a Qbox input file from an xyz file
-# Written by Arpan Kundu 
-# Version: June 29, 2021
 # use: python3 xyz2qbox.py file.xyz
+
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
 
 import sys, math
 import numpy as np

@@ -1,3 +1,7 @@
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 import sys, os, re, time
 import xml.etree.ElementTree as ET
 import numpy as np

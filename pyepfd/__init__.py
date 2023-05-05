@@ -1,3 +1,7 @@
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 from .coord_util \
        import xyz, qbox, ionic_mover, write_nmode
 from .anharm import anharm_measure
