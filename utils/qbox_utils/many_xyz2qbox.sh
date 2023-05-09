@@ -1,7 +1,10 @@
 #!/bin/bash
 ##### To prepare many inputs for qbox from an xyz file using xyz2qbox.sh but avoiding the prompt
 ##### It is basically a wrapper for xyz2qbox.py
-##### Author: Arpan Kundu
+
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
 
 
 #module unload python

@@ -4,6 +4,11 @@
 # extracts eigenvalue n at (ispin,kpoint)
 # note: ispin = 0..1, first eigenvalue is n=1
 
+
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 import xml.sax
 import sys
 import math

@@ -1,3 +1,7 @@
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 __all__=["dm","epce_calculator","phonon_calculator", "reorder_dynmat"]
 
 """ This file contains all the classes relavant to frozen phonon calculation """

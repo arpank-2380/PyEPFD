@@ -1,3 +1,7 @@
+# This file is part of PyEPFD
+# Copyright (c) 2023 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 """
 This module contains classes the deals with I/O operations
 based on a finite-difference phonon calculations performed
