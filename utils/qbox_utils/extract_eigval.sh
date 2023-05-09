@@ -22,7 +22,7 @@ skip_default=true
 
 ### Base for qbox_eig.py
 BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
+#echo $BASE
 ###############    Command line options for this script    ###############
 read_arg=0
 total_arg=`echo "$#"`
@@ -74,6 +74,14 @@ elif [ $1 == '-max_proc' ]; then
        let read_arg=$read_arg+2
 fi
 done
+
+
+if ! type sem > /dev/null; then
+   echo -e "\e[31m Load GNU Parallel module by using: module load parallel. \e[39m"
+   echo -e "\e[31m If GNU parallel is not available please install it. \e[39m"
+   exit
+fi
+
 
 function conv_eigval {
    file=$1

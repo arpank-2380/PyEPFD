@@ -171,8 +171,8 @@ nempty = int(input(prompt+"Enter nempty: "+statement+"(Default = "+cached+str(ne
                    statement+") "+colorexit) or nempty_default)
 nspin = int(input(prompt+"Enter nspin (1/2): "+statement+"(Default = "+cached+str(nspin_default)+\
                    statement+") "+colorexit) or nspin_default)
-delta_spin = int(input(prompt+"Enter delta_spin: "+statement+"(Default = "+\
-             cached+str(delta_spin_default)+statement+") "+colorexit) or delta_spin_default)
+delta_spin = input(prompt+"Enter delta_spin: "+statement+"(Default = "+\
+             cached+str(delta_spin_default)+statement+") "+colorexit) or delta_spin_default
 net_charge = int(input(prompt+"Enter net_charge: "+statement+"(Default = "+\
              cached+str(net_charge_default)+statement+") "+colorexit) or net_charge_default)
 
@@ -298,7 +298,7 @@ for frame in range(start_frame,end_frame,step_frame):
           outfil.write(" set nspin %4d\n"%(nspin))
 
        if delta_spin is not None:
-          outfil.write(" set delta_spin %4d\n"%(delta_spin))
+          outfil.write(" set delta_spin " + str(delta_spin) + "\n")
 
        if net_charge != 0:
           outfil.write(" set net_charge %5d\n"%(net_charge))

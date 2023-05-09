@@ -7,13 +7,42 @@
 # See the LICENCE.md in root directory for full license information.
 
 
-#module unload python
-#module load python
-#clear
+#default values for qbox variables
+## Change them according to your needs
 
-#### Put the path to xyz2qbox.py below ###
+cell_param_default=" 38.000008  0.000000  0.000000  0.000000  38.000008  0.000000  0.000000  0.000000  38.000008"
+qbox_cmd1='  randomize_wf, run -atomic_density 0 80 5'  # placeholder for qbox command for 1st iteration 
+qbox_cmd2='   randomize_wf, run -atomic_density 0 80 5'       # run command for other iteration  
+cube_dir='WF'
+plot_cmd="" #" plot -wf 66 ${cube_dir}/wf66, plot -wf 67 ${cube_dir}/wf67, plot -wf 68 ${cube_dir}/wf68" #" plot -wf 401 ${cube_dir}/wf401"
+#for i in `seq 402 408`; do plot_cmd=${plot_cmd}", plot -wf ${i} ${cube_dir}/wf${i}"; done
+spectrum_dir="" #'spectrum/'
+spectrum_cmd="" #"spectrum spectrum/spec"
+save_wf=''
+xc='PBE'
+wf_dyn='JD'
+ecut='85.0'
+scf_tol='1.00e-8'
+nempty='100'
+nspin="2"
+delta_spin="1"
+net_charge="-1"
+pseudo='ONCV_PBE-1.0'
+
+
+
+#### Deriving the path to xyz2qbox.py  ###
+echo "${BASH_SOURCE[0]}"
 BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-executable=$BASE/xyz2qbox.py
+echo $BASE
+executable=${BASE}/xyz2qbox.py
+
+### Loading python, 
+# if python is loaded already comment the following 2 lines
+module unload python
+module load python
+
+clear
 
 function xyz2qbox {
 python3 $executable $1 $2
@@ -31,26 +60,6 @@ prompt="\e[32m"
 colorexit="\e[39m"
 statement="\e[34m"
 warning="\e[31m"
-
-#default values
-cell_param_default=" 38.000008  0.000000  0.000000  0.000000  38.000008  0.000000  0.000000  0.000000  38.000008"
-qbox_cmd1=' set ecutprec 4, randomize_wf, run -atomic_density 0 200 10'  # placeholder for qbox command for 1st iteration 
-qbox_cmd2=' run 0 100'       # run command for other iteration  
-cube_dir='WF'
-plot_cmd="" #" plot -wf 66 ${cube_dir}/wf66, plot -wf 67 ${cube_dir}/wf67, plot -wf 68 ${cube_dir}/wf68" #" plot -wf 401 ${cube_dir}/wf401"
-#for i in `seq 402 408`; do plot_cmd=${plot_cmd}", plot -wf ${i} ${cube_dir}/wf${i}"; done
-spectrum_dir="" #'spectrum/'
-spectrum_cmd="" #"spectrum spectrum/spec"
-save_wf=''     
-xc='SCAN'
-wf_dyn='PSDA'
-ecut='85.0'
-scf_tol='1.00e-12'
-nempty='0'
-nspin=""
-delta_spin=""
-net_charge=""
-pseudo='ONCV_PBE-1.2'
 
 echo 
 echo
