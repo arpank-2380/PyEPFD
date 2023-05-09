@@ -4,15 +4,16 @@
 ##### Author: Arpan Kundu
 
 
-module unload python
-module load python
-clear
+#module unload python
+#module load python
+#clear
 
 #### Put the path to xyz2qbox.py below ###
-executable=xyz2qbox.py
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+executable=$BASE/xyz2qbox.py
 
 function xyz2qbox {
-$executable $1 $2
+python3 $executable $1 $2
                   }
 
 tot_arg=`echo "$#"`
@@ -43,6 +44,9 @@ wf_dyn='PSDA'
 ecut='85.0'
 scf_tol='1.00e-12'
 nempty='0'
+nspin=""
+delta_spin=""
+net_charge=""
 pseudo='ONCV_PBE-1.2'
 
 echo 
@@ -86,7 +90,7 @@ for it in `seq ${it_start} ${it_end}`
 do
     let start_frame=(${it}-${it_start})*${length}+${shift_from_origin}
     let end_frame=(${it}-${it_start}+1)*${length}+${shift_from_origin}-1
-    printf "$start_frame\n$end_frame\n$step_frame\n$qbox_cmd1\n$qbox_cmd2\n$plot_cmd\n$spectrum_cmd\n$save_wf\n${file_prefix}-${it}.i\n$xc\n$wf_dyn\n$ecut\n$scf_tol\n$nempty\n$pseudo\n" | xyz2qbox $1 no-info
+    printf "$start_frame\n$end_frame\n$step_frame\n$qbox_cmd1\n$qbox_cmd2\n$plot_cmd\n$spectrum_cmd\n$save_wf\n${file_prefix}-${it}.i\n$xc\n$wf_dyn\n$ecut\n$scf_tol\n$nempty\n$nspin\n$delta_spin\n$net_charge\n$pseudo\n" | xyz2qbox $1 no-info
     if [ `grep -c 'set cell' ${file_prefix}-${it}.i` -eq 0 ]; then 
       sed -i "/# Frame/a \ set cell $cell_param" ${file_prefix}-${it}.i
       echo -e "\e[44m For all configurations, cell parameters (in bohr) are set to: $cell_param \e[49m" 

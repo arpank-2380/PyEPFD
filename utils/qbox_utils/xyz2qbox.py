@@ -30,6 +30,9 @@ wf_dyn_default = "JD"
 xc_default = "PBE"
 scf_tol_default = 1.e-8
 nempty_default = 100
+nspin_default = 1
+delta_spin_default = None
+net_charge_default = 0
 pseudo_default = 'ONCV_PBE-1.0'
 qbox_cell_cmd = " set cell "
 save_wf_default = 'n'
@@ -164,6 +167,13 @@ scf_tol = float(input(prompt+"Enter scf_tol (Ry): "+statement+"(Default = "+cach
                  str(scf_tol_default)+statement+") "+colorexit) or scf_tol_default)
 nempty = int(input(prompt+"Enter nempty: "+statement+"(Default = "+cached+str(nempty_default)+\
                    statement+") "+colorexit) or nempty_default)
+nspin = int(input(prompt+"Enter nspin (1/2): "+statement+"(Default = "+cached+str(nspin_default)+\
+                   statement+") "+colorexit) or nspin_default)
+delta_spin = int(input(prompt+"Enter delta_spin: "+statement+"(Default = "+\
+             cached+str(delta_spin_default)+statement+") "+colorexit) or delta_spin_default)
+net_charge = int(input(prompt+"Enter net_charge: "+statement+"(Default = "+\
+             cached+str(net_charge_default)+statement+") "+colorexit) or net_charge_default)
+
 pseudo = str(input(prompt+"Enter pseudopotential: "+statement+"(Default = "+cached+\
                    pseudo_default+statement+") "+colorexit) or pseudo_default)
 
@@ -281,6 +291,15 @@ for frame in range(start_frame,end_frame,step_frame):
     if iframe == 0:
        if nempty>0:
           outfil.write(" set nempty %4d\n"%(nempty))
+
+       if nspin != 1:
+          outfil.write(" set nspin %4d\n"%(nspin))
+
+       if delta_spin is not None:
+          outfil.write(" set delta_spin %4d\n"%(delta_spin))
+
+       if net_charge != 0:
+          outfil.write(" set net_charge %5d\n"%(net_charge))
 
        for cmd in qbox_1st_cmd.split(','):
            outfil.write(cmd+"\n")

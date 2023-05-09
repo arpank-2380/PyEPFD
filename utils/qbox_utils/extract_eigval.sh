@@ -17,6 +17,9 @@ column_only=false
 
 skip_default=true
 
+### Base for qbox_eig.py
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 ###############    Command line options for this script    ###############
 read_arg=0
 total_arg=`echo "$#"`
@@ -150,14 +153,14 @@ do
 done
 #sem --wait
 
-if [[ -d "Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}" ]]; then
-   echo "Directory Eigenvalues/Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3} exists"
+if [[ -d "Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}_is_${ispin}" ]]; then
+   echo "Directory Eigenvalues/Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}_is_${ispin} exists"
 else
-   mkdir Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}
+   mkdir Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}_is_${ispin}
 fi
 
 ##### Extracting eigenvalues for a particular orbital inside Orbital_energy_time_evol directory  ##################
-cd Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}
+cd Orbital_energy_time_evol_kp_${kp1}_${kp2}_${kp3}_is_${ispin}
 
 sem --max-procs ${max_proc}% -L 16                       #parallely spawining many processes
 for mdjob in `seq ${md_start} ${md_end}`
@@ -169,7 +172,7 @@ do
              echo "File orbital${norb}.${prefix}-${mdjob} exists"
              echo "Skipping extracting eigenvalues for Orbital-${norb} from eigvals.${prefix}-${mdjob}"
           else
-             qbox_eig.py $ispin $kp1 $kp2 $kp3 $norb  ../eigvals.${prefix}-${mdjob} > orbital${norb}.${prefix}-${mdjob} 
+             $BASE/qbox_eig.py $ispin $kp1 $kp2 $kp3 $norb  ../eigvals.${prefix}-${mdjob} > orbital${norb}.${prefix}-${mdjob} 
           fi
         else
            echo "File Eigenvalues/eigvals.${prefix}-${mdjob} doesn't exist"
@@ -193,10 +196,10 @@ do
 done
 if  $column_only;  then
 cat $paste_arg > col_orbital.dat
-mv col_orbital.dat $root_dir/col_orbital_kp_${kp1}_${kp2}_${kp3}.dat
+mv col_orbital.dat $root_dir/col_orbital_kp_${kp1}_${kp2}_${kp3}_is_${ispin}.dat
 else
 paste $paste_arg  > orbital.dat
-mv orbital.dat $root_dir/orbital_kp_${kp1}_${kp2}_${kp3}.dat
+mv orbital.dat $root_dir/orbital_kp_${kp1}_${kp2}_${kp3}_is_${ispin}.dat
 fi
 
 rm -rf *.tmp header 
