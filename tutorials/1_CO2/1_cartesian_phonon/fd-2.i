@@ -2,8 +2,8 @@
  set wf_dyn PSDA 
  set ecut  50.00
  set scf_tol 1.00e-12
- species  C_species ../pseudos/C_ONCV_PBE-1.0.xml
  species  O_species ../pseudos/O_ONCV_PBE-1.0.xml
+ species  C_species ../pseudos/C_ONCV_PBE-1.0.xml
 # Frame 11/19 from fd_phonon.xyz#
  set cell     20.000000     0.000000     0.000000     0.000000    20.000000     0.000000     0.000000     0.000000    20.000000
  atom   O1   O_species     0.000000       0.000000       2.186664
