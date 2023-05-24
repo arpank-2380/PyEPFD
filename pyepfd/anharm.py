@@ -357,5 +357,4 @@ class boltzmann_reweighting(dm):
       def _remove_trans_rot(self,ref_coord):
           """ Removes translation of com and angular momentum  """
           for i in range(len(self.disp)):
-              self.disp[i], self.forces[i] = remove_trans_rot( ref_coord = ref_coord, \
-                                          coord = self.disp[i], forces = self.forces[i], mass = self.mass)   
+              self.disp[i] = remove_trans_rot( ref_coord = ref_coord, coord = self.disp[i], mass = self.mass)   
