@@ -542,6 +542,37 @@ class dm:
           header = "# Dynamical matrix (in au):" 
           write_dynmat(self.dynmatrix, prefix+'.dynmat') 
 
+      def calc_free_en(self,T=0.0,unit='Ha'):
+          """
+            Returns Helmholtz Free Energy of vibration (A = U - TS) in Hatree.
+            
+            Arg:
+
+                **T** = Temperature in K
+
+                **unit** = Unit of output (Helmholz Free Energy).
+          """
+          if (unit == 'Ha') | (unit == 'cm-1') | (unit == 'eV') | (unit == 'meV') |\
+             (unit == 'kcal/mol') | (unit == 'kJ/mol') | (unit == 'K') | (unit == 'THz'):
+             pass
+          else:
+             raise ValueError("Unit not understood in dm.calc_free_en().")
+
+          if self.asr is None:
+             sys.exit("Before applying dm.calc_free_en(), apply dm.apply_asr() once.\n\
+ Exiting dm class.") 
+          if self.asr == 'crystal': nmstart = 3
+          elif self.asr == 'lin':   nmstart = 5
+          elif self.asr == 'poly':  nmstart = 6
+          else:                nmstart = 0
+          A = 0.0 
+          for i in range(nmstart,self.nmodes):
+              A += 0.5* self.refomega[i]  \
+              - T * np.log(1+bose_einstein(omega=self.refomega[i], T=T)) / ha2unit['K']
+          A *= ha2unit[unit]
+          return A 
+ 
+
 class stoch_displacements(dm):
       """
       ========================================================
