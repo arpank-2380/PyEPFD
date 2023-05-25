@@ -544,7 +544,7 @@ class dm:
 
       def calc_free_en(self,T=0.0,unit='Ha'):
           """
-            Returns Helmholtz Free Energy of vibration (A = U - TS) in Hatree.
+            Returns Helmholtz Free Energy of vibration (A = U - TS) in chosen unit.
             
             Arg:
 
