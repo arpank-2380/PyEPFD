@@ -545,6 +545,10 @@ class dm:
       def calc_free_en(self,T=0.0,unit='Ha'):
           """
             Returns Helmholtz Free Energy of vibration (A = U - TS) in chosen unit.
+
+            .. note::
+                  If T = 0; it returns the zero-point vibrational energy.
+                  Electronic energy is not included here. Must be added if needed.
             
             Arg:
 
