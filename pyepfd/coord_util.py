@@ -825,7 +825,8 @@ class qbox:
           #elif len[cell] == 9: pass
           #else: raise ValueError("qbox.write: Incorrect cell dimension. Allowed dimensions: 6 or 9") 
 
-          h = abc2h(cell)
+          h = np.reshape(cell,(3,3))
+          print("qbox class speaking: begin qbox input writing.")
           if self.io == 'r':
              raise NotImplementedError("qbox class: write is not implemented for io = r")
           if len(coord) != 3*self.natoms:
@@ -845,6 +846,7 @@ class qbox:
           self.qbfil.write("\n")
           self.qbfil.write(" %s \n" %(self.run_cmd))
           self._iconfg += 1
+          print("qbox class speaking: input writing finished.")
 
       def getv(self, quantity):
           """ 
