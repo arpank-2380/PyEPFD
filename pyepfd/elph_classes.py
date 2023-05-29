@@ -32,9 +32,9 @@ def bose_einstein(omega,omega_unit='Ha',T=0.0):
        bose_einstein = 0.00000000e+00
     else:
        if omega_unit == 'Ha':
-          x = omega*ha2unit['K']/T
+          x = np.abs(omega)*ha2unit['K']/T
        elif omega_unit == 'eV':
-          x = omega*ev2unit['K']/T
+          x = np.abs(omega)*ev2unit['K']/T
        else:
           raise ValueError("omega_unit must be Ha or eV")
        bose_einstein = 1.00000e+00/(np.exp(x)-1.0000000e+0)
