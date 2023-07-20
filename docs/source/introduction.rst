@@ -56,7 +56,7 @@ molecular carbon.
 (2) Kundu, A.; Galli, G.
 Quantum vibronic effects on the electronic properties of molecular
 crystals. *J. Chem. Theory Comput.* **2023**, *19(13)*, 4011.
-`[Link]<https://doi.org/10.1021/acs.jctc.3c00424>`_
+`[Link] <https://doi.org/10.1021/acs.jctc.3c00424>`_
 (`arXiv:2304.13687  <https://arxiv.org/abs/2304.13687>`_.)
 
 References
