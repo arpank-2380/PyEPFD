@@ -44,7 +44,7 @@ class degeneracy:
              no_orb = raw_data.size//len(raw_data)
              no_modes = len(raw_data)//(no_orb)
              if (self.ncol != no_orb) | (self.nrow != 2*no_modes+1): 
-                sys.exit(eigval_file+" and "+overlap_file+" are not consistent.")
+                sys.exit("eigval_file and overlap_file are not consistent.")
              else:
                 overlap_matrix = np.zeros((no_modes,no_orb,no_orb),np.float64) 
                 for mode in range(no_modes):
