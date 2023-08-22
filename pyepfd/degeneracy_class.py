@@ -186,12 +186,13 @@ class align_band_energies(degeneracy):
       Class Align_Band_Energies
       =========================
       This class will read the Kohn Sham eigenvalues (band energies) from a file
-      for several snapshots obtained from MD or MC simulations then align their 
-      energies with respect to the energies of the optimized geometry. This 
-      alignment would be done based on maximum overlap, therefore for each
+      for several snapshots obtained from simulations with **independent mode 
+      approximation** then align their energies with respect to the energies 
+      of the optimized geometry. 
+      This alignment would be done based on maximum overlap, therefore for each
       snapshot an overlap-matrix with respect to optimized geometry must be
       supplied. If the difference between two bands are smaller than a
-      user specified cut-off they would be treated a s degenerate.
+      user specified cut-off they would be treated as degenerate.
 
         **Arguments:**
 
@@ -205,6 +206,14 @@ class align_band_energies(degeneracy):
 
             **degeneracy_cutoff** = Any two elements within a degenerate set would 
             be smaller than this value.
+
+            ..warning::
+              Only to be used with simulations with independent mode approximation
+              when each phonon modes are excited one by one.
+              This should not be used to align energies when all phonon modes are
+              excited at once such as standard MD or MC simulations. 
+
+
       """
       def __init__(self,logfile,eigval_file,overlap_file=None,degeneracy_cutoff=0.002):
           self.logfile = logfile
@@ -244,9 +253,9 @@ class align_band_energies(degeneracy):
             For a degenerate set only average values would be stored.
             If overlap matrix is supplied then for each frames,
             a mapping of orbitals between displaced and optimized
-            would be determined based on maximum overlap and to ensure
-            same electronic state is used for calculating the second
-            derivatives in epce_calculator class
+            geometries would be determined based on maximum overlap to ensure
+            same electronic state is used for calculating band gap 
+            renormalization when **independent mode approximation** is used.
           """
           if self.overlap_matrix is None:
              if self.degeneracy_cutoff is not None:
