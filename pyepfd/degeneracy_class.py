@@ -116,7 +116,7 @@ class degeneracy:
                 for row in range(self.nrow):
                     orbital_energies = self.eigval[row,:]
                     degenerate_energies, degenerate_indices = self._group(orbital_energies, self.degeneracy_cutoff)
-                    self.__average_degenerate_eigval(row,degenerate_energies)
+                    self._average_degenerate_eigval(row,degenerate_energies)
              else:
                 pass  
           else:
@@ -147,9 +147,9 @@ class degeneracy:
                         new_degenerate_indices.append(tmp_degenerate_indices)
                         degenerate_energies.append(tmp_degenerate_energies)
                     #print(row+1, new_degenerate_indices )
-                 self.__average_degenerate_eigval(row,degenerate_energies)
+                 self._average_degenerate_eigval(row,degenerate_energies)
 
-      def __average_degenerate_eigval(self,row,degenerate_energies):
+      def _average_degenerate_eigval(self,row,degenerate_energies):
           """
             Method calculate average of eigenvalues over a degenrate
             orbital space
