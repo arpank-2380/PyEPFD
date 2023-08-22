@@ -235,7 +235,7 @@ class align_band_energies(degeneracy):
               raw_data =  np.loadtxt(filename)
               no_orb = raw_data.size//len(raw_data)
               no_frames = len(raw_data)//(no_orb)
-              print(self.ncol, no_orb); print(self.nrow, no_frames)
+              #print(self.ncol, no_orb); print(self.nrow, no_frames)
               if (self.ncol != no_orb) | (self.nrow != no_frames + 1):
                  sys.exit("eigval_file and overlap_file are not consistent.")
               else:
