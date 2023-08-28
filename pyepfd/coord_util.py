@@ -1037,3 +1037,34 @@ def write_nmode(atoms, cell_v, opt_coord, mode_v, mode_freq, file_path='dynmat',
            mode_v_tmp = np.array(mode_v[:,imode]).reshape(natoms,3)
            for i in range(natoms):
                outfil.write(" %14.6g %14.6g %14.6g\n"%(mode_v_tmp[i,0], mode_v_tmp[i,1], mode_v_tmp[i,2]))
+
+def xyz2qe(xyzdata_path,pw_opt_path,frames,pw_path):
+    """
+    Args:
+        
+        xyzdata_path = Full path to the xyzdata file
+        pw_opt_path = Full path to the file containing all pw options 
+        frames = A tuple containing the indices of the 1st, last 
+        frame and the increments. 
+        pw_path = Path to the directory where pw_inputs would be written 
+        and saved
+    """
+    xyzdata = xyz(file_path=xyzdata_path, io='r')
+    pw_opts = open(pw_opt_path,'r').readlines()
+
+    for frame in range(frames[0], frames[1]+1, frames[2]):
+        qe_input = open(pw_path+'/pw'+str(frame)+'.in','w')
+        for i in range(len(pw_opts)):
+            qe_input.write(pw_opts[i])
+        qe_input.write('CELL_PARAMETERS angstrom\n')
+        cell = abc2h(xyzdata.cell[frame-1]) * bohr2unit['angstrom']
+        for i in range(3):
+            qe_input.write("%15.8f %15.8f %15.8f\n"\
+                    %(cell[0,i],cell[1,i],cell[2,i]))
+        qe_input.write('ATOMIC_POSITIONS angstrom\n')
+        coord = np.reshape(xyzdata.coords[frame-1],(xyzdata.natoms,3)) *\
+                bohr2unit['angstrom']
+        for atom in range(xyzdata.natoms):
+            qe_input.write("%s   %15.8f   %15.8f   %15.8f\n"\
+            %(xyzdata.atoms[atom], coord[atom,0],coord[atom,1],coord[atom,2]))
+
