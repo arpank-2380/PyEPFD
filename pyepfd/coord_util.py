@@ -1043,16 +1043,36 @@ def xyz2qe(xyzdata_path,pw_opt_path,frames,pw_path):
     Args:
         
         xyzdata_path = Full path to the xyzdata file
+
         pw_opt_path = Full path to the file containing all pw options 
-        frames = A tuple containing the indices of the 1st, last 
-        frame and the increments. 
+
+        frames = A tuple or an integer of frame indices. 
+                 If tuple then indices of (start, end) or (start, end, inc)
+                 where inc in the increment
+
         pw_path = Path to the directory where pw_inputs would be written 
         and saved
     """
     xyzdata = xyz(file_path=xyzdata_path, io='r')
     pw_opts = open(pw_opt_path,'r').readlines()
 
-    for frame in range(frames[0], frames[1]+1, frames[2]):
+    try:
+        ntuple = len(frames)
+        if  ntuple == 3:
+            start,end,inc = frames
+        elif ntuple == 2:
+            start,end = frames; inc = 1
+        elif ntuple == 1:
+            start = frames; end = frames; inc = 1
+        else:
+            sys.exit("Length of frames tuple is %d."%ntuple+\
+                     "Maximum allowed length of frames tuple is 3.")
+    except TypeError:
+        start = int(frames); end = int(frames); inc = 1
+
+    if start < 1: sys.exit("Start frame index cannot be less than 1")
+
+    for frame in range(start, end+1, inc):
         qe_input = open(pw_path+'/pw'+str(frame)+'.in','w')
         for i in range(len(pw_opts)):
             qe_input.write(pw_opts[i])
