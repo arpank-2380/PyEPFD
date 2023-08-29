@@ -1048,7 +1048,7 @@ def xyz2qe(xyzdata_path,pw_opt_path,frames,pw_path):
 
         frames = A tuple or an integer of frame indices. 
                  If tuple then indices of (start, end) or (start, end, inc)
-                 where inc in the increment
+                 where inc is the increment
 
         pw_path = Path to the directory where pw_inputs would be written 
         and saved
