@@ -90,7 +90,7 @@ if info_print:
 
 all_species=''
 for species in species_set:
-    all_species=all_species+'\n'+species+"_species"
+    all_species=all_species+'\n'+species #+"_species"
 
 if info_print:
    print(statement+"Present species are: "+cached+all_species +colorexit)
@@ -221,7 +221,7 @@ def get_ipi_cell(line2):    #line2 is a string which is 2nd line of each traject
 def write_string(frame,name,atom_index,x,y,z):
     if frame == 0:
        write_string = str(" atom   "+name+str(atom_index+1).zfill(len(str(nat)))+"   "+\
-                      name+"_species"+' %12.6f   %12.6f   %12.6f\n' %(x,y,z))
+                      name+' %12.6f   %12.6f   %12.6f\n' %(x,y,z))
     else:
        write_string = str(" move   "+name+str(atom_index+1).zfill(len(str(nat)))+\
                       "   to   "+' %12.6f   %12.6f   %12.6f\n' %(x,y,z))
@@ -241,7 +241,7 @@ outfil.write(" set xc "+xc+" \n"+\
 all_species_files=''
 for species in species_set:
     all_species_files=all_species_files+'\n'+species+"_"+pseudo+".xml"
-    outfil.write(" species  "+species+"_species "+pseudo_dir+species+"_"+pseudo+".xml\n")
+    outfil.write(" species  "+species+'  '+ pseudo_dir+species+"_"+pseudo+".xml\n")
 
 #### Warning print
 print(warning+"Warning!\nFiles: "+cached+ all_species_files + warning+\
