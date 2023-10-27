@@ -227,15 +227,6 @@ def write_string(frame,name,atom_index,x,y,z):
                       "   to   "+' %12.6f   %12.6f   %12.6f\n' %(x,y,z))
     return write_string
 
-#### Writing variables in Qbox input
-outfil.write(" set xc "+xc+" \n"+\
-             " set wf_dyn "+wf_dyn+" \n"+\
-             " set ecut %6.2f\n"%(ecut)+\
-             " set scf_tol %8.2e\n"%(scf_tol))
-#if nempty>0:
-#   outfil.write(" set nempty %4d\n"%(nempty))
-
-#outfil.write(" randomize_wf\n")
 
 #### Species and pseudo files
 all_species_files=''
@@ -291,6 +282,12 @@ for frame in range(start_frame,end_frame,step_frame):
         outfil.write(write_string(iframe,name,atom_index,x,y,z))
 
     if iframe == 0:
+       #### Writing variables in Qbox input
+       outfil.write(" set ecut %6.2f\n"%(ecut)+\
+             " set xc "+xc+" \n"+\
+             " set wf_dyn "+wf_dyn+" \n"+\
+             " set scf_tol %8.2e\n"%(scf_tol))
+ 
        if nempty>0:
           outfil.write(" set nempty %4d\n"%(nempty))
 
