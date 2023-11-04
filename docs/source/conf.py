@@ -27,7 +27,7 @@ extensions = [
             #'sphinx-mathjax-offline',
             'sphinx.ext.coverage',
             'sphinx.ext.intersphinx',
-            'sphinx.ext.viewcode',
+            #'sphinx.ext.viewcode',
             'sphinx_rtd_theme',
             'nbsphinx',
             'sphinx.ext.autosectionlabel',
