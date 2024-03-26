@@ -710,6 +710,8 @@ class ionic_mover:
           """
           for idisp in range(len(nmmc.nmdisp)):
               self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
+          if algo == 'os':
+             self.disp_coord = self.disp_coord[:,:-1]
 
       def __define_mass(self):
           """Computes mass matrix based on supplied symbols"""
