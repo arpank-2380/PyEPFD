@@ -7,6 +7,12 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from pyepfd.constants import *
 from pyepfd.elph_classes import nm_sym_displacements,stoch_displacements, coord_com
+from mpi4py import MPI
+import pickle
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 
 def abc2h(abc):
@@ -271,6 +277,7 @@ class xyz:
       """
       def __init__(self, file_path, io='r', atoms=None, xyz_unit='atomic_unit', cell_unit='atomic_unit', \
                    quantity='pos', reorder_seq=None):
+          if rank != 0: return
           init_time = time.time()
           self.io = io
           if self.io == 'r':
@@ -662,35 +669,72 @@ class ionic_mover:
                   idisp += 1
 
       def _nm_disp(self):
-          """Method to perform normal-mode displacements for frequency calculation"""        
-          nmfd = nm_sym_displacements( dynmat = self.dynmat, mass = self.mass,\
+          """Method to perform normal-mode displacements for frequency calculation"""
+          if rank == 0:
+             nmfd = nm_sym_displacements( dynmat = self.dynmat, mass = self.mass,\
                                           mode = self.mode, deltax = self.deltax, deltae = self.deltae)
-          idisp = 1
+             nmfd_serialized = pickle.dumps(nmfd)
+          else:
+             nmfd_serialized = None
+          
+          # Broadcast serialized nmfd to all processes
+          nmfd_serialized = comm.bcast(nmfd_serialized, root=0)
+          # Deserialize nmfd on all processes
+          nmfd = pickle.loads(nmfd_serialized)
+
+          #idisp = 1
           #print(nmfd.displacements)
           if self.nmode_only is None:
              sampled_modes = [i for i in range(len(nmfd.displacements))] 
           else:
              sampled_modes = [i-1 for i in self.nmode_only]
+
+          # Distribute sampled modes among processes
+          total_iterations = self.disp_coord.shape[1]
+          modes_per_process = len(sampled_modes) // size
+          remainder = len(sampled_modes) % size
+          start_index = rank * modes_per_process
+          end_index = start_index + modes_per_process
+          if rank == size - 1:
+             end_index += remainder
+          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations))   
+
           #print("#Mode-index        Disp(au)   Disp(Freq-scaled)") 
-          for imode in sampled_modes:
+          for imode in sampled_modes[start_index:end_index]:
               freq_scaling = np.sqrt(nmfd.omega[imode])
               print("#Mode = %6d Disp-step(au) = %10.4f Disp-step(Freq-scaled) = %10.4f"\
                   %(imode+1, nmfd.displacements[imode],\
                     nmfd.displacements[imode]*freq_scaling))
               print("#Config    Disp(au)   Disp(Freq-scaled)")
-              """
-              .. note::
-                The below loop will be parallelized using MPI4Py in next version.
-              """
+
+              idisp = 0
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
                   #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
-                  self.disp_coord[:,idisp] +=  nmfd.nm2cart_disp(nm_disp)
+                  disp_coord_partial[:,imode * len(self.step_list) + idisp] =  nmfd.nm2cart_disp(nm_disp)
                   idisp += 1
-                  print(" %d  %12.4f  %12.4f"\
-                       %(idisp,nm_disp[imode],nm_disp[imode]*freq_scaling))
-                  #print(nm_disp)    
+                  print("Process-%d:  %d  %12.4f  %12.4f"\
+                       %(rank, idisp,nm_disp[imode],nm_disp[imode]*freq_scaling))
+                  #print(nm_disp) 
+
+          # Gather and broadcast results
+          disp_coord_gathered = comm.gather(disp_coord_partial, root=0)
+
+          comm.Barrier()
+
+          if rank == 0:
+             self.disp_coord += np.sum(disp_coord_gathered, axis=0)
+          self.disp_coord = comm.bcast(self.disp_coord, root=0)       
+
+          if rank != 0:
+          # Optional: Print a message indicating that the process is done
+             # print(f"Process {rank} has finished its work.")
+          # Exit the process
+             MPI.Finalize()
+             exit()
+             return
+          
 
       def _stoch_disp(self,algo,ngrid):
           """
@@ -700,18 +744,74 @@ class ionic_mover:
                                           (iv) 'osrap' (one-shot with random signs and antethetic pairs for each point);
                                            (v) 'mc' (monte-carlo)
                 ngrid = no of samples to be drawn fo 'osr', 'osrap' (2 * ngrid) and 'mc' method explained before.  
+          
+          ..note:
+            This method is parallelized using MPI4Py.
+
           """
-          nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
+
+          if rank == 0:
+             nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
                                       asr = self.asr, temperature = self.temperature,\
                                       ngrid = ngrid, algo = algo, nmode_only = self.nmode_only)
-          """
-          .. note::
-            The below loop will be parallellized using mpi4py in the next version.
-          """
-          for idisp in range(len(nmmc.nmdisp)):
-              self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
+             nmmc_serialized = pickle.dumps(nmmc)
+          else:
+             nmmc_serialized = None
+
+          # Serial Code
+          #for idisp in range(len(nmmc.nmdisp)):
+          #    self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
+          
+          # Broadcast serialized nmmc to all processes
+          nmmc_serialized = comm.bcast(nmmc_serialized, root=0)          
+          # Deserialize nmmc on all processes
+          nmmc = pickle.loads(nmmc_serialized)
+          
+          # Calculate the number of iterations to be handled by each process
+          total_iterations = len(nmmc.nmdisp)
+          iterations_per_process = total_iterations // size
+          remainder = total_iterations % size
+
+          # Distribute the iterations among processes
+          start_index = rank * iterations_per_process
+          end_index = start_index + iterations_per_process
+
+          # Adjust the end index for the last process
+          if rank == size - 1:
+             end_index += remainder
+
+          # Initialize the shared array to hold partial results
+          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations))
+          
+
+          # Compute partial results
+          for idisp in range(start_index, end_index):
+              disp_coord_partial[:, idisp] = nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
+          
+          # Gather partial results from all processes
+          disp_coord_gathered = comm.gather(disp_coord_partial, root=0)
+          
+          comm.Barrier()
+
+          # Concatenate partial results to get the final result
+          if rank == 0:
+             self.disp_coord += np.sum(disp_coord_gathered, axis=0)
+          
+          # Broadcasting final result to all processes
+          self.disp_coord = comm.bcast(self.disp_coord, root=0)   
+
           if algo == 'os':
              self.disp_coord = self.disp_coord[:,:-1]
+          
+          if rank != 0:
+          # Optional: Print a message indicating that the process is done
+             # print(f"Process {rank} has finished its work.")
+          # Exit the process
+             MPI.Finalize()
+             exit()
+             return
+
+
 
       def __define_mass(self):
           """Computes mass matrix based on supplied symbols"""
@@ -778,7 +878,11 @@ class qbox:
              self.natoms = len(self.atoms) ; self.etotals = self.getenergy();  
              try: self.nframes = self.etotals.shape[0]
              except IndexError: self.nframes = self.etotals.size
-             self.forces = self.getv('<force>');   self.coords = self.getv('<position>')
+             self.forces = self.getv('<force>')   
+             self.coords = self.getv('<position>')
+             self.dipole_ion = self.getv('<dipole_ion>')
+             self.dipole_el = self.getv('<dipole_el>')
+             self.dipole_total = self.getv('<dipole_total>')
              self.reorder_seq = reorder_seq
              if reorder_seq is not None: reorder = True
              if reorder: self._reorder()
@@ -855,21 +959,29 @@ class qbox:
           --------------------------
           Get Vector(*getv*) Method
           --------------------------
-          This method gets the vectors (forces or xyz positions") from a a qbox output 
-          and returns it as a 2D vector where each rows are 3N 
-          coordinates of a snapshot/configuration. 
+          This method gets the vectors (forces , xyz positions, or dipole") from a a qbox output 
+          and returns it as a 2D vector where each rows are 3N (forces, xyz)
+          coordinates or 3 dipole moments of a snapshot/configuration. 
           This function is only valid is the qbox class is initiated with
           ``io = 'r'``.
 
             **Arguments:**
 
-                **quantity** = ``'<force>'`` OR ``'<position>'``
+                **quantity** = ``'<force>'`` OR ``'<position>'`` OR ``'<dipole_ion>'`` OR ``'<dipole_el>'`` 
+                OR ``'<dipole_total>'``
           """
-          if (quantity == '<force>') | (quantity == '<position>'): pass
-          else: raise NotImplementedError("quantity must be '<force>' or '<position>'")
-          v = grep(file_path = self.file_path, pattern = quantity, cols=(1,2,3))
-          v = v.flatten().reshape(self.nframes,3*self.natoms)
+          if (quantity == '<force>') | (quantity == '<position>'):
+              v = grep(file_path = self.file_path, pattern = quantity, cols=(1,2,3))
+              v = v.flatten().reshape(self.nframes,3*self.natoms)
+          elif (quantity == '<dipole_ion>') | (quantity == '<dipole_el>') | (quantity == '<dipole_total>'):
+              v = grep(file_path = self.file_path, pattern = quantity, cols=(1,2,3))
+              if len(v) == 0:
+                 v = None 
+          else:
+              raise NotImplementedError("quantity must be '<force>', '<position>', '<dipole_ion>',"+
+                      "'<dipole_el>' or '<dipole_total>'")
           return v
+
 
       def getenergy(self):
           """
