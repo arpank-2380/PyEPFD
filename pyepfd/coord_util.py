@@ -669,7 +669,16 @@ class ionic_mover:
                   idisp += 1
 
       def _nm_disp(self):
-          """Method to perform normal-mode displacements for frequency calculation"""
+          """
+	  Method to perform normal-mode displacements for frequency calculation
+          
+	  ..note:
+            This method is parallelized using MPI4Py. The parallelization is over 
+            normal mode indices. Therefore the number of mpi processes should not be
+            larger than 1/2 of the modes to be sampled to avoid bad load distributions.
+            Idally the number of MPI process should be a divisor of the number of normal 
+            mode to be sampled.
+          """
           if rank == 0:
              nmfd = nm_sym_displacements( dynmat = self.dynmat, mass = self.mass,\
                                           mode = self.mode, deltax = self.deltax, deltae = self.deltae)
@@ -697,34 +706,46 @@ class ionic_mover:
           end_index = start_index + modes_per_process
           if rank == size - 1:
              end_index += remainder
-          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations))   
+          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations), np.float64)   
+          
+          nmlog = open('nmlog'+str(rank)+'.tmp','w+')
 
-          #print("#Mode-index        Disp(au)   Disp(Freq-scaled)") 
+          #print("#Mode-index        Disp(au)   Disp(Freq-scaled)")
+          jmode = 0 
           for imode in sampled_modes[start_index:end_index]:
               freq_scaling = np.sqrt(nmfd.omega[imode])
-              print("#Mode = %6d Disp-step(au) = %10.4f Disp-step(Freq-scaled) = %10.4f"\
-                  %(imode+1, nmfd.displacements[imode],\
+              nmlog.write(
+              "#Process-id = %4d Mode = %6d Disp-step(au) = %10.4f Disp-step(Freq-scaled) = %10.4f\n"\
+                  %(rank, imode+1, nmfd.displacements[imode],\
                     nmfd.displacements[imode]*freq_scaling))
-              print("#Config    Disp(au)   Disp(Freq-scaled)")
+              nmlog.write("#Config    Disp(au)   Disp(Freq-scaled)\n")
 
               idisp = 0
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
                   #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
-                  disp_coord_partial[:,imode * len(self.step_list) + idisp] =  nmfd.nm2cart_disp(nm_disp)
+                  disp_coord_partial[:, rank*modes_per_process* len(self.step_list) + \
+                  jmode * len(self.step_list) + idisp] =  nmfd.nm2cart_disp(nm_disp)
                   idisp += 1
-                  print("Process-%d:  %d  %12.4f  %12.4f"\
-                       %(rank, idisp,nm_disp[imode],nm_disp[imode]*freq_scaling))
+                  nmlog.write(" %d  %12.4f  %12.4f\n"\
+                       %(rank*modes_per_process*len(self.step_list) + jmode * len(self.step_list) + idisp+1, 
+                         nm_disp[imode], nm_disp[imode]*freq_scaling))
                   #print(nm_disp) 
+              jmode += 1
 
           # Gather and broadcast results
           disp_coord_gathered = comm.gather(disp_coord_partial, root=0)
-
+          nmlog.close()
           comm.Barrier()
 
           if rank == 0:
              self.disp_coord += np.sum(disp_coord_gathered, axis=0)
+             #removing .tmp files
+             for i in range(size):
+                 nmlog = open('nmlog'+str(i)+'.tmp','r').read()
+                 print(nmlog)
+                 os.remove('nmlog'+str(i)+'.tmp')
           self.disp_coord = comm.bcast(self.disp_coord, root=0)       
 
           if rank != 0:
@@ -781,7 +802,7 @@ class ionic_mover:
              end_index += remainder
 
           # Initialize the shared array to hold partial results
-          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations))
+          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations), np.float64)
           
 
           # Compute partial results

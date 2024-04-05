@@ -24,6 +24,7 @@ def header():
     rank = comm.Get_rank()
     size = comm.Get_size()
     if rank == 0:
+       print("                                                 ")
        print("          ███████████                            ")  
        print("         ░░███░░░░░███                           ")
        print("          ░███    ░███ █████ ████                ")
