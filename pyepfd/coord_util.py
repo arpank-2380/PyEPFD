@@ -730,7 +730,7 @@ class ionic_mover:
                   nm_disp[imode] = nmfd.displacements[imode]*step
                   #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
                   disp_coord_partial[:, rank*modes_per_process* len(self.step_list) + \
-                  jmode * len(self.step_list) + idisp] =  nmfd.nm2cart_disp(nm_disp)
+                  jmode * len(self.step_list) + idisp + 1] =  nmfd.nm2cart_disp(nm_disp)
                   idisp += 1
                   nmlog.write(" %d  %12.4f  %12.4f\n"\
                        %(rank*modes_per_process*len(self.step_list) + jmode * len(self.step_list) + idisp+1, 
