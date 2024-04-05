@@ -11,6 +11,13 @@ using PyEPFD's **coord_util.ionic_mover** and **elph_classes.phonon_calculator**
 import xml.etree.ElementTree as ET
 import numpy as np
 import sys, os, time
+from mpi4py import MPI
+import pickle
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
 
 class write_pyepfd_info:
       """
@@ -246,7 +253,8 @@ class read_pyepfd_info:
 
           final_time = time.time()
           exec_time = final_time - init_time
-          print("Time spent on read_pyepfd_info class: " + str(exec_time) + " s.")
+          if rank == 0: 
+             print(f"Process-id{rank}: Time spent on read_pyepfd_info class: {exec_time} s.")
 
       def _read_dynmat(self,type='dynmat'):
           """

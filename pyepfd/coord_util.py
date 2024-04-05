@@ -273,10 +273,14 @@ class xyz:
                 This is only valid for ``io = 'r'`` mode.
 
                 **reorder_seq** (optional) = A python list of atom symbols defining the order in which the information
-                read from an xyz file would be saved. Only valid for ``io = 'r'`` mode. 
+                read from an xyz file would be saved. Only valid for ``io = 'r'`` mode.
+
+                **append** = If True, then it would append the new configurations if the xyz file exists.
+                Valid only for ``io = 'w'`` mode 
+ 
       """
       def __init__(self, file_path, io='r', atoms=None, xyz_unit='atomic_unit', cell_unit='atomic_unit', \
-                   quantity='pos', reorder_seq=None):
+                   quantity='pos', reorder_seq=None, append=False):
           if rank != 0: return
           init_time = time.time()
           self.io = io
@@ -296,7 +300,8 @@ class xyz:
                 self.reorder_seq = reorder_seq
                 self._reorder()
           elif self.io == 'w':
-             self.out_xyz = open(file_path,"w+")
+             if append: self.out_xyz = open(file_path,"a")
+             else: self.out_xyz = open(file_path,"w+")
              if atoms is None:
                 sys.exit("Cannot initialize xyz class in 'io = w' mode without a list of atoms")
              self.atoms = atoms; self.xyz_unit = xyz_unit; self.cell_unit = cell_unit; self.natoms = len(atoms)
@@ -423,7 +428,7 @@ class xyz:
                  for j in range(len(vec)):
                      self.coords[i,j] = vec[cart_ind[j]] 
 
-      def write(self, cell, coord):
+      def write(self, cell, coord, append=False):
           """
           --------------
           Write Method
@@ -441,6 +446,7 @@ class xyz:
                 **coord** = A 3N-dimensional vector of cartesian coordinates.
 
           """
+          if rank != 0: return
           cell_write=True
           if cell is not None:
              cell = np.array(cell)
@@ -595,11 +601,27 @@ class ionic_mover:
                 If ``algo = OSR/MC``: ngrid number of additional displaced coordinates would be created.
                 If ``algo = OSRAP/MCAP``: 2*ngrid number of additional displaced coordinates 
                 would be created.
+
+
+        ..warning::
+
+           **MPI4Py Parallelization** is available for ``mode = SD`` and ``mode = (E)NMS/(E)NMFD``.  
+           (1) When ``mode = SD``, the code is parallelized over ``ngrid``. Therefore the number of 
+           employed mpi processes should preferably be a divisor of ``ngrid`` and should not be 
+           larger than 1/2 of ``ngrid``. For ``algo=OS/OSAP`` by definition ``ngrid=1``. Therefore,
+           mpiprocess should not give any scaling.   
+           (2) When ``mode = (E)NMS/(E)NMFD``, the code is parallelized over the number of modes 
+            to be sampled, defined by either ``nmode_only`` list (see above). If this is not set 
+            then all modes are taken into account. Therefor number of employed mpiprocess should 
+            preferably be a divisor of no. of modes to sample and should not be larger than the 
+            half of it. 
+           
             
       """
       def __init__(self,atoms,opt_coord,mode,deltax=0.005,deltae=0.001,\
                   dynmat=None,mass=None,ngrid=1,temperature=0,asr='none',algo='osap', nmode_only=None):
           init_time = time.time()
+          comm.Barrier()
           self.atoms = atoms; self.natoms = len(self.atoms);self.opt_coord = np.array(opt_coord)          
           if len(self.opt_coord) != 3*self.natoms:
              sys.exit("dimensions of atoms and coordinates supplied to ionic_mover class are not consistent.") 
@@ -662,7 +684,8 @@ class ionic_mover:
           
           final_time = time.time()
           exec_time = final_time - init_time
-          print("Time spent on ionic_mover class: " + str(exec_time) + " s.")
+          if rank == 0:
+              print("Time spent on ionic_mover class: " + str(exec_time) + " s.")
       
       def _cart_disp(self):
           """ Method to perform cartesian displacement for frequency calculation"""
@@ -683,10 +706,12 @@ class ionic_mover:
             Idally the number of MPI process should be a divisor of the number of normal 
             mode to be sampled.
           """
+          comm.Barrier()
           if rank == 0:
              nmfd = nm_sym_displacements( dynmat = self.dynmat, mass = self.mass,\
                                           mode = self.mode, deltax = self.deltax, deltae = self.deltae)
              nmfd_serialized = pickle.dumps(nmfd)
+             print(f"ionic_mover._nm_disp() is running with {size} MPI processes.")
           else:
              nmfd_serialized = None
           
@@ -695,27 +720,26 @@ class ionic_mover:
           # Deserialize nmfd on all processes
           nmfd = pickle.loads(nmfd_serialized)
 
-          #idisp = 1
-          #print(nmfd.displacements)
           if self.nmode_only is None:
              sampled_modes = [i for i in range(len(nmfd.displacements))] 
           else:
              sampled_modes = [i-1 for i in self.nmode_only]
 
           # Distribute sampled modes among processes
-          total_iterations = self.disp_coord.shape[1]
           modes_per_process = len(sampled_modes) // size
           remainder = len(sampled_modes) % size
           start_index = rank * modes_per_process
           end_index = start_index + modes_per_process
           if rank == size - 1:
              end_index += remainder
-          disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations), np.float64)   
+
+          disp_per_process = (end_index-start_index)*len(self.step_list)
+          disp_coord_partial = np.zeros((len(self.disp_coord),disp_per_process),np.float64)
           
           nmlog = open('nmlog'+str(rank)+'.tmp','w+')
 
-          #print("#Mode-index        Disp(au)   Disp(Freq-scaled)")
-          jmode = 0 
+          #counters for tracking mode & displacement indices per process 
+          jmode = 0; idisp =0         
           for imode in sampled_modes[start_index:end_index]:
               freq_scaling = np.sqrt(nmfd.omega[imode])
               nmlog.write(
@@ -724,27 +748,26 @@ class ionic_mover:
                     nmfd.displacements[imode]*freq_scaling))
               nmlog.write("#Config    Disp(au)   Disp(Freq-scaled)\n")
 
-              idisp = 0
               for step in self.step_list:
                   nm_disp = np.zeros(3*self.natoms,np.float64)
                   nm_disp[imode] = nmfd.displacements[imode]*step
-                  #print(nmfd.nm2cart_disp(nm_disp).reshape(self.natoms,3))
-                  disp_coord_partial[:, rank*modes_per_process* len(self.step_list) + \
-                  jmode * len(self.step_list) + idisp + 1] =  nmfd.nm2cart_disp(nm_disp)
+                  disp_coord_partial[:,idisp] = nmfd.nm2cart_disp(nm_disp)
                   idisp += 1
                   nmlog.write(" %d  %12.4f  %12.4f\n"\
-                       %(rank*modes_per_process*len(self.step_list) + jmode * len(self.step_list) + idisp+1, 
-                         nm_disp[imode], nm_disp[imode]*freq_scaling))
-                  #print(nm_disp) 
+                       %(rank*modes_per_process*len(self.step_list) + idisp+1, 
+                         nm_disp[imode], nm_disp[imode]*freq_scaling))                  
+                  #if rank == 1: print(f"Rank: {rank} j-mode: {jmode} idisp: {idisp}")  # debugging
               jmode += 1
 
           # Gather and broadcast results
-          disp_coord_gathered = comm.gather(disp_coord_partial, root=0)
+          disp_coord_gathered = comm.gather(disp_coord_partial)
           nmlog.close()
           comm.Barrier()
 
           if rank == 0:
-             self.disp_coord += np.sum(disp_coord_gathered, axis=0)
+             disp_coord_gathered = np.column_stack(disp_coord_gathered)
+             #print(disp_coord_gathered.shape)
+             self.disp_coord[:,1:] += disp_coord_gathered
              #removing .tmp files
              for i in range(size):
                  nmlog = open('nmlog'+str(i)+'.tmp','r').read()
@@ -752,14 +775,6 @@ class ionic_mover:
                  os.remove('nmlog'+str(i)+'.tmp')
           self.disp_coord = comm.bcast(self.disp_coord, root=0)       
 
-          if rank != 0:
-          # Optional: Print a message indicating that the process is done
-             # print(f"Process {rank} has finished its work.")
-          # Exit the process
-             MPI.Finalize()
-             exit()
-             return
-          
 
       def _stoch_disp(self,algo,ngrid):
           """
@@ -774,69 +789,50 @@ class ionic_mover:
             This method is parallelized using MPI4Py.
 
           """
-
+          #print(f"Rank {rank} before barrier")
+          comm.Barrier()
           if rank == 0:
-             nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
-                                      asr = self.asr, temperature = self.temperature,\
-                                      ngrid = ngrid, algo = algo, nmode_only = self.nmode_only)
-             nmmc_serialized = pickle.dumps(nmmc)
-          else:
-             nmmc_serialized = None
+             time_now = time.time
+             print(f"ionic_mover._stoch_disp({algo},{ngrid}) is running with {size} MPI processes.")
 
-          # Serial Code
-          #for idisp in range(len(nmmc.nmdisp)):
-          #    self.disp_coord[:,idisp] += nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
-          
-          # Broadcast serialized nmmc to all processes
-          nmmc_serialized = comm.bcast(nmmc_serialized, root=0)          
-          # Deserialize nmmc on all processes
-          nmmc = pickle.loads(nmmc_serialized)
-          
-          # Calculate the number of iterations to be handled by each process
-          total_iterations = len(nmmc.nmdisp)
-          iterations_per_process = total_iterations // size
-          remainder = total_iterations % size
-
-          # Distribute the iterations among processes
-          start_index = rank * iterations_per_process
-          end_index = start_index + iterations_per_process
-
-          # Adjust the end index for the last process
+          ngrid_per_process = ngrid // size
+          remainder = ngrid % size
           if rank == size - 1:
-             end_index += remainder
+             ngrid_per_process += remainder
+          
+          nmmc = stoch_displacements( dynmat = self.dynmat, mass = self.mass,\
+                                      asr = self.asr, temperature = self.temperature,\
+                                      ngrid = ngrid_per_process, algo = algo, 
+                                      nmode_only = self.nmode_only)
+          total_iterations = len(nmmc.nmdisp)
 
           # Initialize the shared array to hold partial results
           disp_coord_partial = np.zeros((len(self.disp_coord), total_iterations), np.float64)
           
-
           # Compute partial results
-          for idisp in range(start_index, end_index):
+          for idisp in range(total_iterations):
               disp_coord_partial[:, idisp] = nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
-          
+              if rank == 0:
+                 if (idisp + 1) % (total_iterations // 10) == 0:
+                    progress_percentage = ((idisp + 1) / total_iterations) * 100
+                    print(f"Process-id = 0: {progress_percentage:.0f}% of SD iterations completed.")
+          comm.Barrier() 
+
           # Gather partial results from all processes
           disp_coord_gathered = comm.gather(disp_coord_partial, root=0)
-          
-          comm.Barrier()
-
-          # Concatenate partial results to get the final result
+ 
           if rank == 0:
-             self.disp_coord += np.sum(disp_coord_gathered, axis=0)
+             disp_coord_gathered = np.column_stack(disp_coord_gathered)
+             self.disp_coord += disp_coord_gathered
           
           # Broadcasting final result to all processes
           self.disp_coord = comm.bcast(self.disp_coord, root=0)   
 
           if algo == 'os':
              self.disp_coord = self.disp_coord[:,:-1]
-          
-          if rank != 0:
-          # Optional: Print a message indicating that the process is done
-             # print(f"Process {rank} has finished its work.")
-          # Exit the process
-             MPI.Finalize()
-             exit()
-             return
 
-
+      def finalize(self):
+          MPI.Finalize()
 
       def __define_mass(self):
           """Computes mass matrix based on supplied symbols"""
