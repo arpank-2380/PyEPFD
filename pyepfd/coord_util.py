@@ -336,13 +336,17 @@ class xyz:
           if 'CELL(abcABC):' in comment:
               self.cell_tag='CELL(abcABC):'
           if self.cell_tag is not None:
-             if ('x_centeroid{atomic_unit}' in comment) or ('positions{atomic_unit}' in comment):
+             if ('x_centeroid{atomic_unit}' in comment) or ('positions{atomic_unit}' in comment) or \
+                ('position{atomic_unit}' in comment):
                 self.xyz_unit='atomic_unit'
-             if ('f_centeroid{atomic_unit}' in comment) or ('forces{atomic_unit}' in comment):
+             if ('f_centeroid{atomic_unit}' in comment) or ('forces{atomic_unit}' in comment) or \
+                ('force{atomic_unit}' in comment):
                 self.xyz_unit='atomic_unit'; self.force=True ; self.pos = False
-             if ('p_centeroid{atomic_unit}' in comment) or ('momenta{atomic_unit}' in comment):
+             if ('p_centeroid{atomic_unit}' in comment) or ('momenta{atomic_unit}' in comment) or \
+                ('momentum{atomic_unit}' in comment):
                  self.xyz_unit='atomic_unit'; self.mom=True; self.pos = False
-             if ('v_centeroid{atomic_unit}' in comment) or ('velocities{atomic_unit}' in comment):    
+             if ('v_centeroid{atomic_unit}' in comment) or ('velocities{atomic_unit}' in comment) or \
+                ('velocity{atomic_unit}' in comment):    
                  self.xyz_unit='atomic_unit'; self.vel=True; self.pos = False
              if 'cell{atomic_unit}' in comment:
                 self.cell_unit='atomic_unit'
