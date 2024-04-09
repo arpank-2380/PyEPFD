@@ -10,7 +10,7 @@ using PyEPFD's **coord_util.ionic_mover** and **elph_classes.phonon_calculator**
 
 import xml.etree.ElementTree as ET
 import numpy as np
-import sys, os, time
+import sys, os, time, re
 from mpi4py import MPI
 import pickle
 
@@ -282,3 +282,64 @@ class read_pyepfd_info:
           else: raise ValueError("dynmat type not understood")
 
           return
+
+class read_nmdisp_log:
+      """
+      This class reads the log file created by PyEPFD during 
+      normal mode displacements and stores the displacement related 
+      informations. This could be used to parse, e.g., an NMS or ENMS
+      calculations and plot 1D-PES along those modes.
+
+      **Arguments:**
+
+            **file_path** = Full path to the logfile
+
+      **Returns:**
+            Creates following objects within the class.
+
+            **modes** = A python list of modes sampled.
+
+            **disp_steps_au** = A python list of displacement 
+            steps in atomic unit.
+
+            **disp_steps_au** = A python list of displacement 
+            steps in frequency scaled coordinate (unitless).
+
+            disp_au = A Python dictionary whose keys are  normal mode indices 
+            sampled, same as modes above. If we call that key, then it returns
+            a list containing the exact displacement in atomic unit.
+
+            disp_scaled = A Python dictionary whose keys are  normal mode indices 
+            sampled, same as modes above. If we call that key, then it returns 
+            a list containing the exact displacements for that mode in frequency
+            scaled coordinate.
+
+      """
+      def __init__(self,file_path):
+          self.modes = []
+          self.disp_steps_au = []
+          self.disp_steps_scaled = []
+          self.disp_au = {}
+          self.disp_scaled = {}
+
+          with open(file_path, 'r') as file:
+              for line in file:
+                  mode_match = re.match(r'#Process-id\s*=\s*(\d+)'+
+                                       r'\s*Mode\s*=\s*(\d+)'+
+                                       r'\s*Disp-step\(au\)\s*=\s*([\d.-]+)'+
+                                       r'\s*Disp-step\(Freq-scaled\)\s*=\s*([\d.-]+)', line)
+                  displacement_match = re.match(r'\s*(\d+)\s*([\d.-]+)\s*([\d.-]+)', line)
+
+                  if mode_match:
+                      mode = int(mode_match.group(2))
+                      self.modes.append(mode)
+                      self.disp_steps_au.append(float(mode_match.group(3)))
+                      self.disp_steps_scaled.append(float(mode_match.group(4)))
+                      self.disp_au[mode] = []
+                      self.disp_scaled[mode] = []
+                  elif displacement_match:
+                      d_au = float(displacement_match.group(2))
+                      d_scaled = float(displacement_match.group(3))
+                      self.disp_au[mode].append(d_au)
+                      self.disp_scaled[mode].append(d_scaled)
+
