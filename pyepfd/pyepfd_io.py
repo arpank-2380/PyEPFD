@@ -327,19 +327,27 @@ class read_nmdisp_log:
                   mode_match = re.match(r'#Process-id\s*=\s*(\d+)'+
                                        r'\s*Mode\s*=\s*(\d+)'+
                                        r'\s*Disp-step\(au\)\s*=\s*([\d.-]+)'+
-                                       r'\s*Disp-step\(Freq-scaled\)\s*=\s*([\d.-]+)', line)
-                  displacement_match = re.match(r'\s*(\d+)\s*([\d.-]+)\s*([\d.-]+)', line)
+                                       r'\s*Disp-step\(Freq-scaled\)\s*=\s*([\w.-]+)', line)
+                  displacement_match = re.match(r'\s*(\d+)\s*([\d.-]+)\s*([\w.-]+)', line)
 
                   if mode_match:
                       mode = int(mode_match.group(2))
                       self.modes.append(mode)
                       self.disp_steps_au.append(float(mode_match.group(3)))
-                      self.disp_steps_scaled.append(float(mode_match.group(4)))
+                      self.disp_steps_scaled.append(self.safe_float_convert(mode_match.group(4)))
                       self.disp_au[mode] = []
                       self.disp_scaled[mode] = []
                   elif displacement_match:
                       d_au = float(displacement_match.group(2))
-                      d_scaled = float(displacement_match.group(3))
+                      d_scaled = self.safe_float_convert(displacement_match.group(3))
                       self.disp_au[mode].append(d_au)
                       self.disp_scaled[mode].append(d_scaled)
+
+      def safe_float_convert(self, value):
+          try:
+              return float(value)
+          except (ValueError, TypeError):
+              if isinstance(value, str) and value.lower() == 'nan':
+                 return float('nan')
+          return float('nan')             
 
