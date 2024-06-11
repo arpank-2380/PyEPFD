@@ -109,7 +109,7 @@ def write_cube(natom, atoms, coord, origin, na, a, data, fname,comment='Written 
     output filename (fname) and a 2-line comment.
 
     '''
-    print("Writing cube file")
+    print(f"Writing {fname}")
     try:
         with open(fname,'w') as fout:
             if len(comment.split('\n')) != 2:
