@@ -99,6 +99,41 @@ class cube_data:
           integral=vol*density
           return integral
 
+def write_cube(natom, atoms, coord, origin, na, a, data, fname,comment='Written by PyEPFD\n '):
+    '''
+    -----------------------------------------
+    Function for Writing a Gaussian Cube File
+    ----------------------------------------
+    It takes number of atoms (natom), atomic numbers (atoms), atomic xyz coordinates (coord), 
+    number of grid along a direction (na), lattice vectors (a), cube voxel data (data), 
+    output filename (fname) and a 2-line comment.
+
+    '''
+    print("Writing cube file")
+    try:
+        with open(fname,'w') as fout:
+            if len(comment.split('\n')) != 2:
+                raise ValueError( 'write_cube: comment needs to be 2 lines')
+            fout.write(f"{comment}\n")
+            fout.write(f"{natom:4d} {origin[0]:.6f} {origin[1]:.6f} {origin[2]:.6f}\n")
+            fout.write(f"{na[0]:4d} {a[0,0]:.6f} {a[0,1]:.6f}, {a[0,2]:.6f}\n")
+            fout.write(f"{na[1]:4d} {a[1,0]:.6f} {a[1,1]:.6f} {a[1,2]:.6f}\n")
+            fout.write(f"{na[2]:4d} {a[2,0]:.6f} {a[2,1]:.6f} {a[2,2]:.6f}\n")
+            for atom, c in zip(atoms,coord):
+                fout.write(f"{atom} 0 {c[0]:8.4f} {c[1]:8.4f} {c[2]:8.4f}\n")
+            for ix in range(na[0]):
+                for iy in range(na[1]):
+                    for iz in range(na[2]):
+                        fout.write(f"{data[ix,iy,iz]:.5e} ")
+                        if (iz % 6 == 5): fout.write('\n')
+                    fout.write("\n")
+    except IOError as e:
+        print( f"File used as output does not work: {fname}" )
+        print( f"File error ({e.errno}): {e.strerror}")
+        exit()
+    return None
+
+
 def cube_multiplication(files):
     """
     This function multiplies the cube files that are supplied as
