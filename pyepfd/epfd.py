@@ -15,6 +15,7 @@ from pyepfd.pyepfd_io import *
 from pyepfd.constants import *
 from pyepfd.degeneracy_class import degeneracy
 from pyepfd.elph_classes import *
+from pyepfd.cube import *
 
 inp_dir = "./"
 out_dir = "./"
@@ -299,4 +300,97 @@ class mc_convergence:
                  sd_mean = None
           return average, sd_mean
 
+def density_fluctuation(prefix,start=1, end=10, inc=1):
+    """
+    Calculates the (spin) density fluctuation (variance and standard deviation) with 
+    respect to a reference value and saves it as a cube file.
+    Cube file with name {prefix}_frame-0.cube should be present containing the densities
+    of the geometry-optimized configuration
+
+    ..note:  
+    It calculates the variance of density renormalizations using Welfords algorithm.
+    Since, variance remains unchanged on scale shifting, this would be the variance of 
+    density as well. The function is parallelized with mpi4py 
+
+    Args:
+       
+        prefix = file prefix
+        start = start frame index starting with 1
+        end = end frame index
+        inc = frame index increment
+    """
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+ 
+    init_time = time.time()
+    if start < 1: raise ValueError("Allowed values start >= 1")
+    if not os.path.exists(f"{prefix}_frame-0.cube"):
+        print("You must supply file: {prefix}_frame-0.cube containing density data for the optimized geometry")
+        return
+    if rank == 0: print(f"Reading frame 0")
+    ref_cube = cube_data(f"{prefix}_frame-0.cube") 
+    natom = ref_cube.natom; atoms = ref_cube.atoms; coord = ref_cube.coord
+    origin = ref_cube.origin; na = ref_cube.na; a = ref_cube.a
+
+    total_frames = (end-start)//inc + 1
+    frame_per_process = total_frames // size
+    remainder_frames = total_frames % size
+    start_frame_index = rank*frame_per_process*inc + 1
+    end_frame_index = start_frame_index + frame_per_process*inc
+    if rank == size - 1:
+             end_frame_index += remainder_frames
+    local_nframes = 0 
+    local_mean =  np.zeros(np.shape(ref_cube.data),np.float64)
+    local_M2 = np.zeros(np.shape(ref_cube.data),np.float64)
+
+    #print(mean_renorm, M2_renorm)
+    for i in range(start_frame_index, end_frame_index,inc):
+        print(f"pid-{rank}: Reading frame {i}")
+
+        temp_cube = cube_data(f"{prefix}_frame-{i}.cube")
+        if temp_cube.natom != natom: raise ValueError(f"natom mistmatch with reference for {i}-th frame")
+        if temp_cube.atoms != atoms: raise ValueError(f"atom mistmatch with reference for {i}-th frame")
+        if temp_cube.na.any() != na.any(): raise ValueError(f"na mistmatch with reference for {i}-th frame")
+        if np.any(np.abs(temp_cube.a - a)) > 1e-6: raise ValueError(f"a mistmatch with reference for {i}-th frame")
+        tmp_renorm = (temp_cube.data - ref_cube.data)
+        local_nframes += 1
+        delta1 = tmp_renorm - local_mean
+        local_mean += delta1/local_nframes
+        delta2 = tmp_renorm - local_mean
+        local_M2 += delta1 * delta2
+        
+    means = comm.gather(local_mean, root=0)
+    M2s = comm.gather(local_M2, root=0)
+    nframes = comm.gather(local_nframes, root=0)
+
+    if rank == 0:
+       renorm = np.copy(means[0])
+       M2_renorm = np.copy(M2s[0])
+       combined_nframes = current_nframes = nframes[0]
+       for i in range(1,size):
+           combined_nframes += nframes[i]
+           delta = means[i] - renorm
+           renorm = (current_nframes*renorm + nframes[i]*means[i])/combined_nframes
+           M2_renorm += M2s[i] + delta * delta * current_nframes * nframes[i] / combined_nframes
+           current_nframes += nframes[i]
+
+       variance = M2_renorm/total_frames
+       stdev = np.sqrt(variance)
+       mean = renorm + ref_cube.data
+
+       write_cube(natom, atoms, coord, origin, na, a, data = mean,
+                 fname = f"{prefix}_mean.cube", comment = f"Written by PyEPFD\ndensity mean") 
+       write_cube(natom, atoms, coord, origin, na, a, data = variance, 
+                 fname = f"{prefix}_variance.cube", comment = f"Written by PyEPFD\ndensity variance")
+       write_cube(natom, atoms, coord, origin, na, a, data = stdev,
+                 fname = f"{prefix}_stdev.cube", comment = f"Written by PyEPFD\ndensity stdev")
+       write_cube(natom, atoms, coord, origin, na, a, data = renorm,
+                 fname = f"{prefix}_renorm.cube", comment = f"Written by PyEPFD\ndensity stdev")
+
+       end_time = time.time()
+       lapsed_time = end_time - init_time
+       print(f"Time spent on density_fluctuation: {lapsed_time} s.")
 
