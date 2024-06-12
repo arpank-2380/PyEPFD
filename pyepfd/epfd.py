@@ -352,7 +352,7 @@ def density_fluctuation(prefix,start=1, end=10, inc=1):
 
         temp_cube = cube_data(f"{prefix}_frame-{i}.cube")
         if temp_cube.natom != natom: raise ValueError(f"natom mistmatch with reference for {i}-th frame")
-        if temp_cube.atoms != atoms: raise ValueError(f"atom mistmatch with reference for {i}-th frame")
+        if temp_cube.atoms != atoms: print(f"Warning! atom mistmatch with reference for {i}-th frame")
         if temp_cube.na.any() != na.any(): raise ValueError(f"na mistmatch with reference for {i}-th frame")
         if np.any(np.abs(temp_cube.a - a)) > 1e-6: raise ValueError(f"a mistmatch with reference for {i}-th frame")
         tmp_renorm = (temp_cube.data - ref_cube.data)
