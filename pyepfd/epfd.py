@@ -388,7 +388,7 @@ def density_fluctuation(prefix,start=1, end=10, inc=1):
        write_cube(natom, atoms, coord, origin, na, a, data = stdev,
                  fname = f"{prefix}_stdev.cube", comment = f"Written by PyEPFD\ndensity stdev")
        write_cube(natom, atoms, coord, origin, na, a, data = renorm,
-                 fname = f"{prefix}_renorm.cube", comment = f"Written by PyEPFD\ndensity stdev")
+                 fname = f"{prefix}_renorm.cube", comment = f"Written by PyEPFD\ndensity renormalization")
 
        end_time = time.time()
        lapsed_time = end_time - init_time
