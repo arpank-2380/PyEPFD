@@ -116,7 +116,7 @@ def write_cube(natom, atoms, coord, origin, na, a, data, fname,comment='Written 
                 raise ValueError( 'write_cube: comment needs to be 2 lines')
             fout.write(f"{comment}\n")
             fout.write(f"{natom:4d} {origin[0]:.6f} {origin[1]:.6f} {origin[2]:.6f}\n")
-            fout.write(f"{na[0]:4d} {a[0,0]:.6f} {a[0,1]:.6f}, {a[0,2]:.6f}\n")
+            fout.write(f"{na[0]:4d} {a[0,0]:.6f} {a[0,1]:.6f} {a[0,2]:.6f}\n")
             fout.write(f"{na[1]:4d} {a[1,0]:.6f} {a[1,1]:.6f} {a[1,2]:.6f}\n")
             fout.write(f"{na[2]:4d} {a[2,0]:.6f} {a[2,1]:.6f} {a[2,2]:.6f}\n")
             for atom, c in zip(atoms,coord):
