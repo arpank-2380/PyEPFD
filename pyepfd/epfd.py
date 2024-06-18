@@ -328,7 +328,7 @@ def density_fluctuation(prefix,start=1, end=10, inc=1):
     init_time = time.time()
     if start < 1: raise ValueError("Allowed values start >= 1")
     if not os.path.exists(f"{prefix}_frame-0.cube"):
-        print("You must supply file: {prefix}_frame-0.cube containing density data for the optimized geometry")
+        print(f"You must supply file: {prefix}_frame-0.cube containing density data for the optimized geometry")
         return
     if rank == 0: print(f"Reading frame 0")
     ref_cube = cube_data(f"{prefix}_frame-0.cube") 
