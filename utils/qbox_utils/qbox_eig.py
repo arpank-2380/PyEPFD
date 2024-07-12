@@ -6,8 +6,8 @@
 
 
 # This file is part of PyEPFD
-# Copyright (c) 2023 Arpan Kundu
-# See the LICENCE.md in root directory for full license information.
+# It includes code from Qbox, which is licensed under the GNU General Public Licence
+# Copyright (c) 2024 Francois Gygi 
 
 import xml.sax
 import sys
