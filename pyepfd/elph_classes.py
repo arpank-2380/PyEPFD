@@ -656,7 +656,7 @@ class stoch_displacements(dm):
              self.nmdisp = np.zeros((len(signs),self.nmodes),np.float64)
              #print(self.nmdisp.shape)
              for mode in range(self.nmstart,self.nmodes):
-                 for idisp in range(len(signs)):
+                 for idisp in range(len(signs)): 
                     self.nmdisp[idisp,mode] += sigma[mode]*signs[idisp,mode]
           else:
              self.nmdisp = np.zeros((self.ngrid,self.nmodes),np.float64)
@@ -665,7 +665,8 @@ class stoch_displacements(dm):
                  self.nmdisp[:,mode] += rng.normal(0.0,sigma[mode],self.ngrid)
              if 'ap' in self.algo:
                  ap_nmdisp = -1.0 * self.nmdisp   #Antethetic pairs of sample points
-                 self.nmdisp = np.vstack((self.nmdisp,ap_nmdisp))
+                 interleaved = [elem for pair in zip(self.nmdisp, ap_nmdisp) for elem in pair]
+                 self.nmdisp = np.vstack((interleaved))
 
       def _gen_signs(self):
           """
@@ -678,7 +679,8 @@ class stoch_displacements(dm):
              signs = rng.choice(options, size=(self.ngrid,self.nmodes))
              if 'ap' in self.algo:
                 apsigns = -1 * signs              #Antethetic pairs of sample points
-                signs = np.vstack((signs, apsigns))
+                interleaved = [elem for pair in zip(signs, apsigns) for elem in pair]
+                signs = np.vstack(interleaved)
           else:
              #print('no r')
              signs = np.ones((2,self.nmodes),np.int64)
