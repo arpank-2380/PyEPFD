@@ -6,12 +6,7 @@
 
 
 # This file is part of PyEPFD
-<<<<<<< HEAD:utils/qbox_utils/qbox_eigval.py
 # Adapted by Arpan Kundu from qbox_eig.py of Qbox ( www.qboxcode.org )
-=======
-# It includes code from Qbox, which is licensed under the GNU General Public Licence
-# Copyright (c) 2024 Francois Gygi 
->>>>>>> 9315683b4c2704d15662c0dc0d2212c080b65289:utils/qbox_utils/qbox_eig.py
 
 import xml.sax
 import sys
