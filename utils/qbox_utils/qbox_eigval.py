@@ -6,8 +6,7 @@
 
 
 # This file is part of PyEPFD
-# It includes code from Qbox, which is licensed under the GNU General Public Licence
-# Copyright (c) 2024 Francois Gygi 
+# Adapted by Arpan Kundu from qbox_eig.py of Qbox ( www.qboxcode.org )
 
 import xml.sax
 import sys

@@ -20,7 +20,7 @@ column_only=false
 
 skip_default=true
 
-### Base for qbox_eig.py
+### Base for qbox_eigval.py
 BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 #echo $BASE
 ###############    Command line options for this script    ###############
@@ -45,11 +45,11 @@ elif [ $1 == '-seq' ]; then           # file sequence from (lower value) to (hig
         md_end=$3
         shift 3
         let read_arg=$read_arg+3
-elif [ $1 == '-ispin' ]; then        # ispin value for qbox_eig.py
+elif [ $1 == '-ispin' ]; then        # ispin value for qbox_eigval.py
         ispin=$2
         shift 2
         let read_arg=$read_arg+2
-elif [ $1 == '-kp' ]; then      # Kpoints values for qbox_eig.py code
+elif [ $1 == '-kp' ]; then      # Kpoints values for qbox_eigval.py code
        kp1=$2
        kp2=$3
        kp3=$4
@@ -183,7 +183,7 @@ do
              echo "File orbital${norb}.${prefix}-${mdjob} exists"
              echo "Skipping extracting eigenvalues for Orbital-${norb} from eigvals.${prefix}-${mdjob}"
           else
-             $BASE/qbox_eig.py $ispin $kp1 $kp2 $kp3 $norb  ../eigvals.${prefix}-${mdjob} > orbital${norb}.${prefix}-${mdjob} 
+             $BASE/qbox_eigval.py $ispin $kp1 $kp2 $kp3 $norb  ../eigvals.${prefix}-${mdjob} > orbital${norb}.${prefix}-${mdjob} 
           fi
         else
            echo "File Eigenvalues/eigvals.${prefix}-${mdjob} doesn't exist"

@@ -1,6 +1,6 @@
 #!/bin/bash
 ##### To prepare many inputs for qbox from an xyz file using xyz2qbox.sh but avoiding the prompt
-##### It is basically a wrapper for xyz2qbox.py
+##### It is basically a wrapper for xyz2qb.py
 
 # This file is part of PyEPFD
 # Copyright (c) 2023 Arpan Kundu
@@ -31,11 +31,11 @@ pseudo='ONCV_PBE-1.0'
 
 
 
-#### Deriving the path to xyz2qbox.py  ###
+#### Deriving the path to xyz2qb.py  ###
 echo "${BASH_SOURCE[0]}"
 BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo $BASE
-executable=${BASE}/xyz2qbox.py
+executable=${BASE}/xyz2qb.py
 
 ### Loading python, 
 # if python is loaded already comment the following 2 lines
