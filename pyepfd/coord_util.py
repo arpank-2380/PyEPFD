@@ -1341,9 +1341,7 @@ class qe:
 
 
       def _parse_xml(self):
-          print("parse_xml")
           for self.iframe in range(self.frame_start, self.frame_end+1, self.frame_inc):
-              print(f"self.iframe = {self.iframe}")
               xml_file_path = f"{self.path}/{self.frame_prefix}-{self.iframe}" +\
                               f"/{self.pw_prefix}.xml"
               self.tree = ET.parse(xml_file_path)
@@ -1451,7 +1449,6 @@ class qe:
           return eigenvalues
 
       def __getsystem__(self):
-          print("getsystem")
           atomic_structure = self.root.find("input/atomic_structure")
           self.natoms = int(atomic_structure.attrib["nat"]) 
           self.atoms = []
