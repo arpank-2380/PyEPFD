@@ -812,7 +812,7 @@ class ionic_mover:
           # Compute partial results
           for idisp in range(total_iterations):
               disp_coord_partial[:, idisp] = nmmc.nm2cart_disp(nmmc.nmdisp[idisp])
-              if rank == 0:
+              if (rank == 0) & (total_iterations >= 10): 
                  if (idisp + 1) % (total_iterations // 10) == 0:
                     progress_percentage = ((idisp + 1) / total_iterations) * 100
                     print(f"Process-id = 0: {progress_percentage:.0f}% of SD iterations completed.")
