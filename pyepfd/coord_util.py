@@ -1222,4 +1222,245 @@ def xyz2qe(xyzdata_path,pw_opt_path,frames,pw_path):
         for atom in range(xyzdata.natoms):
             qe_input.write("%s   %15.8f   %15.8f   %15.8f\n"\
             %(xyzdata.atoms[atom], coord[atom,0],coord[atom,1],coord[atom,2]))
+class qe:
+      """
+      ===========================
+      Class QE(Quantum Espresso)
+      ===========================
+      This class has methods to convert xyz files to quantum espresso inputs
+      and parse quantum espresso outputs
+
+      **Arguments:**
+
+          **io** = input/output status. 
+                Options are:
+                    **(1)** *'r'*: In this mode the class would read series of quantum espresso
+                    output files (from single-point calculations) and store the data;
+                OR
+                    **(2)** *'w'* = In this mode the class would write a series of 
+                    quantum espresso input files each performing single-point calculations
+
+          **path** = (1) For ``io = 'w'`` mode, this is the path to the xyz file containing displaced 
+                     configurations (FD/ENMFD/SD etc)
+                OR
+                     (2) For ``io = 'r'`` mode, this should be the root directory path where qe single-
+                     point calculations will be performed.
+
+          **frames** = A tuple or an integer of frame indices. 
+                 If tuple then indices of (start, end) or (start, end, inc)
+                 where inc is the increment. Same for both ``io = 'w'/'r'``.
+
+          **pw_opt_path** = Full path to the file containing all pw input options
+                            needed for ``io='w'`` mode.
+
+          **pw_path** = Path to the directory, required for ``io = 'w'`` mode.
+                        Here pw input files would be written and saved.
+
+          **frame_prefix** = Active for ``io = 'r'`` mode.
+                             A string defining the prefix of the directories where QE single
+                             point calculations are performed. The default value is ``'frame'``,
+                             meaning within the root directory defined by ``path`` variable,
+                             there would be directories frame-1, frame-2,..., frame-n, where
+                             actual QE calculation and their outputs exist. 
+
+
+          **bands** = An integrer or a tuple of integers specifying the frame
+                      indices. If tuple then indices of (start, end) or (start, end, inc)
+                      where inc is the increment. It is an optional argument for ``io='r'``
+                      mode. If used, the band energies will be extracted and written to a 
+                      .dat file. For example, the name of the .dat file will be 
+                       is_0_orb-2-5.dat, if 
+                      ``spin = 0`` (see below), and ``bands = (2,5,1)`` are chosen.
+
+          **spin** = An integer specifying the spin. It is an optional argument for 
+                     ``io='r'`` mode to decide band energies for which spin would be 
+                     written to the .dat file.
+                     Options are: 0 = Spin-up (default), 1 = Spin-down (spin-polarized only),
+                     2 = Both spins (spin-polarized only).
+
+          **pw_prefix** = A string that is used as quantum espresso prefix in a calculation.
+                          This would create a file with name pw_prefix.xml, which will pe 
+                          parsed by the class. The default value is ``'pwscf'``. This 
+                          argument is active only for ``io='r'`` mode.
+
+
+      """
+      def __init__(self, path, frames, io='r', pw_opt_path = None, pw_path = 'PWINPs', 
+                   frame_prefix='frame', pw_prefix='pwscf',bands=None, spin=0):
+          if rank != 0: return
+          init_time = time.time()
+          self.io = io;   self.path = path;   self.spin = spin; self.bands = bands
+          self.frame_prefix = frame_prefix;    self.pw_prefix=pw_prefix
+          self.pw_opt_path = pw_opt_path;     self.pw_path = pw_path
+          try:
+              frame_ntuple = len(frames)
+              if  frame_ntuple == 3:
+                  self.frame_start, self.frame_end, self.frame_inc = frames
+              elif frame_ntuple == 2:
+                  self.frame_start, self.frame_end = frames; self.frame_inc = 1
+              elif frame_ntuple == 1:
+                  self.frame_start = frames; self.frame_end = frames; self.frame_inc = 1
+              else:
+                  sys.exit(f"Length of frames tuple is {frame_ntuple}. "+\
+                           "Maximum allowed length of frames tuple is 3.")
+          except TypeError:
+              self.frame_start = int(frames); self.frame_end = int(frames); self.frame_inc = 1
+          
+          self.nframes = (self.frame_end - self.frame_start)//self.frame_inc + 1
+
+          if bands is not None:
+             try:
+                 band_ntuple = len(bands)
+                 if  band_ntuple == 3:
+                     self.band_start, self.band_end, self.band_inc = bands
+                 elif band_ntuple == 2:
+                     self.band_start, self.band_end = bands; self.band_inc = 1
+                 elif band_ntuple == 1:
+                     self.band_start = bands; self.band_end = bands; self.band_inc = 1
+                 else:
+                     sys.exit(f"Length of bands tuple is {band_ntuple}. "+\
+                              "Maximum allowed length of bands tuple is 3.")
+             except TypeError:
+                 self.band_start = int(bands); self.band_end = int(bands); self.band_inc = 1
+             if self.band_start < 1: sys.exit(f"Band index cannot be less than 1")   
+       
+
+          if self.io == 'w':
+             if pw_opt_path is None: 
+                 raise ValueError("pw_opt_path is required containing a file with all PW "+\
+                          "options except the cell parameter and atomic coordinates.")
+             xyz2qe(self.path, self.pw_opt_path, frames, self.pw_path)
+          elif self.io == 'r':
+               self._parse_xml()                
+          else:
+             raise NotImplementedError("qe class: io status must be r or w.")    
+        
+          final_time = time.time()
+          exec_time = final_time - init_time
+          print("Time spent on qe class: " + str(exec_time) + " s.")
+
+
+      def _parse_xml(self):
+          for self.iframe in range(self.frame_start, self.frame_end+1, self.frame_inc):
+              xml_file_path = f"{self.path}/{self.frame_prefix}-{self.iframe}" +\
+                              f"/{self.pw_prefix}.xml"
+              self.tree = ET.parse(xml_file_path)
+              self.root = self.tree.getroot()
+              if self.iframe == self.frame_start:
+                 self.__getsystem__()
+                 self.forces = self._getv('force')
+                 self.coords =  self._getv('position')
+                 self.etotals = float(self.root.findall("output/total_energy/etot")[-1].text)
+              else:
+                 self.forces = np.vstack((self.forces, self._getv('force')))
+                 self.coords = np.vstack((self.coords, self._getv('position')))
+                 self.etotals = np.append(self.etotals,\
+                                float(self.root.findall("output/total_energy/etot")[-1].text)) 
+              if self.bands is not None:
+                 self._write_eigval()       
+
+      def _getv(self,quantity):
+          """
+          Get coordinate or forces vector
+          Args: 
+              
+              **quantity** = A string. Options are
+                             (1) force ( or <force>) and
+                             (2) position(or <position>) 
+
+          Returns a numpuy array of length 3*natoms    
+          """
+          if   (quantity == 'position') | (quantity == '<position>'):
+               v_string = []
+               for atom in self.tree.findall('./output/atomic_structure/atomic_positions/atom'):
+                   for pos_string in atom.text.split():
+                       v_string.append(pos_string)
+          elif (quantity == 'force') | (quantity == '<force>'): 
+               v_string = self.root.find("output/forces").text.replace("\n", " ").split() 
+          else:
+               raise ValueError("Supplied value of quantity should be either force or position")
+          v = np.array(v_string)
+          return v
+
+      def _write_eigval(self):
+          if self.spin == 0:   spin_range = (0,1)
+          elif self.spin == 1: spin_range = (1,2)
+          elif self.spin == 2: spin_range = (0,2)
+          else: raise ValueError("The allowed values of spin are 0 (up), 1(down) and 2(both).")
+
+          if self.iframe == self.frame_start:
+             self.eigvalfile = [] 
+             for isp in range(spin_range[0],spin_range[1]):
+                 self.eigvalfile.append(
+                 open(f"is_{isp}_orb-{self.band_start}-{self.band_end}.dat", 'w+'))
+          ### printing header
+                 for ibnd in range(self.band_start, self.band_end+1, self.band_inc):
+                     self.eigvalfile[isp].write("#Orbital-"+str(ibnd)+"  ")
+                 self.eigvalfile[isp].write("\n ")
+
+          ### collecting and printing eigenvalues
+          eigvals = self._get_eigval()
+          for isp in range(spin_range[0],spin_range[1]):
+              for ibnd in range(eigvals.shape[0]):
+                  self.eigvalfile[isp].write("%14.8f  "%eigvals[ibnd,isp])
+              self.eigvalfile[isp].write("\n ")
+     
+      def _get_eigval(self):
+          """
+          This method extracts Kohn-Sham eigenvalues from a quantum espresso
+          calculation. It parse the XML output file within the directory
+
+
+          Returns:
+
+             A numpy array of order (n,m), with n rows containing the eigenvalues 
+             of orbitals. The value of m=1 for spin = 0,1, but for for spin = 2, 
+             value of m = 2 with first colum containing eigenvalues with up spin and
+             lowest column with down spin.
+          """
+
+          all_eigenvalues = [float(value) for value in \
+                  self.root.find(".//eigenvalues").text.split()]
+
+          nband = int(self.root.find(".//bands/nbnd").text)
+
+          spin_polarized = bool(self.root.find(".//spin/lsda").text)
+          if not spin_polarized:
+              if self.spin > 0:
+                  print("This is not a spin polarized calculations. Setting Spin = 0")
+
+          eigenvalues = []
+          if self.spin < 2:
+              for band in range(self.spin*nband+self.band_start, \
+                      self.spin*nband+self.band_end+1, self.band_inc):
+                  eigenvalues.append(all_eigenvalues[band-1])
+          else:
+              for ispin in range(2):
+                  for band in range(ispin*nband+self.band_start, ispin*nband+self.band_end+1, self.band_inc):
+                      eigenvalues.append(all_eigenvalues[band-1])
+          eigenvalues = np.array(eigenvalues)
+          eigenvalues *= ha2unit['eV']
+
+          eigval_len = len(eigenvalues)
+          if self.spin == 2:
+             eigenvalues = np.reshape(eigenvalues, (eigval_len//2,2), order = 'F')
+          else:
+             eigenvalues = np.reshape(eigenvalues, (eigval_len,1))
+          return eigenvalues
+
+      def __getsystem__(self):
+          atomic_structure = self.root.find("input/atomic_structure")
+          self.natoms = int(atomic_structure.attrib["nat"]) 
+          self.atoms = []
+          for atom in atomic_structure.findall('./atomic_positions/atom'):
+              self.atoms.append(atom.attrib['name'])
+          cell_v = np.zeros((3,3),np.float64)
+          cell_addresses = ['./cell/a1', './cell/a2', './cell/a3']
+          for i in range(3):
+              cell_v[i] = np.array( [float(x) for x in \
+                          atomic_structure.find(cell_addresses[i]).text.split()] )
+          self.cell = h2abc( np.transpose(cell_v) ) # Transpose to make it upper triangular form
+          self.mass = np.array([[masses[element]*amu,masses[element]*amu,masses[element]*amu]\
+                      for element in self.atoms]).reshape(3*self.natoms)
+          
 
