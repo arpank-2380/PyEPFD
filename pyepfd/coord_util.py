@@ -1379,7 +1379,7 @@ class qe:
                v_string = self.root.find("output/forces").text.replace("\n", " ").split() 
           else:
                raise ValueError("Supplied value of quantity should be either force or position")
-          v = np.array(v_string)
+          v = np.array(v_string,np.float64)
           return v
 
       def _write_eigval(self):
