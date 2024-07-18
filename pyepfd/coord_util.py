@@ -1375,8 +1375,12 @@ class qe:
                for atom in self.tree.findall('./output/atomic_structure/atomic_positions/atom'):
                    for pos_string in atom.text.split():
                        v_string.append(pos_string)
-          elif (quantity == 'force') | (quantity == '<force>'): 
-               v_string = self.root.find("output/forces").text.replace("\n", " ").split() 
+          elif (quantity == 'force') | (quantity == '<force>'):
+               try: 
+                  v_string = self.root.find("output/forces").text.replace("\n", " ").split() 
+               except AttributeError:
+                  v_string = []
+                  print("Forces are not found in the qe output(s).")
           else:
                raise ValueError("Supplied value of quantity should be either force or position")
           v = np.array(v_string,np.float64)
