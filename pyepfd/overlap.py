@@ -2,7 +2,7 @@
 # Copyright (c) 2023 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
-import sys
+import sys, time
 import pyepfd.cube as cube
 import numpy as np
 from mpi4py import MPI
@@ -57,6 +57,8 @@ class mode_overlap():
           size = comm.Get_size()
           rank = comm.Get_rank()
           
+          init_time = time.time()
+
           if nmode%size == 0:
              mode_per_process = nmode//size
           else:
@@ -95,16 +97,24 @@ class mode_overlap():
               
               imode = 0
               for frames in frame_list:
+                  if rank == 0: 
+                     print(f"pid-{rank}: Processing {imode+1} / {mode_per_process} mode(s)")
                   iorb = 0
                   for orbital1 in orbitals:
                       for orbital2 in orbitals:
-                          files = ["%s%s%d_frame-%d.cube"%(directory,cube_prefix,orbital1,frames[0]),\
-                                   "%s%s%d_frame-%d.cube"%(directory,cube_prefix,orbital2,frames[1])]       
+                          files = ["%s/%s%d_frame-%d.cube"%(directory,cube_prefix,orbital1,frames[0]),\
+                                   "%s/%s%d_frame-%d.cube"%(directory,cube_prefix,orbital2,frames[1])]       
                           #print(files)
                           value = cube.overlap_integral(files)
                           overlap_integral_list[imode,iorb] = value
                           #print(imode,iorb,value)
-                          iorb += 1    
+                          iorb += 1
+                          time_now = time.time()
+                          elapsed_time = time_now - init_time
+                          if rank == 0: 
+                             print(f"       {iorb} / {norb**2} overlap intergal(s) computed.")
+                             print(f"       Elapsed time {elapsed_time} s.")
+
                   imode += 1
               
               overlap_integral_tmp = comm.gather(overlap_integral_list)
@@ -131,6 +141,11 @@ class mode_overlap():
                             break
               outfile.close()
               iorb_space += 1
+
+          final_time = time.time()
+          exec_time = final_time - init_time
+          if rank == 0:
+             print(f"pid-{rank}: Time spent on mode_overlap: " + str(exec_time) + " s.")    
       
       def flatten(self,L):
           for item in L:
@@ -179,6 +194,8 @@ class frame_overlap():
           size = comm.Get_size()
           rank = comm.Get_rank()
 
+          init_time = time.time()
+
           nframe = (last_frame - start_frame)// inc_frame + 1
           
           if nframe%size == 0:
@@ -220,16 +237,24 @@ class frame_overlap():
               
               iframe = 0
               for frame in frame_list:
+                  if rank == 0: 
+                     print(f"pid-{rank}: Processing {iframe+1} / {frames_per_process} frame(s)")
                   iorb = 0
                   for orbital1 in orbitals:
                       for orbital2 in orbitals:
-                          files = ["%s%s%d_frame-%d.cube"%(directory,cube_prefix,orbital1,ref_frame),\
-                                   "%s%s%d_frame-%d.cube"%(directory,cube_prefix,orbital2,frame)]       
+                          files = ["%s/%s%d_frame-%d.cube"%(directory,cube_prefix,orbital1,ref_frame),\
+                                   "%s/%s%d_frame-%d.cube"%(directory,cube_prefix,orbital2,frame)]       
                           value = cube.overlap_integral(files)
                           #print("Files: %s, Overlap: %14.6g)"%(files,value))
                           overlap_integral_list[iframe,iorb] = value
                           #print(iframe,iorb,value)
                           iorb += 1    
+                          time_now = time.time()
+                          elapsed_time = time_now - init_time
+                          if rank == 0:
+                             print(f"       {iorb} / {norb**2} overlap intergal(s) computed.")
+                             print(f"       Elapsed time {elapsed_time} s.")
+
                   iframe += 1
               
               overlap_integral_tmp = comm.gather(overlap_integral_list)
@@ -256,6 +281,11 @@ class frame_overlap():
                             break
               outfile.close()
               iorb_space += 1
+
+          final_time = time.time()
+          exec_time = final_time - init_time
+          if rank == 0:
+             print(f"pid-{rank}: Time spent on frame_overlap: " + str(exec_time) + " s.")     
 
       def flatten(self,L):
           for item in L:
