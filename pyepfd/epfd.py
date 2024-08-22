@@ -338,7 +338,7 @@ def density_fluctuation(prefix,start=1, end=10, inc=1):
     total_frames = (end-start)//inc + 1
     frame_per_process = total_frames // size
     remainder_frames = total_frames % size
-    start_frame_index = rank*frame_per_process*inc + 1
+    start_frame_index = start + rank*frame_per_process*inc 
     end_frame_index = start_frame_index + frame_per_process*inc
     if rank == size - 1:
              end_frame_index += remainder_frames
