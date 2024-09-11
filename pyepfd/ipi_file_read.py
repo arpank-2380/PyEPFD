@@ -5,6 +5,11 @@
 import xml.etree.ElementTree as ET
 import numpy as np
 import sys, os, time
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 
 class ipi_info:
@@ -142,5 +147,6 @@ class ipi_info:
 
           final_time = time.time()
           exec_time = final_time - init_time
-          print("Time spent on ipi_info class: " + str(exec_time) + " s.")
+          if rank == 0:
+             print("Time spent on ipi_info class: " + str(exec_time) + " s.")
 
