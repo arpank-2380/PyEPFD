@@ -148,5 +148,5 @@ class ipi_info:
           final_time = time.time()
           exec_time = final_time - init_time
           if rank == 0:
-             print("Time spent on ipi_info class: " + str(exec_time) + " s.")
+             print(f"Process-id{rank}: Time spent on ipi_info class: " + str(exec_time) + " s.")
 
