@@ -28,7 +28,7 @@ class nm_info:
              pyepfd = read_pyepfd_info(file_path = phonon_info_file)
              if pyepfd.ref_dynmatrix is not None:
                 dyn_mat = dm(dynmat=pyepfd.ref_dynmatrix, mass= pyepfd.mass)
-             elif pyepfd.dynmatrix:
+             elif pyepfd.dynmatrix is not None:
                 dyn_mat = dm(dynmat=pyepfd.dynmatrix, mass= pyepfd.mass) 
              else:
                 raise ValueError("Dynamical matrix not found in " + phonon_info_file) 
