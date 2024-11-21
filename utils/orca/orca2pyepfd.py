@@ -149,9 +149,9 @@ write_pyepfd_info(inp_dynmat = None,\
    deltae=0.000,\
    asr = asr)
 
-print(f"\033[92mSuccessfully written {restart_file}.\n" + 
-"\033[91mChange the values of <phonon mode>, <deltax>, <deltae>, \n"+ 
+print(f"Successfully written {restart_file}.\n" + 
+"Change the values of <phonon mode>, <deltax>, <deltae>, \n"+ 
 "<ngrid> and <cell> if needed.")
 final_time = time.time()
 exec_time = final_time - init_time
-print("\033[00mTotal time required (s): " + str(exec_time))
+print("Total time required (s): " + str(exec_time))
