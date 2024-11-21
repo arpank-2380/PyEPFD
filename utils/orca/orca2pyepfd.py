@@ -94,6 +94,7 @@ else:
     freq_scale = 1.0
 print("-----------------------------------------------------")
 print(f"Converting {file_path} to {restart_file}")
+print(f"Frequency scale factor = {freq_scale}")
 print("-----------------------------------------------------")
 
 parsed_data = parse_orca_hess(file_path)
