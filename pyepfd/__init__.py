@@ -1,5 +1,5 @@
 # This file is part of PyEPFD
-# Copyright (c) 2023 Arpan Kundu
+# Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
 from .coord_util \
@@ -49,5 +49,15 @@ def header():
        print("Author             : Arpan Kundu")
        print("Author Email       : arpan.kundu@gmail.com")
        print("Today              : ", datetime.datetime.today())
+       print("*************************************************")
+       print("                   CITATIONS                     ")
+       print("=================================================")
+       print("Please cite the following 3 references:          ")
+       print("(1) A. Kundu et al, Phys. Rev. Mater (2021), 5,  ")
+       print("L070801, ")
+       print("(2) A. Kundu and G Galli, ")
+       print("J. Chem. Theory. Comput. (2023), 19, 4011")
+       print("(3) https://pyepfd.readthedocs.io/en/latest/")
+       print("*************************************************")
 
 header()
