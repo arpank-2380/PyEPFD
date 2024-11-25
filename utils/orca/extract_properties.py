@@ -1,3 +1,6 @@
+# This file is part of PyEPFD
+# Copyright (c) 2024 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
 """
 This script is an example of how orca Kohn-Sham eigenvalues can be extracted
 and stored into a file.

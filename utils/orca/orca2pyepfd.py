@@ -1,7 +1,26 @@
+# This file is part of PyEPFD
+# Copyright (c) 2024 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
 import sys, os, time
 from pyepfd.pyepfd_io import *
 from pyepfd.constants import *
 from pyepfd.elph_classes import *
+
+"""
+This script converts an orca hessian file (orca.hess)
+into a pyepfd input/restart file (pyepfd.xml)
+
+The script accepts atleast 2 mandatory command line arguments:
+(1) full path to the orca hessian file (input)
+(2) full path to the pyepfd.xml file (output)
+and an optional command-line argument:
+(3) a frequency scale factor, in case you want to scale the
+orca frequencies for your stochastic displacements.
+
+Usage: 
+python orca2pyepfd.py path_to_orca.hess path_to_pyepfd_restart.xml 
+<freq_scale_factor>[optional]
+"""
 
 def parse_orca_hess(filepath):
     data = {

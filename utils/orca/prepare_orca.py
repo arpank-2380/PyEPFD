@@ -1,7 +1,33 @@
+# This file is part of PyEPFD
+# Copyright (c) 2024 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 import sys,os, shutil
 from pyepfd.coord_util import xyz
 
-# usage: python prepare_orca.py <temperature> <last_frame_index> <path_to_orca.inp>
+"""
+This script prepares orca inputs for each frame from an XYZ
+trajectory file from a stochastic calculation. 
+It accepts 3 arguments: 
+(1) full path to the xyz file,
+(2) index of the last frame,
+(3) Full path to a pre-prepared orca input file with coordinates supplied
+by an XYZ file name (dummy).
+usage: python prepare_orca.py <xyz_path>  <last_frame_index> <path_to_orca.inp>
+
+Example orca.inp:
+
+!B3LYP D3 DEF2-TZVP
+
+%pal
+nprocs 48
+end
+
+%maxcore 14000
+
+*xyzfile 0 3 geom.xyz
+    
+"""
 if len(sys.argv) != 4:
    sys.exit("\033[91mUsage: python prepare_orca.py <trajectory.xyz>" +\
            " <last_frame_index> <path_to_orca.inp>\033[00m")
