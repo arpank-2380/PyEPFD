@@ -288,7 +288,8 @@ class mc_convergence:
              weights_chunk = weights[ data_range[0] : data_range[1] ]
           average = np.average(data_chunk,weights = weights, axis = axis)
           if weights is None:
-             sd_mean = np.sqrt( np.var(data_chunk, axis = axis)/float(data_chunk.shape[0] - 1) )
+             with np.errstate(invalid='ignore', divide='ignore'):
+                  sd_mean = np.sqrt( np.var(data_chunk, axis = axis)/float(data_chunk.shape[0] - 1) )
           else:
               try:
                   from statsmodels.stats.weightstats import DescrStatsW
