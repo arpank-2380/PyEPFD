@@ -9,6 +9,7 @@ from pyepfd.constants import *
 from pyepfd.elph_classes import nm_sym_displacements,stoch_displacements, coord_com
 from mpi4py import MPI
 import pickle
+import warnings
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -71,7 +72,9 @@ def grep(file_path, pattern, cols):
             **cols** = A tuple of columns that we want to read from the grepped line
     """
     os.system("grep '"+ pattern + "' " + file_path + " > tmp")
-    data_array = np.genfromtxt("tmp",usecols = cols,dtype=np.float64)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="genfromtxt: Empty input file")
+        data_array = np.genfromtxt("tmp",usecols = cols,dtype=np.float64)
     os.system("rm -rf tmp")
     return data_array
 
