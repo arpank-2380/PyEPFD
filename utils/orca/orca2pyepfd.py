@@ -101,7 +101,7 @@ def parse_orca_hess(filepath):
 init_time = time.time()
 if (len(sys.argv) < 2) or (len(sys.argv) > 4):
    sys.exit("\033[91mUsage: python orca2pyepfd.py path_to_orca.hess " + \
-           "path_to_pyepfd_restart.xml <freq_scale_factor>[optional]")
+           "path_to_pyepfd_restart.xml <freq_scale_factor>[optional]\033[00m")
    
 # Usage
 
