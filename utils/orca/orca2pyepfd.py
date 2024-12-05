@@ -148,7 +148,7 @@ else: asr = 'none'
 dm.apply_asr(opt_coord = opt_coord, asr=asr)
 print("#Mode    Frequency(cm-1)")
 for i in range(len(dm.refomega)):
-    print(f"{i:5d} {dm.refomega[i]*ha2unit['cm-1']:10.2f}")
+    print(f"{i+1:5d} {dm.refomega[i]*ha2unit['cm-1']:10.2f}")
 
 # Since orca is not a periodic code, 
 # We are assuming a cubic cell of 100 Angstrom

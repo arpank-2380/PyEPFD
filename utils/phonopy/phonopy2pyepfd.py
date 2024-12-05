@@ -1,7 +1,7 @@
 # This file is part of PyEPFD
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
-import sys,os
+import sys,os, time
 import numpy as np
 from pyepfd.elph_classes import *
 from pyepfd.pyepfd_io import *
@@ -49,6 +49,7 @@ def fc_read(file_path='FORCE_CONSTANTS'):
     fcmatrix =  fcmatrix * fc_unit_conv
     return fcmatrix
 
+init_time = time.time()
 if len(sys.argv) < 3:
    sys.exit("\033[91mUsage: python phonopy2pyepfd.py path_to_opt_geometry.xyz path_to_pyepfd_restart.xml <freq_scale_factor>[optional]") 
 
@@ -70,8 +71,9 @@ dynmatrix *= np.square(freq_scale)
 dm=dm(dynmat=dynmatrix, mass=opt.mass)
 dm.apply_asr(opt_coord = opt.coords[0], asr='crystal')
 
+print("#Mode    Frequency(cm-1)")
 for i in range(len(dm.refomega)):
-    print(i, dm.refomega[i]*ha2unit['cm-1'])
+    print(i+1, dm.refomega[i]*ha2unit['cm-1'])
 
 write_pyepfd_info(inp_dynmat = None,\
    dynmat = dm.dynmatrix,\
@@ -83,3 +85,11 @@ write_pyepfd_info(inp_dynmat = None,\
    mode='fd',\
    deltax=0.019,\
    asr = 'crystal')
+
+print(f"Successfully written {restart_file}.\n" +
+"Change the values of <phonon mode>, <asr>, <deltax>, <deltae>, \n"+
+"<ngrid> and <cell> if needed.")
+final_time = time.time()
+exec_time = final_time - init_time
+print("Total time required (s): " + str(exec_time))
+
