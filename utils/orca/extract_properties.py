@@ -80,13 +80,14 @@ def get_patterns(filepath):
            orb_pattern, orb_down_pattern 
 
 
-def extract_eigenvalue(filepath, pattern, ispin=0):
+def extract_eigenvalue(filepath, pattern, ispin=0, repeat_pattern=False):
     """ Returns one eigenvalue in eV from an orca output"""
     value = grep(filepath, pattern, cols = 3)
     if value.ndim == 0:
        eigenvalue = float(value)
     else: 
-       eigenvalue = value[-2:][ispin]
+       if repeat_pattern: eigenvalue = value[-2:][ispin]
+       else: eigenvalue = value[-1] 
     return eigenvalue
 
 def extract_etotal(filepath):
@@ -250,11 +251,13 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
            etotalfile.write(f" {etotal[-1]:20.12g} \n")
 
         for iorb in range(orbitals[0], orbitals[1]+1, orbitals[2]):
-            eigenvalue = extract_eigenvalue(outpath,up_pattern[iorb],0)
+            repeat_pattern = up_pattern[iorb] in down_pattern
+            eigenvalue = extract_eigenvalue(outpath,up_pattern[iorb],0, repeat_pattern)
             eigvalfile.write(f"{eigenvalue:13.8g} ")
             if iorb == orbitals[1]: eigvalfile.write("\n")
             if spin_polarized:
-               eigenvalue = extract_eigenvalue(outpath,down_pattern[iorb],1)
+               repeat_pattern = down_pattern[iorb] in up_pattern 
+               eigenvalue = extract_eigenvalue(outpath,down_pattern[iorb],1,repeat_pattern)
                eigvalfile2.write(f"{eigenvalue:13.8g} ")
                if iorb == orbitals[1]: eigvalfile2.write("\n")
 
