@@ -284,12 +284,13 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
            frame_indices.append(iframe) 
            _, coord, force, _ = read_engrad(engrad) 
            coords.append(coord); forces.append(force)
-
-        if (i_progress % progress == 0) & (i_progress != 0):
-           current_time = time.time()
-           elapsed_time = current_time - init_time
-           print(f"\033[94m{i_progress}/{nframes}\033[00m"+\
-                   f" frames processed in \033[94m{elapsed_time:9.3f}\033[00m s.") 
+           
+        if progress != 0:
+           if (i_progress % progress == 0) & (i_progress != 0) :
+              current_time = time.time()
+              elapsed_time = current_time - init_time
+              print(f"\033[94m{i_progress}/{nframes}\033[00m"+\
+                      f" frames processed in \033[94m{elapsed_time:9.3f}\033[00m s.") 
     
     # closing files
     etotalfile.close(); eigvalfile.close()
