@@ -183,7 +183,7 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
     """
     init_time = time.time()
     print(f"Extracting properties from orca calculations")
-    print(f"Frame range: {frames}")
+    print(f"Frame range: \033[94m{frames}\033[00m")
 
 
     # For engrad.npz files
@@ -194,7 +194,10 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
        full_path = True # Is supplied path is the full path of calculations?
     else: full_path = False
 
-    for iframe in range(frames[0],frames[1]+1, frames[2]):
+    nframes = (frames[1]-frames[0]+1)//(frames[2])
+    progress = nframes//10
+
+    for i_progress, iframe in enumerate(range(frames[0],frames[1]+1, frames[2])):
         if full_path:
            outpath = f"{path}/{orca_prefix}.out" 
            engrad  = f"{path}/{orca_prefix}.engrad"
@@ -281,6 +284,12 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
            frame_indices.append(iframe) 
            _, coord, force, _ = read_engrad(engrad) 
            coords.append(coord); forces.append(force)
+
+        if (i_progress % progress == 0) & (i_progress != 0):
+           current_time = time.time()
+           elapsed_time = current_time - init_time
+           print(f"\033[94m{i_progress}/{nframes}\033[00m"+\
+                   f" frames processed in \033[94m{elapsed_time:9.3f}\033[00m s.") 
     
     # closing files
     etotalfile.close(); eigvalfile.close()
