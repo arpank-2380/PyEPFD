@@ -14,7 +14,7 @@ from .xyz2nmode import *
 
 
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 def header():
     """Prints welcome header """

@@ -11,7 +11,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pyepfd",
-    version="1.0",
+    version="1.1",
     author="Arpan Kundu",
     author_email="arpan.kundu@gmail.com",
     description="A python package for computing electron-phonon renormalizations from finite displacements",
