@@ -96,7 +96,7 @@ def extract_etotal(filepath):
     return value
 
 
-def extract_population(filepath, patterns, nspin=1):
+def extract_population(filepath, patterns, nspin=1, atom_indices=None):
     """
     Args: 
         filepath = Full path to the file
@@ -109,21 +109,24 @@ def extract_population(filepath, patterns, nspin=1):
     """
     mulliken_charge = []; loewdin_charge = [] 
     mulliken_spin = []; loewdin_spin = []
-    for pattern in patterns:
-        col = len(pattern.split())
-        if nspin == 1: 
-            value = grep(filepath, pattern, cols = col)[-2:]
-            mulliken_charge.append(value[0])
-            loewdin_charge.append(value[1])
-        elif nspin == 2:
-            value = grep(filepath, pattern, cols = (col,col+1))[-2:]
-            mulliken_charge.append(value[0,0])
-            loewdin_charge.append(value[1,0])
-            mulliken_spin.append(value[0,1])
-            loewdin_spin.append(value[1,1])
-        else:
-            raise ValueError(
-            "orca_util/extract_population: Allowed values of nspin are 1 or 2") 
+
+    if atom_indices is not None:
+       for iatom in atom_indices:
+           pattern = patterns[iatom]
+           col = len(pattern.split())
+           if nspin == 1: 
+               value = grep(filepath, pattern, cols = col)[-2:]
+               mulliken_charge.append(value[0])
+               loewdin_charge.append(value[1])
+           elif nspin == 2:
+               value = grep(filepath, pattern, cols = (col,col+1))[-2:]
+               mulliken_charge.append(value[0,0])
+               loewdin_charge.append(value[1,0])
+               mulliken_spin.append(value[0,1])
+               loewdin_spin.append(value[1,1])
+           else:
+               raise ValueError(
+               "orca_util/extract_population: Allowed values of nspin are 1 or 2") 
             
     return np.array(mulliken_charge), np.array(loewdin_charge), \
            np.array(mulliken_spin), np.array(loewdin_spin) 
@@ -209,8 +212,9 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
            atom_symbols, spin_polarized, population_pattern, \
            up_pattern, down_pattern = get_patterns(outpath)
 
-           if atom_indices == None:
-              atom_indices = list(range(len(atom_symbols))) 
+           if atom_indices is not None:
+              if atom_indices[0] < 0:
+                 atom_indices = list(range(len(atom_symbols))) 
 
            etotalfile = open(f"{path}/etotals.dat", 'w+')
            etotalfile.write(f"# Total Energy (Eh) for frames: {frames} \n")
@@ -220,14 +224,14 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
            for iorb in range(orbitals[0],orbitals[1]+1,orbitals[2]):
                eigvalfile.write(f"#Orbital-{iorb}   ")
            eigvalfile.write("\n")    
-
-           m_charge_file = open(f"{path}/mulliken_charges.dat", 'w+')
-           l_charge_file = open(f"{path}/loewdin_charges.dat", 'w+')
-           m_charge_file.write("# "); l_charge_file.write("# ")
-           for iatom in atom_indices:
-               m_charge_file.write(f"{atom_symbols[iatom]} ")
-               l_charge_file.write(f"{atom_symbols[iatom]} ")
-           m_charge_file.write("\n"); l_charge_file.write("\n")
+           if atom_indices is not None:
+              m_charge_file = open(f"{path}/mulliken_charges.dat", 'w+')
+              l_charge_file = open(f"{path}/loewdin_charges.dat", 'w+')
+              m_charge_file.write("# "); l_charge_file.write("# ")
+              for iatom in atom_indices:
+                  m_charge_file.write(f"{iatom}:{atom_symbols[iatom]} ")
+                  l_charge_file.write(f"{iatom}:{atom_symbols[iatom]} ")
+              m_charge_file.write("\n"); l_charge_file.write("\n")
 
            if spin_polarized:
               eigvalfile2 = \
@@ -235,14 +239,14 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
               for iorb in range(orbitals[0],orbitals[1]+1,orbitals[2]):
                   eigvalfile2.write(f"#Orbital-{iorb}   ")
               eigvalfile2.write("\n")    
-                
-              m_spin_file = open(f"{path}/mulliken_spins.dat", 'w+')
-              l_spin_file = open(f"{path}/loewdin_spins.dat", 'w+')
-              m_spin_file.write("# "); l_spin_file.write("# ")
-              for iatom in atom_indices:
-                  m_spin_file.write(f"{atom_symbols[iatom]} ")
-                  l_spin_file.write(f"{atom_symbols[iatom]} ")
-              m_spin_file.write("\n"); l_spin_file.write("\n")
+              if atom_indices is not None:  
+                 m_spin_file = open(f"{path}/mulliken_spins.dat", 'w+')
+                 l_spin_file = open(f"{path}/loewdin_spins.dat", 'w+')
+                 m_spin_file.write("# "); l_spin_file.write("# ")
+                 for iatom in atom_indices:
+                     m_spin_file.write(f"{iatom}:{atom_symbols[iatom]} ")
+                     l_spin_file.write(f"{iatom}:{atom_symbols[iatom]} ")
+                 m_spin_file.write("\n"); l_spin_file.write("\n")
 
         etotal = extract_etotal(outpath)
 
@@ -267,17 +271,17 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
         if spin_polarized: nspin = 2
         else: nspin = 1
         mulliken_charge, loewdin_charge, mulliken_spin, loewdin_spin = \
-            extract_population(outpath,population_pattern,nspin)
-
-        for iatom in atom_indices:
-            m_charge_file.write(f" {mulliken_charge[iatom]:12.6f}  ")
-            l_charge_file.write(f" {loewdin_charge[iatom]:12.6f}  ")
-            if spin_polarized:
-               m_spin_file.write(f" {mulliken_spin[iatom]:12.6f}  ") 
-               l_spin_file.write(f" {loewdin_spin[iatom]:12.6f}  ")
-        m_charge_file.write(" \n"); l_charge_file.write("\n")
-        if spin_polarized:
-           m_spin_file.write("\n"); l_spin_file.write("\n") 
+            extract_population(outpath,population_pattern,nspin,atom_indices)
+        if atom_indices is not None:
+           for iatom in range(len(mulliken_charge)):
+               m_charge_file.write(f" {mulliken_charge[iatom]:12.6f}  ")
+               l_charge_file.write(f" {loewdin_charge[iatom]:12.6f}  ")
+               if spin_polarized:
+                  m_spin_file.write(f" {mulliken_spin[iatom]:12.6f}  ") 
+                  l_spin_file.write(f" {loewdin_spin[iatom]:12.6f}  ")
+           m_charge_file.write(" \n"); l_charge_file.write("\n")
+           if spin_polarized:
+              m_spin_file.write("\n"); l_spin_file.write("\n") 
 
         #Reading engrad files if exists
         if os.path.exists(engrad):
@@ -294,9 +298,10 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
     
     # closing files
     etotalfile.close(); eigvalfile.close()
-    m_charge_file.close(); l_charge_file.close()
-    if spin_polarized:
-       eigvalfile2.close(); m_spin_file.close(); l_spin_file.close()
+    if atom_indices is not None:
+       m_charge_file.close(); l_charge_file.close()
+       if spin_polarized:
+          eigvalfile2.close(); m_spin_file.close(); l_spin_file.close()
     
     # writing engrad.npz file
     if len(forces) != 0:
@@ -323,15 +328,16 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
               f"   {path}/is_0_orb-{orbitals[0]}-{orbitals[1]}.dat\033[00m")
         print(f"SPIN DOWN orbital energies are written at : \n\033[92m" +\
               f"   {path}/is_1_orb-{orbitals[0]}-{orbitals[1]}.dat\033[00m")
-    print(f"Mulliken charges are written at: \n\033[92m" +\
-          f"   {path}/mulliken_charges.dat\033[00m")
-    print(f"Loewdin charges are written at: \n\033[92m" +\
-          f"   {path}/loewdin_charges.dat\033[00m")
-    if spin_polarized:
-            print(f"Mulliken spin populations are written at: \n\033[92m" +\
-                  f"   {path}/mulliken_spins.dat\033[00m")
-            print(f"Loewdin spin populations are written at: \n\033[92m" +\
-                  f"   {path}/loewdin_spins.dat\033[00m")
+    if atom_indices is not None:    
+       print(f"Mulliken charges are written at: \n\033[92m" +\
+             f"   {path}/mulliken_charges.dat\033[00m")
+       print(f"Loewdin charges are written at: \n\033[92m" +\
+             f"   {path}/loewdin_charges.dat\033[00m")
+       if spin_polarized:
+               print(f"Mulliken spin populations are written at: \n\033[92m" +\
+                     f"   {path}/mulliken_spins.dat\033[00m")
+               print(f"Loewdin spin populations are written at: \n\033[92m" +\
+                     f"   {path}/loewdin_spins.dat\033[00m")
 
     if len(forces) != 0:
        print("*************************************************") 
@@ -399,10 +405,14 @@ def print_help():
             f"(starting with 0 as orca output)\n"+\
             f"                for which we want to extract (charge/spin) populations.\n"+\
             f"                The argument \033[92m<atom_indices>\033[00m either takes\n"+\
-            f"                    (1) many integers separated by ',' defining "+\
+            f"                    (1) A string either \n"+\
+            f"                         [a] 'none' (default): populations wont be extracted, \n"
+            f"                      or [b] 'all': populations of all atoms would be extracted. \n"+\
+            f"                or\n"+\
+            f"                    (2) many integers separated by ',' defining "+\
             f"the list of atom indices,\n"+\
             f"                or\n"+\
-            f"                    (2) Integers (max. 3) separated by ':' defining ranges.\n"+\
+            f"                    (3) Integers (max. 3) separated by ':' defining ranges.\n"+\
             f"                     See the frames above for definition of ranges."
             )
     return
@@ -425,18 +435,23 @@ def extract_range(string):
     return ranges    
 
 def atom_lists(string):
-    atom_lists = []
-    if ':' in string: 
-        ranges = extract_range(string)
-        atom_lists = list(range(ranges[0],ranges[1]+1,ranges[2]))
-    else:
-        inputs = string.split(',')
-        for i in inputs:
-            if bool(re.match(r'^[+]?\d+$', i)):
-               atom_lists.append(int(i))
-            else:
-               print("\033[91matom_indices list not understood. Extracting all atoms.\033[00m") 
-               atom_lists = None
+    if string.lower() == 'none':
+       atom_lists = None
+    elif string.lower() == 'all':
+       atom_lists = [-1] #flags all atoms should be included
+    else:       
+       atom_lists = []
+       if ':' in string: 
+           ranges = extract_range(string)
+           atom_lists = list(range(ranges[0],ranges[1]+1,ranges[2]))
+       else:
+           inputs = string.split(',')
+           for i in inputs:
+               if bool(re.match(r'^[+]?\d+$', i)):
+                  atom_lists.append(int(i))
+               else:
+                  print("\033[91matom_indices list not understood. Not extracting populations.\033[00m") 
+                  atom_lists = None
     return atom_lists         
 
 
