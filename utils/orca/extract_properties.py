@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # This file is part of PyEPFD
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
@@ -355,66 +355,67 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
     return 
 
 def print_help():
-    sys.exit(f"================================================\n"+\
-            f"      ORCA EXTRACT_PROPERTIES HELP MESSAGES \n"+\
-            f"=================================================\n"+\
-            f"\033[91mUsage (optional arguments in [...]):\n"+\
-            f"extract_properties.py -p \033[92m<full_path>\033[91m "+\
-            f"-n \033[92m<n_orbital>\033[91m"+\
-            f" [-f \033[92m<frames>\033[91m] "+\
-            f"[-o \033[92m<prefix>\033[91m] [-a \033[92m<atom_indices>\033[91m] \n\033[00m"+\
+    print(f"================================================\n"+\
+         f"      ORCA EXTRACT_PROPERTIES HELP MESSAGES \n"+\
+         f"=================================================\n"+\
+         f"\033[91mUsage (optional arguments in [...]):\n"+\
+         f"extract_properties.py -p \033[92m<full_path>\033[91m "+\
+         f"-n \033[92m<n_orbital>\033[91m"+\
+         f" [-f \033[92m<frames>\033[91m] "+\
+         f"[-o \033[92m<prefix>\033[91m] [-a \033[92m<atom_indices>\033[91m] \n\033[00m"+\
 
-            f"\nCommand line argunemts: \n\n"+\
-            f"\033[91m -h, --help   =\033[00m prints help message.\n\n"+\
-            f"\033[91m -p, --path   =\033[00m \033[92m<full_path>\033[00m"+\
-            f" to the orca calculations.\n"+\
-            f"                For a single frame \033[92m<full_path>\033[00m of the directory"+\
-            f" where .out file \n"+\
-            f"                is present.\n"+\
-            f"                For many frames, \033[92m<full_path>\033[00m of the directory"+\
-            f" where individual \n"+\
-            f"                frame directories exist.\n\n"
+         f"\nCommand line argunemts: \n\n"+\
+         f"\033[91m -h, --help   =\033[00m prints help message.\n\n"+\
+         f"\033[91m -p, --path   =\033[00m \033[92m<full_path>\033[00m"+\
+         f" to the orca calculations.\n"+\
+         f"                For a single frame \033[92m<full_path>\033[00m of the directory"+\
+         f" where .out file \n"+\
+         f"                is present.\n"+\
+         f"                For many frames, \033[92m<full_path>\033[00m of the directory"+\
+         f" where individual \n"+\
+         f"                frame directories exist.\n\n"
 
-            f"\033[91m -o, --orca   =\033[00m"+\
-            f" A string defining \033[92m<prefix>\033[00m of orca outputs.\n"+\
-            f"                The default is 'orca-sp'.\n\n"+\
+         f"\033[91m -o, --orca   =\033[00m"+\
+         f" A string defining \033[92m<prefix>\033[00m of orca outputs.\n"+\
+         f"                The default is 'orca-sp'.\n\n"+\
 
-            f"\033[91m -n, --n_orb  =\033[00m The range of orbital indices"+\
-            f"(\033[92m<n_orbital>\033[00m) to be extracted.\n"+\
-            f"                The indices are the same as with orca-output (starts with 0)\n"+\
-            f"                The argument \033[92m<n_orbital>\033[00m"+\
-            f" may take 3 integers separated by ':'.\n"+\
-            f"                These integers define \033[92mstart:end:step\033[00m"+\
-            f" of the orbital indices.\n"+\
-            f"                  [a] only providing \033[92mstart\033[00m"+\
-            f" would extract start orbital only.\n"+\
-            f"                  [b] if only \033[92mstart:end\033[00m"+\
-            f" provided then \033[92mstep = 1\033[00m.\n\n"+\
+         f"\033[91m -n, --n_orb  =\033[00m The range of orbital indices"+\
+         f"(\033[92m<n_orbital>\033[00m) to be extracted.\n"+\
+         f"                The indices are the same as with orca-output (starts with 0)\n"+\
+         f"                The argument \033[92m<n_orbital>\033[00m"+\
+         f" may take 3 integers separated by ':'.\n"+\
+         f"                These integers define \033[92mstart:end:step\033[00m"+\
+         f" of the orbital indices.\n"+\
+         f"                  [a] only providing \033[92mstart\033[00m"+\
+         f" would extract start orbital only.\n"+\
+         f"                  [b] if only \033[92mstart:end\033[00m"+\
+         f" provided then \033[92mstep = 1\033[00m.\n\n"+\
 
-            f"\033[91m -f, --frames =\033[00m The range of \033[92m<frames>\033[00m.\n"+\
-            f"                The argument \033[92m<frames>\033[00m"+\
-            f" may take 3 integers separated by ':'.\n"+\
-            f"                These integers define \033[92mstart:end:step\033[00m"+\
-            f" of the trajectory frames.\n"+\
-            f"                  [a] only providing \033[92mstart\033[00m"+\
-            f" would extract start frame only.\n"+\
-            f"                  [b] if only \033[92mstart:end\033[00m"+\
-            f" provided then \033[92mstep = 1\033[00m.\n\n"+\
+         f"\033[91m -f, --frames =\033[00m The range of \033[92m<frames>\033[00m.\n"+\
+         f"                The argument \033[92m<frames>\033[00m"+\
+         f" may take 3 integers separated by ':'.\n"+\
+         f"                These integers define \033[92mstart:end:step\033[00m"+\
+         f" of the trajectory frames.\n"+\
+         f"                  [a] only providing \033[92mstart\033[00m"+\
+         f" would extract start frame only.\n"+\
+         f"                  [b] if only \033[92mstart:end\033[00m"+\
+         f" provided then \033[92mstep = 1\033[00m.\n\n"+\
 
-            f"\033[91m -a, --atoms  =\033[00m The list of \033[92m<atom_indices>\033[00m "+\
-            f"(starting with 0 as orca output)\n"+\
-            f"                for which we want to extract (charge/spin) populations.\n"+\
-            f"                The argument \033[92m<atom_indices>\033[00m either takes\n"+\
-            f"                    (1) A string either \n"+\
-            f"                         [a] 'none' (default): populations wont be extracted, \n"
-            f"                      or [b] 'all': populations of all atoms would be extracted. \n"+\
-            f"                or\n"+\
-            f"                    (2) many integers separated by ',' defining "+\
-            f"the list of atom indices,\n"+\
-            f"                or\n"+\
-            f"                    (3) Integers (max. 3) separated by ':' defining ranges.\n"+\
-            f"                     See the frames above for definition of ranges."
-            )
+         f"\033[91m -a, --atoms  =\033[00m The list of \033[92m<atom_indices>\033[00m "+\
+         f"(starting with 0 as orca output)\n"+\
+         f"                for which we want to extract (charge/spin) populations.\n"+\
+         f"                The argument \033[92m<atom_indices>\033[00m either takes\n"+\
+         f"                    (1) A string either \n"+\
+         f"                         [a] 'none' (default): populations wont be extracted, \n"
+         f"                      or [b] 'all': populations of all atoms would be extracted. \n"+\
+         f"                or\n"+\
+         f"                    (2) many integers separated by ',' defining "+\
+         f"the list of atom indices,\n"+\
+         f"                or\n"+\
+         f"                    (3) Integers (max. 3) separated by ':' defining ranges.\n"+\
+         f"                     See the frames above for definition of ranges."
+         )
+    sys.exit(0)
     return
 
 def extract_range(string):
