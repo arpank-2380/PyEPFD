@@ -154,7 +154,7 @@ def read_engrad(filepath):
               break
        len_block2 = nline - breakpoint   
        block1_data = np.genfromtxt(filepath,
-                skip_footer=len_block2, dtype=np.float64)
+                skip_footer=len_block2-2, dtype=np.float64)
        natoms = int(block1_data[0])
        etotal = block1_data[1]
        forces = block1_data[2:]
@@ -207,7 +207,7 @@ def extract_properties(path, frames, orbitals, orca_prefix = 'orca-sp', atom_ind
         else:
            outpath = f"{path}/frame-{iframe}/{orca_prefix}.out"
            engrad  = f"{path}/frame-{iframe}/{orca_prefix}.engrad"   
-        coords = []; forces = []; etotals = []
+        #coords = []; forces = []; etotals = []
         if iframe == frames[0]:
            atom_symbols, spin_polarized, population_pattern, \
            up_pattern, down_pattern = get_patterns(outpath)

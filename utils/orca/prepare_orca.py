@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This file is part of PyEPFD
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
