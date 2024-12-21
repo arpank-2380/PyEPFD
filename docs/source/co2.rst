@@ -12,3 +12,4 @@ These tutorials demonstrate how to utilize core features of **pyEPFD**.
    co2_epce_zpr
    co2_stoch_mc.rst
    co2_analysis.rst
+   co2_stoch_mc_orca.rst

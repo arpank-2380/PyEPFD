@@ -1,0 +1,7 @@
+!B3LYP DEF2-TZVP EnGrad
+
+%maxcore 28000
+
+%pal nprocs 12 end
+
+*xyzfile 0 1 coord.xyz

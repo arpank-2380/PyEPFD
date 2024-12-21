@@ -1,0 +1,7 @@
+!B3LYP DEF2-TZVP OPT FREQ TIGHTSCF
+
+%maxcore 28000
+
+%pal nprocs 12 end
+
+*xyzfile 0 1 co2-init.xyz
