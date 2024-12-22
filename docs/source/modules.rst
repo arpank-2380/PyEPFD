@@ -6,6 +6,7 @@ Code Documentation
 
    anharm
    coord_util
+   west_util
    cube
    degeneracy_class
    elph_classes
