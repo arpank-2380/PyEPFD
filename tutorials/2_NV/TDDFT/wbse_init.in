@@ -1,0 +1,10 @@
+input_west:
+  qe_prefix: pwscf
+  west_prefix: pwscf
+  outdir: ./
+
+wbse_init_control:
+  wbse_init_calculation: S
+  solver: TDDFT
+  localization: W
+  overlap_thr: 0.001

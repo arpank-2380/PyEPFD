@@ -8,3 +8,4 @@ These tutorials demonstrate how to utilize core features of **pyEPFD**.
    :maxdepth: 4
 
    co2
+   nv

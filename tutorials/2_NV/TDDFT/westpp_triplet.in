@@ -1,0 +1,10 @@
+input_west:
+   qe_prefix: pwscf
+   west_prefix: triplet
+   outdir: ./
+
+westpp_control:
+   westpp_calculation: CM
+   westpp_n_liouville_to_use: 2
+   westpp_range: [350, 460]
+   westpp_l_spin_flip: False

@@ -1,0 +1,33 @@
+input_west:
+  qe_prefix: pwscf
+  west_prefix: pwscf
+  outdir: ./
+
+wbse_init_control:
+  wbse_init_calculation: S
+  solver: TDDFT
+  localization: W
+  overlap_thr: 0.001
+
+wbse_control:
+  wbse_calculation: D
+  scissor_ope: 0.0
+  n_liouville_eigen: 4
+  n_liouville_times: 10
+  n_liouville_maxiter: 1000
+  n_liouville_read_from_file: 0
+  trev_liouville: 0.000000001
+  trev_liouville_rel: 0.0000001
+  wbse_epsinfty: 1.0
+  spin_excitation: S
+  l_preconditioning: True
+  l_pre_shift: True
+  l_spin_flip: True
+  l_spin_flip_kernel: True
+  l_spin_flip_alda0: False
+  l_print_spin_flip_kernel: False
+  spin_flip_cut1: 500
+  spin_flip_cut2: 0.0001
+  l_reduce_io: True
+  l_minimize_exx_if_active: False
+  n_exx_lowrank: 480
