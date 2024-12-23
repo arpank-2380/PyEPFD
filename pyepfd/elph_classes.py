@@ -2,9 +2,11 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+""" This module contains all the methods / classes relavant to 
+frozen phonon calculation """
+
 __all__=["dm","epce_calculator","phonon_calculator", "reorder_dynmat"]
 
-""" This file contains all the classes relavant to frozen phonon calculation """
 import sys
 import numpy as np
 from pyepfd.ipi_file_read import ipi_info
@@ -767,7 +769,7 @@ class phonon_calculator:
             **ngrid** = Number of displacement grid points for central difference,
             allowed values: ``1``, ``2``, ``3`` or ``4``.
 
-                ..note::
+                .. note::
                     Actual number of points would be double as we do symmetric displacements.
 
             **forces** = A (2 x ``ngrid``, 3 x *N*) numpy array. Each row represents 3N-force components 
@@ -781,7 +783,7 @@ class phonon_calculator:
 
             **deltae**  = Energy scaled displacement (*float*) in atomic_unit (Hartree)
 
-                .. note::
+                .. important::
                     Use same value for the ``mode``, ``deltax`` and ``deltae``
                     that was used for creating the displacements using **ionic_mover_class**.
 

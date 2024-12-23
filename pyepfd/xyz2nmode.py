@@ -2,6 +2,11 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+"""
+This module contains classes to project an XYZ trajectory file into
+normal-mode coordinates.
+"""
+
 __all__=["prob_dist_on_nm"]
 
 import sys,os,time

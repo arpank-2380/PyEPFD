@@ -1,12 +1,13 @@
+# This file is part of PyEPFD
+# Copyright (c) 2024 Arpan Kundu
+# See the LICENCE.md in root directory for full license information.
+
 """
 This Module contains the metods and fph class that an user would need to 
 compute Electron Phonon Renormalization using  frozen phonon finite 
 difference method. This module also contains mc_convergence class that
 is needed to test convergence as well as obtaining the renormalized band gap and stochastic error bar from a stochastic displacement calculation.
 """
-# This file is part of PyEPFD
-# Copyright (c) 2024 Arpan Kundu
-# See the LICENCE.md in root directory for full license information.
 
 import sys
 import numpy as np
@@ -303,22 +304,32 @@ class mc_convergence:
 
 def density_fluctuation(prefix,start=1, end=10, inc=1):
     """
+    ==========================================
+    Function Density Fluctuation
+    ==========================================
     Calculates the (spin) density fluctuation (variance and standard deviation) with 
     respect to a reference value and saves it as a cube file.
     Cube file with name {prefix}_frame-0.cube should be present containing the densities
     of the geometry-optimized configuration
 
-    ..note:  
-    It calculates the variance of density renormalizations using Welfords algorithm.
-    Since, variance remains unchanged on scale shifting, this would be the variance of 
-    density as well. The function is parallelized with mpi4py 
+    .. note::  
+        It calculates the variance of density renormalizations using Welfords algorithm.
+        Since, variance remains unchanged on scale shifting, this would be the variance of 
+        density as well. 
 
-    Args:
+    .. important::
+        The function is **MPI parallelized** over the no. of frames. 
+
+    **Arguments:**
        
-        prefix = file prefix
-        start = start frame index starting with 1
-        end = end frame index
-        inc = frame index increment
+        **prefix** = file prefix
+
+        **start** = start frame index starting with 1
+
+        **end** = end frame index
+
+        **inc** = frame index increment
+
     """
     from mpi4py import MPI
     comm = MPI.COMM_WORLD

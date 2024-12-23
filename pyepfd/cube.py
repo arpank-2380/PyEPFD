@@ -2,6 +2,11 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+"""
+This module contains classes to manipulate cube files storing density
+or wave function informations.
+"""
+
 import sys 
 import copy
 import numpy as np

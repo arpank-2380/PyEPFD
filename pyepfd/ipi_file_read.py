@@ -2,6 +2,9 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+""" This module contains classes relevant to parsing and storing 
+    an i-PI restart file."""
+
 import xml.etree.ElementTree as ET
 import numpy as np
 import sys, os, time

@@ -2,6 +2,15 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+"""
+This module contains the classes to compute overlap integral matrices between 
+single-particle wave functions (stored as cube files) between displaced geometries.
+       
+.. important::
+    These classes are **MPI parallelized**.
+
+"""
+
 import sys, time
 import pyepfd.cube as cube
 import numpy as np
@@ -12,6 +21,7 @@ from mpi4py import MPI
 
 #orbital_space=[[126,127,128],[iorb for iorb in range(129,135)]]
 #orbital_space=[[66,67,68]]
+
 
 class mode_overlap():
       """
@@ -165,6 +175,10 @@ class frame_overlap():
       (usually from MD or Frozen phonon) and a reference structure 
       (usually optimized structure)
 
+        .. warning::
+           Parallelization is done over frames.
+           The chosen number of MPI tasks should not be within N/2 and N;
+           where N is the total number of frames to be proessed.
       
         **Arguments:**
 

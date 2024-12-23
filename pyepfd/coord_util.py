@@ -2,6 +2,10 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+"""
+This module contains methods and classes dealing with atomic coordinates.
+"""
+
 import sys, os, re, time
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -84,8 +88,9 @@ def quaternion_fit(ref_coord, coord, mass):
     Function quaternion_fit
     -----------------------
     This function fits a quaternion that rotates a set of 3N-coordinates into a a set of ref coordinates.
-
-    Citation: SIMON K. KEARSLEY, Acta Cryst. (1989). A45, 208-210
+    
+        .. seealso ::
+           Simon K. Kearsley, Acta Cryst. (1989). A45, 208-210
     
         **Arguments:**
 
@@ -188,19 +193,19 @@ def remove_trans_rot(ref_coord, coord, mass, rotation=True, forces=None, wrt_com
 
             **rotation** = Do you want to remove angular momentum/rotation?
             Allowed values are:
-            **(1)** *True*(Default): Angular momentum would be removed from **coord** w.r.t **ref_coord**
-            OR
+            **(1)** *True* (Default): Angular momentum would be removed from **coord** w.r.t **ref_coord**   
+            OR       
             **(2)** *False*: Angular momentum would not be removed.
 
             **forces** (optional) = *None* (Default) OR 
-            A 3N-dimensional vector of forces in rotated reference frame
-            if supplied then forces would be rotated back to ref_coord frame
+            A 3N-dimensional vector of forces in rotated reference frame.
+            If supplied, the forces would be rotated back to ref_coord frame
 
-            **wrt_com** = Do you want to obtain the coordinates with tespect to center of mass (c.o.m)?
+            **wrt_com** = Do you want to obtain the coordinates with respect to center of mass (c.o.m)?
             Allowed values are:
-            **(1)** *True*: Coordinates with respect to c.o.m would be returned
-            OR
-            **(2)** *False*(Default): Coordinates with respect to original refence point 
+            **(1)** *True*: Coordinates with respect to c.o.m would be returned   
+            OR   
+            **(2)** *False* (Default): Coordinates with respect to original refence point 
             would be returned.
 
         **Returns:**
@@ -513,19 +518,20 @@ class ionic_mover:
                     OR 
                         **(6)** *'ENMS'*: Energy-scaled Normal Mode Sampling
 
-                   More Information
-                    FD must be used for computing Cartesian normal-mode frequencies.
-                    The dynamical matrix obtained in this way, can be used for 
-                    NMFD/ENMFD/SD/NMS/ENMS calculations. NMFD/ENMFD can be used to refine
-                    Cartesian frequencies or electron-phonon renormalizations. SD can be 
-                    used to compute zero-point energy, vibrational energy including 
-                    nuclear-quantum effects or electronic properties at a finite *T*.
-                    NMS/ENMS can be used to scan/sample a few specific normal modes and
-                    plot how energies/band gaps/ HOMO / LUMO changes along these few 
-                    normal modes.
+                   .. tip::
+                      More Information
+                       FD must be used for computing Cartesian normal-mode frequencies.
+                       The dynamical matrix obtained in this way, can be used for 
+                       NMFD/ENMFD/SD/NMS/ENMS calculations. NMFD/ENMFD can be used to refine
+                       Cartesian frequencies or electron-phonon renormalizations. SD can be 
+                       used to compute zero-point energy, vibrational energy including 
+                       nuclear-quantum effects or electronic properties at a finite *T*.
+                       NMS/ENMS can be used to scan/sample a few specific normal modes and
+                       plot how energies/band gaps/ HOMO / LUMO changes along these few 
+                       normal modes.
 
-                    .. note::
-                        For **FD/NMFD/ENMFD/NMS/ENMS** symmetric displacement is used.
+                   .. note::
+                       For **FD/NMFD/ENMFD/NMS/ENMS** symmetric displacement is used.
 
 
                 **deltax** = A displacement (*float*) in atomic unit (Bohr)
@@ -549,24 +555,26 @@ class ionic_mover:
 
                 **temperature** = A *float*. Default value is 0. It is only used for ``mode = SD``.
               
-                **algo** = Algorithms to use for ``mode = SD``. 
+                **algo** = Algorithms to use for ``mode = SD``.
                     Options are:
                         **(1)** *'OS'*: One-Shot method proposed by Zacharius and Giustino,
-                        see Zacharius, M.; Giustino, F. 
-                        One-shot calculation of temperature-dependent optical spectra and 
-                        phonon-induced band-gap renormalization.
-                        *Phys. Rev. B.* **2016**, *94*, 075125
+                          .. seealso :: 
+                             Zacharius, M.; Giustino, F. 
+                             One-shot calculation of temperature-dependent optical spectra and 
+                             phonon-induced band-gap renormalization.
+                             *Phys. Rev. B.* **2016**, *94*, 075125
                     OR
                         **(2)** *'OSAP'*: (Default): One-Shot method but with anti-thetic pair.
                     OR
                         **(3)** *'OSR'*: One-shot sampling of random signs as described in the 
-                        paper: Karsai, F.; Engel, M.; Flage-Larsen, E; Kresse, G.
-                        Electron-phonon coupling in semiconductors within the GW approximation.
-                        *New J. Phys.* **2018**, *20*, 123008.
-                        This is essentiatially same as the thermal line sampling proposed by 
-                        Monserrat, see 
-                        Monserrat, B. Vibrational averages along thermal lines.
-                        *Phys. Rev. B* **2016**, *93*, 014302.
+                        following reference [1] or thermal line sampling in reference [2] 
+                          .. seealso ::
+                             [1] Karsai, F.; Engel, M.; Flage-Larsen, E; Kresse, G.
+                             Electron-phonon coupling in semiconductors within the GW approximation.
+                             *New J. Phys.* **2018**, *20*, 123008.
+
+                             [2] Monserrat, B. Vibrational averages along thermal lines.
+                             *Phys. Rev. B* **2016**, *93*, 014302.
                     OR
                         **(4)** *'OSRAP'*: Same as OSR but including the antithetic-pairs.
                     OR
@@ -586,7 +594,7 @@ class ionic_mover:
                         **(D)** *Any positive integer* for ``mode = SD`` and 
                         ``algo = OSR/OSRAP/MC/MCAP``.
 
-                **mode_only** (Optional) = A python-list of normal-mode indices 
+                **nmode_only** (Optional) = A python-list of normal-mode indices 
                 along which displacements are performed.
                 
         **Returns**:
@@ -600,24 +608,25 @@ class ionic_mover:
                 
                 For ``mode = SD``, 
                 if ``algo = OS``: only 1 additional displaced coordinate would be created.
-                If ``algo = OSAP``: only 1 additional displaced coordinates would be created.
+                If ``algo = OSAP``: only 2 additional displaced coordinates would be created.
                 If ``algo = OSR/MC``: ngrid number of additional displaced coordinates would be created.
                 If ``algo = OSRAP/MCAP``: 2*ngrid number of additional displaced coordinates 
                 would be created.
 
 
-        ..warning::
-
+        .. important ::
            **MPI4Py Parallelization** is available for ``mode = SD`` and ``mode = (E)NMS/(E)NMFD``.  
+
            (1) When ``mode = SD``, the code is parallelized over ``ngrid``. Therefore the number of 
            employed mpi processes should preferably be a divisor of ``ngrid`` and should not be 
            larger than 1/2 of ``ngrid``. For ``algo=OS/OSAP`` by definition ``ngrid=1``. Therefore,
            mpiprocess should not give any scaling.   
+           
            (2) When ``mode = (E)NMS/(E)NMFD``, the code is parallelized over the number of modes 
-            to be sampled, defined by either ``nmode_only`` list (see above). If this is not set 
-            then all modes are taken into account. Therefor number of employed mpiprocess should 
-            preferably be a divisor of no. of modes to sample and should not be larger than the 
-            half of it. 
+           to be sampled, defined by either ``nmode_only`` list (see above). If this is not set 
+           then all modes are taken into account. Therefor number of employed mpi processes should 
+           preferably be a divisor of no. of modes to sample and should not be larger than the 
+           half of it. 
            
             
       """
@@ -834,8 +843,8 @@ class ionic_mover:
           if algo == 'os':
              self.disp_coord = self.disp_coord[:,:-1]
 
-      def finalize(self):
-          MPI.Finalize()
+      #def finalize(self):
+      #    MPI.Finalize()
 
       def __define_mass(self):
           """Computes mass matrix based on supplied symbols"""
@@ -865,15 +874,11 @@ class qbox:
 
             **run_cmd** = A list of qbox run commands
 
-            .. warning::
-                Currently, ``io='w'`` is experimental and not recomended to be used. 
-                Any keys such as ``atoms``, ``run_cmd``, that is associated with 
-                ``io = 'w'`` mode should not be used as well.
-
-            .. note::
+            .. caution ::
                 Qbox reorders the atom sequence and print the results with reordered
-                atom sequence. This creates problem while post-processing the files to compute
-                for example, normal modes. The next two arguments help to interpret and store
+                atom sequence. This creates problem while post-processing the files,
+                for example, obtaining normal modes. 
+                The next two arguments help to interpret and store
                 qbox output data by nullyfying the reordering done by qbox and store them 
                 according to the atoms sequence user needs.
             
@@ -886,11 +891,12 @@ class qbox:
             **reorder_seq** = A python list of atom symbols specifying the atom sequence. Only valid 
             if ``reorder = True``.
 
-                **More Information on how to use.**
-                For example ``reorder_seq = ['C','H','O','N']`` would store all informations on 
-                Carbon, Hydrogen, Oxygen and Nitrogen atoms sequentially. 
-                For the default value *None*, atoms would be
-                ordered according to the input sequence.
+               .. tip ::
+                   **More Information on how to use.**
+                   For example ``reorder_seq = ['C','H','O','N']`` would store all informations on 
+                   Carbon, Hydrogen, Oxygen and Nitrogen atoms sequentially. 
+                   For the default value *None*, atoms would be
+                   ordered according to the input sequence.
 
 
       """
@@ -936,9 +942,6 @@ class qbox:
           --------------------
           This method writes the atoms & coordinates in a qbox input file. 
           This method can be used only if qbox class is initiated with ``io = 'w'``.
-
-            .. warning::
-                For future use. Currently not recommended.
 
             **Arguments:**
 
@@ -1178,18 +1181,34 @@ def write_nmode(atoms, cell_v, opt_coord, mode_v, mode_freq, file_path='dynmat',
 
 def xyz2qe(xyzdata_path,pw_opt_path,frames,pw_path):
     """
-    Args:
+    This function converts an xyz trajectory files into an 
+    Quantum Espresso (QE) input deck. 
+
+    **Arguments:**
         
-        xyzdata_path = Full path to the xyzdata file
+        **xyzdata_path** = Full path to the xyzdata file
 
-        pw_opt_path = Full path to the file containing all pw options 
+        **pw_opt_path** = Full path to the file containing all pw options 
 
-        frames = A tuple or an integer of frame indices. 
-                 If tuple then indices of (start, end) or (start, end, inc)
-                 where inc is the increment
+        **frames** = A tuple or an integer of frame indices. 
+        If tuple then indices of (start, end) or (start, end, inc)
+        where inc is the increment
 
-        pw_path = Path to the directory where pw_inputs would be written 
+        **pw_path** = Path to the directory where pw_inputs would be written 
         and saved
+
+    **Returns:**
+
+        At the given **pw_path**, it creates several files: 
+        pw1.in, pw2.in,..., pw<n>.in for each frames in the trajectory
+
+
+    .. warning ::
+
+       This function will be removed in the later releases.
+       Therefore, for converting xyz files to QE input decks,
+       it is recommended to use the QE class (see below) as shown in
+       Tutorial 2.1.
     """
     xyzdata = xyz(file_path=xyzdata_path, io='r')
     pw_opts = open(pw_opt_path,'r').readlines()

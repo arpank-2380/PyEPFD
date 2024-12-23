@@ -3,9 +3,23 @@
 Phonon Renormalizations of Vertical Excitation Energies 
 =======================================================
 
-In this exercise we will learn how to compute phonon-renormalizations
-of single-particle levels and vertical excitation energies of many-body
-states of a spin defect in diamond. 
+For this tutorial we will use Quantum Espresso as a DFT solver
+and WEST code for TDDFT calculations. 
+
+The ground state phonon
+were precomputed using finite displacement method using 
+PhonoPy Code. Note, it could also be performed using PyEPFD,
+as we did in exercise 1.1. However, the NV-center has a C\ :sub:`3v`
+symmetry, which PhonoPy can exploit to reduce number of
+DFT single-point calculations needed for obtaining the
+phonon modes. Currently, phonon calculations using PyEPFD
+cannot exploit symmetry.
+
+After obtaining the phonon modes we would compute the 
+stochastic displacements and perform DFT and TDDFT 
+calculations using QE and WEST code.
+
+Lets get started.
 
 
 .. toctree::

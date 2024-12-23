@@ -2,6 +2,8 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+""" This module contains classes dealing with anharmonicity"""
+
 import sys, os, time
 import numpy as np
 from pyepfd.coord_util import *
@@ -253,11 +255,17 @@ class boltzmann_reweighting(dm):
       =========================================================================
       Boltzmann Reweighting Class
       =========================================================================
-      .. warning:: 
-         This class is experimental and not recommended for use.
+      .. danger:: 
+         This class is experimental. Only use it if you know what you want.
       
       This class uses a Boltzmann reweighting technique at a finite T to include 
-      anharmonicity. T cannot be small or 0. 
+      anharmonicity. 
+        .. important::
+           T cannot be small or 0 for Boltzmann weights. 
+           However, if you want only energy based anharmonic
+           measure (see below), 
+           then temperature can be anything as the quantity does not 
+           depend on it directly. You can use any non-zero value here.
      
         **Arguments:**
             
@@ -290,7 +298,15 @@ class boltzmann_reweighting(dm):
 
         **Returns:**
 
-            The modified weights for new configurations as an object **anharm.boltzmann_reweighting.weights**.
+            (1) The modified weights for new configurations as an object **anharm.boltzmann_reweighting.weights**
+
+            (2) The energy based anharmonic measure as an object **anharm.boltzmann_reweighting.anharm_measure** 
+
+            .. warning ::
+               If you use stochastic trajectories for calculating energy based anharmonic measure, please use
+               only ``algo = MC`` OR ``MCAP``. As it is a ratio of fluctuations between anharmonic and total energies, 
+               we need to create an ensemble that samples the full vibrational density and not only the thermal
+               lines along the normal modes.
       """
 
       def __init__(self,dynmat, mass, \

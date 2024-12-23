@@ -2,6 +2,16 @@
 # Copyright (c) 2024 Arpan Kundu
 # See the LICENCE.md in root directory for full license information.
 
+"""
+This module contains methods and classes treating degenerate
+orbital energies while post-processing ``NMFD/ENMFD`` displacements
+to obtain phonon-renormalizations of the single-particle levels.
+
+.. danger::
+    Most probably you would never need to use this basic classes.
+    Only use if you know what you are doing.
+"""
+
 import sys, time
 import numpy as np
 

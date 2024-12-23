@@ -5,9 +5,9 @@
 """
 This module contains methods for parsing WEST outputs
 
-..note:
-    Currently only parsing TDDFT outputs is supported.
-    In future further parsers would be developed.
+.. note::
+    Currently, parsing of TDDFT outputs is supported only.
+    In future, further parsers would be developed.
 """
 
 
@@ -20,19 +20,21 @@ def tddft_energy(frames,west_prefix,path='./'):
     """
     Parse the summary.json file from each folder and obtain the tddft energies
 
-    Args:
+    **Arguments:**
 
-        frames = A tuple or an integer of frame indices. 
-                 If tuple then indices of (start, end) or (start, end, inc)
-                 where inc in the increment
+        **frames** = A tuple or an integer of frame indices. 
+        If tuple then indices of (start, end) or (start, end, inc)
+        where inc in the increment
 
-        west_prefix = A string that is same with west prefix used in 
+        **west_prefix** = A string that is same with west prefix used in 
         the WEST calculation
 
-        path = path to the root directory where all frame calculations
+        **path** = path to the root directory where all frame calculations
         exists with directory name frame-1, frame-2 etc.
 
-    Returns: TDDFT excitation energies (array) in eV 
+    **Returns:**
+        
+        TDDFT excitation energies (numpy array) in eV 
     """
     init_time = time.time()
     try: 
