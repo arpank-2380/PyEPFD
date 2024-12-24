@@ -2,7 +2,8 @@
 
 How to use ORCA interface?
 ============================
-This tutorial demonstrates how to calculate Electron-Phonon Renormalization of band gaps **pyEPFD** and **ORCA**.
+This tutorial demonstrates how to calculate Electron-Phonon Renormalization 
+of band gaps using **PyEPFD** and **ORCA**.
 
 .. toctree::
    :maxdepth: 1

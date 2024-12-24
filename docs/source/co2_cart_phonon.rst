@@ -2,7 +2,7 @@
 
 Cartesian Phonon Calculation
 =========
-These tutorials demonstrate how to perform a Cartesian phonon calculation using **pyEPFD** and **Qbox**.
+These tutorials demonstrate how to perform a Cartesian phonon calculation using **PyEPFD** and **Qbox**.
 
 .. toctree::
    :maxdepth: 1

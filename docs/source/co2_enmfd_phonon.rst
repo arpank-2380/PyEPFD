@@ -2,7 +2,7 @@
 
 Normal-Mode Phonon Calculation
 =========
-These tutorials demonstrate how to perform a energy-scaled normal mode phonon calculation using **pyEPFD** and **Qbox**.
+These tutorials demonstrate how to perform a energy-scaled normal mode phonon calculation using **PyEPFD** and **Qbox**.
 
 .. toctree::
    :maxdepth: 1

@@ -15,7 +15,15 @@ the ab-initio forces and electronic properties such as eigenenergies of
 the bands. PyEPFD also provides tools to analyze the validity of the 
 harmonic approximation if a Molecular Dynamics and/or Monte Carlo 
 trajectories are available. Currently, for the ab-initio part, PyEPFD 
-depends on Qbox code (http://qboxcode.org/). However, it is very easy 
+depends on the follwing codes:
+
+(1) Qbox code (http://qboxcode.org/),
+
+(2) Quantum Espresso (https://www.quantum-espresso.org/), 
+
+(3) ORCA (https://www.faccts.de/orca/)
+
+However, it is very easy 
 to use pyEPFD with any ab-inito code of your choice.     
 
 Features:
