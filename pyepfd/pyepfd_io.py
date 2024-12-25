@@ -302,14 +302,14 @@ class read_nmdisp_log:
             **disp_steps_au** = A python list of displacement 
             steps in atomic unit.
 
-            **disp_steps_au** = A python list of displacement 
+            **disp_steps_scaled** = A python list of displacement 
             steps in frequency scaled coordinate (unitless).
 
-            disp_au = A Python dictionary whose keys are  normal mode indices 
+            **disp_au** = A Python dictionary whose keys are  normal mode indices 
             sampled, same as modes above. If we call that key, then it returns
             a list containing the exact displacement in atomic unit.
 
-            disp_scaled = A Python dictionary whose keys are  normal mode indices 
+            **disp_scaled** = A Python dictionary whose keys are  normal mode indices 
             sampled, same as modes above. If we call that key, then it returns 
             a list containing the exact displacements for that mode in frequency
             scaled coordinate.
