@@ -13,5 +13,6 @@ Code Documentation
    ipi_file_read
    overlap
    epfd
+   vibrational_spectra
    pyepfd_io
    xyz2nmode
