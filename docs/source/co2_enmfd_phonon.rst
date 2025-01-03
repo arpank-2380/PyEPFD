@@ -10,5 +10,5 @@ These tutorials demonstrate how to perform a energy-scaled normal mode phonon ca
    tutorials/1_CO2/1_enmfd_phonon.ipynb
    tutorials/1_CO2/2_enmfd_phonon.ipynb
    tutorials/1_CO2/3_enmfd_phonon.ipynb
-
+   tutorials/1_CO2/4_enmfd_phonon.ipynb
 

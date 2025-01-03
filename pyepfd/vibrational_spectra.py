@@ -58,9 +58,9 @@ def add_broadening( freq, osc_str, line_profile="Lorentzian",
 
         (2) Y-axis values (intensity) of the spectra as a numpy 1D float array
     """
-
-    x_min = np.amin(freq) - 50
-    x_max = np.amax(freq) + 50
+    
+    x_min = np.amin(freq) - 4*line_param
+    x_max = np.amax(freq) + 4*line_param
     x = np.arange(x_min, x_max, step)
     y = np.zeros((len(x)))
 
@@ -769,16 +769,28 @@ class ir:
 
           self.spectra =  add_broadening(
                           freq = self.omega_osc_str[0],
-                          osc_str = self.omega_osc_str[1])
+                          osc_str = self.omega_osc_str[1],
+                          line_profile = line_profile,
+                          line_param = line_param,
+                          step = step)
           self.spectra_x = add_broadening(
                           freq = self.omega_osc_str[0],
-                          osc_str = self.omega_osc_str[2])
+                          osc_str = self.omega_osc_str[2],
+                          line_profile = line_profile,
+                          line_param = line_param,
+                          step = step)
           self.spectra_y = add_broadening(
                           freq = self.omega_osc_str[0],
-                          osc_str = self.omega_osc_str[3])
+                          osc_str = self.omega_osc_str[3],
+                          line_profile = line_profile,
+                          line_param = line_param,
+                          step = step)
           self.spectra_z = add_broadening(
                           freq = self.omega_osc_str[0],
-                          osc_str = self.omega_osc_str[4])
+                          osc_str = self.omega_osc_str[4],
+                          line_profile = line_profile,
+                          line_param = line_param,
+                          step = step)
           np.savez(save_path, 
                    spectra = self.spectra,
                    spectra_x = self.spectra_x,
