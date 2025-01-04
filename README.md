@@ -26,7 +26,7 @@ depends on the following codes:
 (4) ORCA (https://www.faccts.de/orca/)
 
 However, it is very easy 
-to use pyEPFD with any ab-inito code of your choice.     
+to use PyEPFD with any ab-inito code of your choice.     
 
 ## Features
 
